@@ -1,0 +1,48 @@
+---
+  - hosts: localhost
+    vars:
+      caas_apiurl: https://api-eu.dimensiondata.com
+      root_password: P$$ssWwrrdGoDd!
+    vars_files:
+      - /root/caas_credentials.yml
+    tasks:
+      - name: Deploy Infrastructure on DD MCP Amsterdam
+        caas_server:
+          caas_apiurl: "{{ caas_apiurl }}"
+          caas_username: "{{ caas_username }}"
+          caas_password: "{{ caas_password }}"
+          name: "OGR Test"
+          action: deployServer
+          count: 3
+          data: 
+              #description: ansible.CaaS This a test, feel free to delete
+              imageId: bfe177f0-23ec-4886-a046-c516f354fd53
+              start: true
+              administratorPassword: "{{ root_password }}"
+              #cpu:
+                  #count: 16
+                  #coresPerSocket: 1
+                  #speed: STANDARD
+              networkInfo:
+                  #networkDomainId: fd340f41-7f93-4dda-a7f2-e46cc6302613
+                  networkDomainName: FR_OGR_Ansible_SandBox
+                  primaryNic: 
+                      #vlanId: 0cd34569-e3b4-46ca-9c86-3e8c2b08d732
+                      vlanName: vlan_webservers
+                      #privateIpv4: 172.24.42.43
+        register: caas_server
+      - name: Add new instance to host group
+        add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=launched
+        with_items: caas_server.serverList.server
+      - name: Wait for SSH to come up
+        wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=5 state=started
+        with_items: caas_server.serverList.server
+  - name: Configure instance(s)
+    hosts: launched
+    sudo: True
+    gather_facts: True
+    tasks:
+      - name: ping
+        ping:
+      - name: Install latest Apache Web Server
+        yum: name=httpd state=latest
