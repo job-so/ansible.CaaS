@@ -27,108 +27,103 @@ except ImportError:
     IMPORT_STATUS = False
 
 DOCUMENTATION = '''
----
+--- 
+author: "Olivier GROSJEANNE, @job-so"
+description: 
+  - "Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform For now, this module only support MCP 2.0."
 module: caas_server
-short_description: Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform
-version_added: "0.4"
-author: "Olivier GROSJEANNE (job-so)"
-description:
-    - Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform
-	- For now, this module only support MCP 2.0.
-options:
-    caas_apiurl:
-        description:
-            - Africa (AF) : https://api-mea.dimensiondata.com
-            - Asia Pacific (AP) : https://api-ap.dimensiondata.com
-            - Australia (AU) : https://api-au.dimensiondata.com
-            - Canada(CA) : https://api-canada.dimensiondata.com
-            - Europe (EU) : https://api-eu.dimensiondata.com
-            - North America (NA) : https://api-na.dimensiondata.com
-            - South America (SA) : https://api-latam.dimensiondata.com
-         required: true
-    caas_datacenter:
-        description:
-		    - You can use your own "Private MCP", or any public MCP 2.0 below :
-            - Asia Pacific (AP) :
-			    - AP3 : Singapore - Serangoon
-            - Australia (AU) :
-			    - AU9 : Australia - Sydney
-				- AU10 : Australia - Melbourne
-				- AU11 : New Zealand - Hamilton
-            - Europe (EU) : 
-				- EU6 : Germany - Frankfurt
-				- EU7 : Netherland - Amsterdam
-				- EU8 : UK - London
-            - North America (NA) :
-			    - NA9 : US - Ashburn
-				- NA12 : US - Santa Clara
-         required: true
-    caas_username:
-        description:
-            - Your username credential 
-         required: true
-    caas_password:
-        description:
-            - The associated password
-         required: true
-    name:
-        description:
-            - Name that has to be given to the instance
-        	- Minimum length: 1 character
-            - Maximum length: 75 characters.
-         required: true
-	count = dict(type='int', default='1'),
-        description:
-            - Number of instances to deploy.  Decreasing this number as no effect.
-        default: 1
-    state:
-        description:
-            - Should the resource be present or absent.
-			- Take care : Absent will powerOff and delete all servers. 
-        choices: [present, absent]
-        default: present
-    action: 
-        description:
-            - Action to perform against all servers.
-                - startServer : starts non-running Servers			
-			    - shutdownServer : performs guest OS initiated shutdown of running Servers (preferable to powerOffServer)
-			    - rebootServer : performs guest OS initiated restart of running Servers (preferable to resetServer)
-			    - resetServer : performs hard reset of running Servers
-                - powerOffServer : performs hard power off of running Servers
-			    - updateVmwareTools : triggers an update of the VMware Tools software running on the guest OS of the Servers
-			    - upgradeVirtualHardware : triggers an update of the VMware Virtual Hardware. VMware recommend cloning the Server prior to performing the upgrade in case something goes wrong during the upgrade process
-        choices: [startServer, shutdownServer, rebootServer, resetServer, powerOffServer, updateVmwareTools, upgradeVirtualHardware']
-        default: startServer
-    wait = dict(default=True),
-        description:
-            - 
-        choices: [present, absent]
-        default: present
+options: 
+  caas_apiurl: 
+    description: 
+      - "Africa (AF) : https://api-mea.dimensiondata.com"
+      - "Asia Pacific (AP) : https://api-ap.dimensiondata.com"
+      - "Australia (AU) : https://api-au.dimensiondata.com"
+      - "Canada(CA) : https://api-canada.dimensiondata.com"
+      - "Europe (EU) : https://api-eu.dimensiondata.com"
+      - "North America (NA) : https://api-na.dimensiondata.com"
+      - "South America (SA) : https://api-latam.dimensiondata.com"
+    required: true
+  caas_datacenter: 
+    description: 
+      - "You can use your own 'Private MCP', or any public MCP 2.0 below :"
+      - "Asia Pacific (AP) :"
+      - "   AP3 Singapore - Serangoon"
+      - "Australia (AU) :"
+      - "   AU9 Australia - Sydney"
+      - "   AU10  Australia - Melbourne"
+      - "   AU11 New Zealand - Hamilton"
+      - "Europe (EU) :"
+      - "   EU6 Germany - Frankfurt"
+      - "   EU7 Netherland - Amsterdam"
+      - "   EU8 UK - London"
+      - "North America (NA) :"
+      - "   NA9 US - Ashburn"
+      - "   NA12 US - Santa Clara"
+    required: true
+  caas_password: 
+    description: 
+      - "The associated password"
+    required: true
+  caas_username: 
+    description: 
+      - "Your username credential"
+    required: true
+  name: 
+    description: 
+      - "Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters."
+    required: true
+  count: 
+    default: 1
+    description: 
+      - "Number of instances to deploy.  Decreasing this number as no effect."
+  state:  
+    choices: ['present','absent']
+    default: present
+    description: 
+      - "Should the resource be present or absent."
+      - "Take care : Absent will powerOff and delete all servers."
+  action: 
     description:
-        description:
-            - Maximum length: 255 characters.
-        default: Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS
-    imageId:
-        description:
-            - UUID of the Server Image being used as the target for the new Server deployment
-			- Alternatively, 
-        choices: [present, absent]
-        default: ''
-    imageName = dict(default=''),
-        description:
-            - 
-        choices: [present, absent]
-        default: present
-    administratorPassword = dict(default='',no_log=True),
-        description:
-            - 
-        choices: [present, absent]
-        default: present
-    networkInfo:
-            - For an MCP 2.0 request, a networkInfo element is required. networkInfo identifies the Network Domain to which the Server will be deployed.
-            - It contains a primaryNic element defining the required NIC for the Server and optional additionalNic elements defining any additional VLAN connections for the Server. 
-            - Each NIC must contain either a VLAN ID (vlanId) OR a Private IPv4 address (privateIpv4) from the target VLAN which the NIC will associate the Server with.
-        default: ''
+      - "Action to perform against all servers."
+      - "startServer : starts non-running Servers"            
+      - "shutdownServer : performs guest OS initiated shutdown of running Servers (preferable to powerOffServer)"
+      - "rebootServer : performs guest OS initiated restart of running Servers (preferable to resetServer)"
+      - "resetServer : performs hard reset of running Servers"
+      - "powerOffServer : performs hard power off of running Servers"
+      - "updateVmwareTools : triggers an update of the VMware Tools software running on the guest OS of the Servers"
+      - "upgradeVirtualHardware : triggers an update of the VMware Virtual Hardware. VMware recommend cloning the Server prior to performing the upgrade in case something goes wrong during the upgrade process"
+    choices: ['startServer', 'shutdownServer', 'rebootServer', 'resetServer', 'powerOffServer', 'updateVmwareTools', 'upgradeVirtualHardware']
+    default: "startServer"
+  wait:
+    description:
+      - "TBC"
+    choices: [true,false]
+    default: true
+  description:
+    description:
+      - "Maximum length: 255 characters."
+    default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
+  imageId:
+    description:
+      - "UUID of the Server Image being used as the target for the new Server deployment"
+    choices: [present, absent]
+    default: null
+  imageName:
+    description:
+      - "TBC"
+    default: null
+  administratorPassword:
+    description:
+      - "TBC"
+    default: null
+  networkInfo:
+    description:
+      - "For an MCP 2.0 request, a networkInfo element is required. networkInfo identifies the Network Domain to which the Server will be deployed."
+      - "It contains a primaryNic element defining the required NIC for the Server and optional additionalNic elements defining any additional VLAN connections for the Server."
+      - "Each NIC must contain either a VLAN ID (vlanId) OR a Private IPv4 address (privateIpv4) from the target VLAN which the NIC will associate the Server with."
+    default: null
+short_description: "Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform"
+version_added: "1.9"
 '''
 
 EXAMPLES = '''
@@ -234,7 +229,7 @@ def main():
     #if not datacenterId
 	
 	# resolve imageId, networkId, vlanId
-    if module.params['imageId']=='':
+    if module.params['imageId']=='': # or null ?
         if module.params['imageName']!='':
             f = { 'datacenterId' : module.params['caas_datacenter'], 'name' : module.params['imageName'] }
             uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/image/osImage?'+urllib.urlencode(f)
