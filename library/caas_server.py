@@ -145,9 +145,9 @@ EXAMPLES = '''
 '''
 
 logging.basicConfig(filename='caas-server.log',level=logging.DEBUG)
-logging.debug(str(datetime.datetime.now()))
+logging.debug("--------------------------------"+str(datetime.datetime.now()))
 
-def getOrgId(username, password, apiurl):
+def _getOrgId(username, password, apiurl):
     apiuri = '/oec/0.9/myaccount'
     request = urllib2.Request(apiurl + apiuri)
     base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
@@ -166,6 +166,46 @@ def getOrgId(username, password, apiurl):
         result['msg'] = e.read()
     return result
 
+def _listServer(module,caas_username,caas_password,caas_apiurl,orgId,wait):
+	# List Servers with this Name, in this networkDomain, in this vlanId
+    f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
+    uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
+    b = True;
+    while wait and b:
+        result = caasAPI(caas_username,caas_password, uri, '')
+        serverList = result['msg']
+        b = False
+        for (server) in serverList['server']:
+            logging.debug(server['id']+' '+server['name']+' '+server['state'])
+            if server['state'] != "NORMAL":
+		        b = True
+        if b:
+            time.sleep(5)
+    return serverList
+
+def _executeAction(module,caas_username,caas_password,caas_apiurl,orgId,serverList,action):
+    logging.debug("---_executeAction "+action)
+    has_changed = False
+    _data = {}
+    uri = caas_apiurl+'/caas/2.1/'+orgId+'/server/'+action
+    for (server) in serverList['server']:
+        logging.debug(server['id'])
+        _data['id'] = server['id']
+        data = json.dumps(_data)
+        if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
+            result = caasAPI(caas_username,caas_password, uri, data)
+            if not result['status']:
+                module.fail_json(msg=result['msg'])
+            else:
+                has_changed = True	
+        if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
+            result = caasAPI(caas_username,caas_password, uri, data)
+            if not result['status']:
+                module.fail_json(msg=result['msg'])
+            else:
+                has_changed = True	
+    return has_changed
+	
 def caasAPI(username, password, uri, data):
     logging.debug(uri)
     if data == '':
@@ -220,7 +260,10 @@ def main():
     has_changed = False
 	
     # Check Authentication and get OrgId
-    result = getOrgId(module.params['caas_username'],module.params['caas_password'],module.params['caas_apiurl'])
+    caas_username = module.params['caas_username']
+    caas_password = module.params['caas_password']
+    caas_apiurl = module.params['caas_apiurl']
+    result = _getOrgId(caas_username,caas_password,caas_apiurl)
     if not result['status']:
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
@@ -255,42 +298,15 @@ def main():
                     if result['msg']['totalCount']==1:
                         module.params['networkInfo']['primaryNic']['vlanId'] = result['msg']['vlan'][0]['id']
 	
-	# List Servers with this Name, in this networkDomain, in this vlanId
-    f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
-    uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
-    b = True;
-    while module.params['wait'] and b:
-        result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
-        serverList = result['msg']
-        b = False
-        for (server) in serverList['server']:
-            logging.debug(server['id']+' '+server['name']+' '+server['state'])
-            if server['state'] != "NORMAL":
-		        b = True
-        if b:
-            time.sleep(5)
+    serverList = _listServer(module,caas_username,caas_password,caas_apiurl,orgId,True)
 	
-	# Execute Action on Servers
-    _data = {}
-    uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/'+module.params['action']
-    for (server) in serverList['server']:
-        logging.debug(server['id'])
-        _data['id'] = server['id']
-        data = json.dumps(_data)
-        if not server['started'] and (module.params['action'] == "startServer" or module.params['action'] == "updateVmwareTools"):
-            result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True	
-        if server['started'] and (module.params['action'] == "shutdownServer" or module.params['action'] == "powerOffServer" or module.params['action'] == "resetServer" or module.params['action'] == "rebootServer" or module.params['action'] == "upgradeVirtualHardware"):
-            result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True	
+   # if state=absent
+    if module.params['state']=='absent':
+        has_changed = _executeAction(module, caas_username,caas_password,caas_apiurl,orgId,serverList,'powerOffServer') or has_changed
+        serverList = _listServer(module,caas_username,caas_password,caas_apiurl,orgId,True)
+        has_changed = _executeAction(module, caas_username,caas_password,caas_apiurl,orgId,serverList,'deleteServer') or has_changed
 
-	# Deploy New Servers if needed
+	# if state=present
     if module.params['state'] == "present":
         i = serverList['totalCount']
         uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/deployServer'
@@ -303,23 +319,11 @@ def main():
             else:
                 has_changed = True
 	    i += 1			
-		
-    # List Servers with this Name
-    f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
-    uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
-    b = True;
-    while module.params['wait'] and b:
-        result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
-        serverList = result['msg']
-        b = False
-        for (server) in serverList['server']:
-            logging.debug(server['id']+' '+server['name']+' '+server['state'])
-            if server['state'] != "NORMAL":
-		        b = True
-        if b:
-            time.sleep(5)
 
-    module.exit_json(changed=has_changed, servers=result['msg'])
+        # Execute Action on Servers
+        has_changed = _executeAction(module, caas_username,caas_password,caas_apiurl,orgId,serverList,module.params['action']) or has_changed
+		
+    module.exit_json(changed=has_changed, servers=_listServer(module,caas_username,caas_password,caas_apiurl,orgId,module.params['wait']))
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':
