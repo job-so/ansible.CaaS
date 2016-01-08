@@ -286,7 +286,7 @@ def main():
                     module.params['imageId'] = result['msg']['osImage'][0]['id']
     if not 'networkDomainId' in module.params['networkInfo']:
         if 'networkDomainName' in module.params['networkInfo']:
-            f = { 'name' : module.params['networkInfo']['networkDomainName']}
+            f = { 'name' : module.params['networkInfo']['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
             uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
             result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
             if result['status']:

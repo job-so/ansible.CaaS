@@ -1,5 +1,6 @@
 ---
-  - hosts: localhost
+  - name: Deploy Dimension Data infrastructure  
+    hosts: localhost
     vars:
       root_password: P$$ssWwrrdGoDd!
     vars_files:
@@ -12,6 +13,15 @@
           caas_password: "{{ caas_password }}"
           datacenterId: "{{ caas_datacenter }}"
           name: "ansible.CaaS_Sandbox"
+      - name: Deploy a DMZ
+        caas_vlan:
+          caas_apiurl: "{{ caas_apiurl }}"
+          caas_username: "{{ caas_username }}"
+          caas_password: "{{ caas_password }}"
+          datacenterId: "{{ caas_datacenter }}"
+          networkDomainName: "ansible.CaaS_Sandbox"
+          name: "vlan_webservers"
+          privateIpv4BaseAddress: "172.24.42.0"
       - name: Deploy WebServers
         caas_server:
           caas_apiurl: "{{ caas_apiurl }}"
@@ -46,7 +56,7 @@
         wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=300 state=started
         when: item.started
         with_items: caas_server.servers.server
-  - name: Configure instance(s)
+  - name: Configure Servers
     hosts: WebServers
     sudo: True
     gather_facts: True

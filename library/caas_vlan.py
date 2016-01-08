@@ -30,8 +30,8 @@ DOCUMENTATION = '''
 --- 
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Remove Network domains on Dimension Data Managed Cloud Platform"
-module: caas_networkdomain
+  - "Create, Remove Network vlans on Dimension Data Managed Cloud Platform"
+module: caas_vlan
 options: 
   caas_apiurl: 
     description: 
@@ -51,7 +51,9 @@ options:
     required: true
   name: 
     description: 
-      - "Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters."
+      - "Name that has to be given to the instance"
+      - "The name must be unique inside the DataCenter"
+      - "Minimum length 1 character Maximum length 75 characters."
     required: true
   state:  
     choices: ['present','absent']
@@ -63,18 +65,36 @@ options:
     description:
       - "Maximum length: 255 characters."
     default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
+  networkDomainId:
+    description:
+      - "The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
+    default: null
+  networkDomainName:
+    description:
+      - "The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
+    default: null
+  privateIpv4BaseAddress:
+    description:
+      - "RFC1918 Dot-decimal representation of an IPv4 address."
+      - "For example: “10.0.4.0”. Must be unique within the Network Domain."
+    default: null
+  privateIpv4BaseAddress:
+    description:
+      - "An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided."
+      - "If this property is not provided, the VLAN will default to being /24"
+    default: null
 short_description: "Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"
 version_added: "1.9"
 '''
 
 EXAMPLES = '''
-# Creates a new networkdomain named "ansible.Caas_SandBox", 
+# Creates a new vlan named "ansible.Caas_SandBox", 
 -caas_networkdomain:
     caas_apiurl: "{{ caas_apiurl }}"
     caas_username: "{{ caas_username }}"
     caas_password: "{{ caas_password }}"
     datacenterId: "{{ caas_datacenter }}"
-    name: "ansible.Caas_SandBox"
+    name: "vlan_webservers"
     register: caas_networkdomain
 '''
 
@@ -99,6 +119,22 @@ def _getOrgId(username, password, apiurl):
     except urllib2.HTTPError, e:
         result['msg'] = e.read()
     return result
+
+def _listVlan(module,caas_username,caas_password,caas_apiurl,orgId,wait):
+    f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
+    uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
+    b = True;
+    while wait and b:
+        result = caasAPI(caas_username,caas_password, uri, '')
+        vlanList = result['msg']
+        b = False
+        for (vlan) in vlanList['vlan']:
+            logging.debug(vlan['id']+' '+vlan['name']+' '+vlan['state'])
+            if vlan['state'] != "NORMAL":
+		        b = True
+        if b:
+            time.sleep(5)
+    return vlanList
 
 def caasAPI(username, password, uri, data):
     logging.debug(uri)
@@ -142,9 +178,13 @@ def main():
             caas_username = dict(required=True),
             caas_password = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
+            wait = dict(default=True),
             name = dict(required=True),
             description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
-            type = dict(default='ESSENTIALS', choices=['ESSENTIALS', 'ADVANCED'])
+            networkDomainId = dict(default=None),
+            networkDomainName = dict(default=None),
+            privateIpv4BaseAddress = dict(default=None),
+            privateIpv4PrefixSize = dict(default=None),
         )
     )
     if not IMPORT_STATUS:
@@ -162,6 +202,9 @@ def main():
     state = module.params['state']
     module.params.pop('state', None)
 
+    wait = module.params['wait']
+    module.params.pop('wait', None)
+
     result = _getOrgId(caas_username,caas_password,caas_apiurl)
     if not result['status']:
         module.fail_json(msg=result['msg'])
@@ -170,13 +213,18 @@ def main():
 	#Check dataCenterId
     #if not datacenterId
 	
-    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
-    uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-    result = caasAPI(caas_username,caas_password, uri, '')
-    if result['status']:
-        networkDomainList = result['msg']
-    else:
-        module.fail_json(msg=result['msg'])
+    if module.params['networkDomainId']==None:
+        if module.params['networkDomainName']!=None:
+            f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
+            uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            result = caasAPI(caas_username,caas_password, uri, '')
+            if result['status']:
+                if result['msg']['totalCount']==1:
+                    module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
+                    module.params.pop('networkDomainName', None)
+                    module.params.pop('datacenterId', None)					
+	
+    vlanList = _listVlan(module,caas_username,caas_password,caas_apiurl,orgId,True)
  	
    # if state=absent
     #if state=='absent':
@@ -184,8 +232,8 @@ def main():
 	
 	# if state=present
     if state == "present":
-        if networkDomainList['totalCount'] < 1:
-            uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/deployNetworkDomain'
+        if vlanList['totalCount'] < 1:
+            uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/deployVlan'
             data = json.dumps(module.params)
             result = caasAPI(caas_username,caas_password, uri, data)
             if not result['status']:
@@ -193,10 +241,8 @@ def main():
             else:
                 has_changed = True
 	
-    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
-    uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-    networkDomainList = caasAPI(caas_username,caas_password, uri, '')
-    module.exit_json(changed=has_changed, networkdomain=networkDomainList)
+    vlanList = _listVlan(module,caas_username,caas_password,caas_apiurl,orgId,wait)
+    module.exit_json(changed=has_changed, networkdomain=vlanList)
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':
