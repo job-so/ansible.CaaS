@@ -5,16 +5,19 @@
     vars_files:
       - /root/caas_credentials.yml
     tasks:
-        #caas_networkdomain:
-        #  name: "ansible.CaaS_Sandbox"
-        #  vars_files:
-        #    - /root/caas_credentials.yml
+      - name: Deploy my Nework Domain
+        caas_networkdomain:
+          caas_apiurl: "{{ caas_apiurl }}"
+          caas_username: "{{ caas_username }}"
+          caas_password: "{{ caas_password }}"
+          datacenterId: "{{ caas_datacenter }}"
+          name: "ansible.CaaS_Sandbox"
       - name: Deploy WebServers
         caas_server:
           caas_apiurl: "{{ caas_apiurl }}"
           caas_username: "{{ caas_username }}"
           caas_password: "{{ caas_password }}"
-          caas_datacenter: "{{ caas_datacenter }}"
+          datacenterId: "{{ caas_datacenter }}"
           name: "WebServer"
           #state: "absent"
           #action: shutdownServer
@@ -29,7 +32,7 @@
               #speed: STANDARD
           networkInfo:
               #networkDomainId: fd340f41-7f93-4dda-a7f2-e46cc6302613
-              networkDomainName: FR_OGR_Ansible_SandBox
+              networkDomainName: ansible.CaaS_Sandbox
               primaryNic: 
                   #vlanId: 0cd34569-e3b4-46ca-9c86-3e8c2b08d732
                   vlanName: vlan_webservers

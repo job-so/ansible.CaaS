@@ -43,7 +43,7 @@ options:
       - "North America (NA) : https://api-na.dimensiondata.com"
       - "South America (SA) : https://api-latam.dimensiondata.com"
     required: true
-  caas_datacenter: 
+  datacenterId: 
     description: 
       - "You can use your own 'Private MCP', or any public MCP 2.0 below :"
       - "Asia Pacific (AP) :"
@@ -133,7 +133,7 @@ EXAMPLES = '''
     caas_apiurl: "{{ caas_apiurl }}"
     caas_username: "{{ caas_username }}"
     caas_password: "{{ caas_password }}"
-    caas_datacenter: "{{ caas_datacenter }}"
+    datacenterId: "{{ caas_datacenter }}"
     name: "WebServer"
     imageName: CentOS 7 64-bit 2 CPU
     administratorPassword: "{{ root_password }}"
@@ -144,8 +144,8 @@ EXAMPLES = '''
     register: caas_server
 '''
 
-logging.basicConfig(filename='caas-server.log',level=logging.DEBUG)
-logging.debug("--------------------------------"+str(datetime.datetime.now()))
+logging.basicConfig(filename='caas.log',level=logging.DEBUG)
+logging.debug("--------------------------------caas_server---"+str(datetime.datetime.now()))
 
 def _getOrgId(username, password, apiurl):
     apiuri = '/oec/0.9/myaccount'
@@ -224,15 +224,19 @@ def caasAPI(username, password, uri, data):
             result['msg'] = json.loads(response.read())
             result['status'] = True
         except urllib2.HTTPError, e:
-            result['msg'] = json.loads(e.read())
-            if result['msg']['responseCode'] == "RESOURCE_BUSY":
-                logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
-                time.sleep(10)
-                retryCount += 1
+            if e.code == 400:
+                result['msg'] = json.loads(e.read())
+                if result['msg']['responseCode'] == "RESOURCE_BUSY":
+                    logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
+                    time.sleep(10)
+                    retryCount += 1
+                else:
+                    retryCount = 9999
             else:
                 retryCount = 9999
+                result['msg'] = str(e.code) + e.reason + e.read()
         except urllib2.URLError as e:
-            result['msg'] = e.reason
+            result['msg'] = str(e.code)
             retryCount = 9999
     return result
 
@@ -240,7 +244,7 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             caas_apiurl = dict(required=True),
-            caas_datacenter = dict(required=True),
+            datacenterId = dict(required=True),
             caas_username = dict(required=True),
             caas_password = dict(required=True,no_log=True),
 			name = dict(required=True),
@@ -274,7 +278,7 @@ def main():
 	# resolve imageId, networkId, vlanId
     if module.params['imageId']=='': # or null ?
         if module.params['imageName']!='':
-            f = { 'datacenterId' : module.params['caas_datacenter'], 'name' : module.params['imageName'] }
+            f = { 'datacenterId' : module.params['datacenterId'], 'name' : module.params['imageName'] }
             uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/image/osImage?'+urllib.urlencode(f)
             result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
             if result['status']:
