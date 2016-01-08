@@ -1,0 +1,35 @@
+---
+  - name: Clean Dimension Data infrastructure  
+    hosts: localhost
+    vars_files:
+      - /root/caas_credentials.yml
+    tasks:
+      - name: TearDown WebServers
+        caas_server:
+          caas_apiurl: "{{ caas_apiurl }}"
+          caas_username: "{{ caas_username }}"
+          caas_password: "{{ caas_password }}"
+          datacenterId: "{{ caas_datacenter }}"
+          networkInfo:
+              networkDomainName: ansible.CaaS_Sandbox
+              primaryNic: 
+                  vlanName: vlan_webservers
+          name: "WebServer"
+          state: absent
+      - name: TearDown  DMZ
+        caas_vlan:
+          caas_apiurl: "{{ caas_apiurl }}"
+          caas_username: "{{ caas_username }}"
+          caas_password: "{{ caas_password }}"
+          datacenterId: "{{ caas_datacenter }}"
+          networkDomainName: "ansible.CaaS_Sandbox"
+          name: "vlan_webservers"
+          state: absent
+      - name: TearDown my Nework Domain
+        caas_networkdomain:
+          caas_apiurl: "{{ caas_apiurl }}"
+          caas_username: "{{ caas_username }}"
+          caas_password: "{{ caas_password }}"
+          datacenterId: "{{ caas_datacenter }}"
+          name: "ansible.CaaS_Sandbox"
+          state: absent
