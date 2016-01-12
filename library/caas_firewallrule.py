@@ -99,7 +99,7 @@ EXAMPLES = '''
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
-logging.debug("--------------------------------caas_networkdomain---"+str(datetime.datetime.now()))
+logging.debug("--------------------------------caas_firewallrule---"+str(datetime.datetime.now()))
 
 def _getOrgId(caas_credentials):
     apiuri = '/oec/0.9/myaccount'
@@ -154,21 +154,21 @@ def caasAPI(caas_credentials, uri, data):
             retryCount = 9999
     return result
 
-def _listVlan(module,caas_credentials,orgId,wait):
+def _listFirewallRule(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
+    uri = '/caas/2.1/'+orgId+'/network/firewallRule?'+urllib.urlencode(f)
     b = True;
     while wait and b:
         result = caasAPI(caas_credentials, uri, '')
-        vlanList = result['msg']
+        firewallRuleList = result['msg']
         b = False
-        for (vlan) in vlanList['vlan']:
-            logging.debug(vlan['id']+' '+vlan['name']+' '+vlan['state'])
-            if vlan['state'] != "NORMAL":
+        for (firewallRule) in firewallRuleList['firewallRule']:
+            logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
+            if firewallRule['state'] != "NORMAL":
 		        b = True
         if b:
             time.sleep(5)
-    return vlanList
+    return firewallRuleList
 
 def main():
     module = AnsibleModule(
@@ -177,11 +177,15 @@ def main():
             state = dict(default='present', choices=['present', 'absent']),
             wait = dict(default=True),
             name = dict(required=True),
-            description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
+            action=dict(default='ACCEPT_DECISIVELY', choices = ['ACCEPT_DECISIVELY','DROP']),
+            ipVersion=dict(default='IPV4', choices = ['IPV4','IPV6']),
+            protocol=dict(default='TCP', choices = ['IP', 'ICMP', 'TCP','UDP']),
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
-            privateIpv4BaseAddress = dict(default=None),
-            privateIpv4PrefixSize = dict(default=None),
+            source = dict(),
+            destination = dict(),
+            enabled = dict(default=True),
+            placement = dict(),
         )
     )
     if not IMPORT_STATUS:
@@ -193,11 +197,11 @@ def main():
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
     module.params.pop('caas_credentials', None)
 
-    state = module.params['state']
-    module.params.pop('state', None)
-
     wait = module.params['wait']
     module.params.pop('wait', None)
+
+    state = module.params['state']
+    module.params.pop('state', None)
 
     result = _getOrgId(caas_credentials)
     if not result['status']:
@@ -218,7 +222,7 @@ def main():
                     module.params.pop('networkDomainName', None)
                     module.params.pop('datacenterId', None)					
 	
-    vlanList = _listVlan(module,caas_credentials,orgId,True)
+    firewallList = _listFirewallRule(module,caas_credentials,orgId,True)
  	
    # if state=absent
     #if state=='absent':
@@ -226,17 +230,30 @@ def main():
 	
 	# if state=present
     if state == "present":
-        if vlanList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/network/deployVlan'
+        if firewallList['totalCount'] < 1:
+            uri = '/caas/2.1/'+orgId+'/network/createFirewallRule'
             data = json.dumps(module.params)
             result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
                 module.fail_json(msg=result['msg'])
             else:
                 has_changed = True
+        if firewallList['totalCount'] == 1:
+            if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
+                uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
+                _data = {}                
+                _data['id'] = firewallList['firewallRule'][0]['id']
+                _data['enabled'] = module.params['enabled']
+                data = json.dumps(_data)
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']:
+                    module.fail_json(msg=result['msg'])
+                else:
+                    has_changed = True
+
 	
-    vlanList = _listVlan(module,caas_credentials,orgId,wait)
-    module.exit_json(changed=has_changed, vlans=vlanList)
+    firewallRuleList = _listFirewallRule(module,caas_credentials,orgId,wait)
+    module.exit_json(changed=has_changed, firewallRule=firewallRuleList)
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':

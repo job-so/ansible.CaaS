@@ -8,26 +8,18 @@
     tasks:
       - name: Deploy my Nework Domain
         caas_networkdomain:
-          caas_apiurl: "{{ caas_apiurl }}"
-          caas_username: "{{ caas_username }}"
-          caas_password: "{{ caas_password }}"
-          datacenterId: "{{ caas_datacenter }}"
+          caas_credentials: "{{ caas_credentials }}"
           name: "ansible.CaaS_Sandbox"
       - name: Deploy a DMZ
         caas_vlan:
-          caas_apiurl: "{{ caas_apiurl }}"
-          caas_username: "{{ caas_username }}"
-          caas_password: "{{ caas_password }}"
-          datacenterId: "{{ caas_datacenter }}"
+          caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "ansible.CaaS_Sandbox"
           name: "vlan_webservers"
           privateIpv4BaseAddress: "172.24.42.0"
+        register: vlan_webservers
       - name: Deploy WebServers
         caas_server:
-          caas_apiurl: "{{ caas_apiurl }}"
-          caas_username: "{{ caas_username }}"
-          caas_password: "{{ caas_password }}"
-          datacenterId: "{{ caas_datacenter }}"
+          caas_credentials: "{{ caas_credentials }}"
           name: "WebServer"
           #state: "absent"
           #action: shutdownServer
@@ -48,6 +40,53 @@
                   vlanName: vlan_webservers
                   #privateIpv4: 172.24.42.42
         register: caas_server
+      - name: Disable Default Rule that Drop Any external IPv6 connection
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "CCDEFAULT.DenyExternalInboundIPv6"
+          enabled: False
+      - name: Add FireWall Rule to allow IPv4 SSH for Ansible
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "ssh_for_ansible"
+          #action: "ACCEPT_DECISIVELY"
+          #ipVersion: "IPV6"
+          #protocol: "TCP"
+          source:
+            ip:
+              address: 10.2.0.0
+              prefixSize: 16
+          destination:
+            ip:
+              address: 10.4.0.0
+              prefixSize: 16
+            port:
+              begin: 22
+          placement:
+            position: "FIRST"
+          #enabled: False
+      - name: Add FireWall Rule to allow IPv6 SSH for Ansible
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "ssh_for_ansible_to_vlan_webservers"
+          action: "ACCEPT_DECISIVELY"
+          ipVersion: "IPV6"
+          protocol: "TCP"
+          source:
+            ip:
+              address: "{{ ansible_all_ipv6_addresses[0] }}"
+          destination:
+            ip:
+              address: "{{ vlan_webservers.vlans.vlan[0].ipv6Range.address }}"
+              prefixSize: "{{ vlan_webservers.vlans.vlan[0].ipv6Range.prefixSize }}"
+            port:
+              begin: 22
+          placement:
+            position: "FIRST"
+          #enabled: False
       - name: Add new instances to group WebServers
         add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
         when: item.started

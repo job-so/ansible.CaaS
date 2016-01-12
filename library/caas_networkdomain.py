@@ -81,10 +81,10 @@ EXAMPLES = '''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_networkdomain---"+str(datetime.datetime.now()))
 
-def _getOrgId(username, password, apiurl):
+def _getOrgId(caas_credentials):
     apiuri = '/oec/0.9/myaccount'
-    request = urllib2.Request(apiurl + apiuri)
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    request = urllib2.Request(caas_credentials['apiurl'] + apiuri)
+    base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     result = {}
     result['status'] = False
@@ -100,13 +100,13 @@ def _getOrgId(username, password, apiurl):
         result['msg'] = e.read()
     return result
 
-def caasAPI(username, password, uri, data):
+def caasAPI(caas_credentials, uri, data):
     logging.debug(uri)
     if data == '':
-        request = urllib2.Request(uri)
+        request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
-        request	= urllib2.Request(uri, data)
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+    base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
     result = {}
@@ -137,10 +137,7 @@ def caasAPI(username, password, uri, data):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            caas_apiurl = dict(required=True),
-            datacenterId = dict(required=True),
-            caas_username = dict(required=True),
-            caas_password = dict(required=True,no_log=True),
+            caas_credentials = dict(required=True),
             state = dict(default='present', choices=['present', 'absent']),
             name = dict(required=True),
             description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
@@ -152,17 +149,14 @@ def main():
     has_changed = False
 	
     # Check Authentication and get OrgId
-    caas_username = module.params['caas_username']
-    module.params.pop('caas_username', None)
-    caas_password = module.params['caas_password']
-    module.params.pop('caas_password', None)
-    caas_apiurl = module.params['caas_apiurl']
-    module.params.pop('caas_apiurl', None)
+    caas_credentials = module.params['caas_credentials']
+    module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
+    module.params.pop('caas_credentials', None)
 
     state = module.params['state']
     module.params.pop('state', None)
 
-    result = _getOrgId(caas_username,caas_password,caas_apiurl)
+    result = _getOrgId(caas_credentials)
     if not result['status']:
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
@@ -171,8 +165,8 @@ def main():
     #if not datacenterId
 	
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
-    uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-    result = caasAPI(caas_username,caas_password, uri, '')
+    uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+    result = caasAPI(caas_credentials, uri, '')
     if result['status']:
         networkDomainList = result['msg']
     else:
@@ -185,17 +179,17 @@ def main():
 	# if state=present
     if state == "present":
         if networkDomainList['totalCount'] < 1:
-            uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/deployNetworkDomain'
+            uri = '/caas/2.1/'+orgId+'/network/deployNetworkDomain'
             data = json.dumps(module.params)
-            result = caasAPI(caas_username,caas_password, uri, data)
+            result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
                 module.fail_json(msg=result['msg'])
             else:
                 has_changed = True
 	
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
-    uri = caas_apiurl+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-    networkDomainList = caasAPI(caas_username,caas_password, uri, '')
+    uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+    networkDomainList = caasAPI(caas_credentials, uri, '')
     module.exit_json(changed=has_changed, networkdomain=networkDomainList)
 
 from ansible.module_utils.basic import *

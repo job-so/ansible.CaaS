@@ -147,10 +147,10 @@ EXAMPLES = '''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_server---"+str(datetime.datetime.now()))
 
-def _getOrgId(username, password, apiurl):
+def _getOrgId(caas_credentials):
     apiuri = '/oec/0.9/myaccount'
-    request = urllib2.Request(apiurl + apiuri)
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    request = urllib2.Request(caas_credentials['apiurl'] + apiuri)
+    base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     result = {}
     result['status'] = False
@@ -166,53 +166,13 @@ def _getOrgId(username, password, apiurl):
         result['msg'] = e.read()
     return result
 
-def _listServer(module,caas_username,caas_password,caas_apiurl,orgId,wait):
-	# List Servers with this Name, in this networkDomain, in this vlanId
-    f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
-    uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
-    b = True;
-    while wait and b:
-        result = caasAPI(caas_username,caas_password, uri, '')
-        serverList = result['msg']
-        b = False
-        for (server) in serverList['server']:
-            logging.debug(server['id']+' '+server['name']+' '+server['state'])
-            if server['state'] != "NORMAL":
-		        b = True
-        if b:
-            time.sleep(5)
-    return serverList
-
-def _executeAction(module,caas_username,caas_password,caas_apiurl,orgId,serverList,action):
-    logging.debug("---_executeAction "+action)
-    has_changed = False
-    _data = {}
-    uri = caas_apiurl+'/caas/2.1/'+orgId+'/server/'+action
-    for (server) in serverList['server']:
-        logging.debug(server['id'])
-        _data['id'] = server['id']
-        data = json.dumps(_data)
-        if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
-            result = caasAPI(caas_username,caas_password, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True	
-        if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
-            result = caasAPI(caas_username,caas_password, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True	
-    return has_changed
-	
-def caasAPI(username, password, uri, data):
+def caasAPI(caas_credentials, uri, data):
     logging.debug(uri)
     if data == '':
-        request = urllib2.Request(uri)
+        request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
-        request	= urllib2.Request(uri, data)
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+    base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
     result = {}
@@ -240,13 +200,50 @@ def caasAPI(username, password, uri, data):
             retryCount = 9999
     return result
 
+def _listServer(module,caas_credentials,orgId,wait):
+	# List Servers with this Name, in this networkDomain, in this vlanId
+    f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
+    uri = '/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
+    b = True;
+    while wait and b:
+        result = caasAPI(caas_credentials, uri, '')
+        serverList = result['msg']
+        b = False
+        for (server) in serverList['server']:
+            logging.debug(server['id']+' '+server['name']+' '+server['state'])
+            if server['state'] != "NORMAL":
+		        b = True
+        if b:
+            time.sleep(5)
+    return serverList
+
+def _executeAction(module,caas_credentials,orgId,serverList,action):
+    logging.debug("---_executeAction "+action)
+    has_changed = False
+    _data = {}
+    uri = '/caas/2.1/'+orgId+'/server/'+action
+    for (server) in serverList['server']:
+        logging.debug(server['id'])
+        _data['id'] = server['id']
+        data = json.dumps(_data)
+        if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
+            result = caasAPI(caas_credentials, uri, data)
+            if not result['status']:
+                module.fail_json(msg=result['msg'])
+            else:
+                has_changed = True	
+        if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
+            result = caasAPI(caas_credentials, uri, data)
+            if not result['status']:
+                module.fail_json(msg=result['msg'])
+            else:
+                has_changed = True	
+    return has_changed
+	
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            caas_apiurl = dict(required=True),
-            datacenterId = dict(required=True),
-            caas_username = dict(required=True),
-            caas_password = dict(required=True,no_log=True),
+            caas_credentials = dict(required=True),
 			name = dict(required=True),
 			count = dict(type='int', default='1'),
             state = dict(default='present', choices=['present', 'absent']),
@@ -257,6 +254,7 @@ def main():
             imageName = dict(default=''),
             administratorPassword = dict(default='',no_log=True),
             networkInfo = dict(),
+            cpu = dict(),
         )
     )
     if not IMPORT_STATUS:
@@ -264,10 +262,11 @@ def main():
     has_changed = False
 	
     # Check Authentication and get OrgId
-    caas_username = module.params['caas_username']
-    caas_password = module.params['caas_password']
-    caas_apiurl = module.params['caas_apiurl']
-    result = _getOrgId(caas_username,caas_password,caas_apiurl)
+    caas_credentials = module.params['caas_credentials']
+    module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
+    module.params.pop('caas_credentials', None)
+
+    result = _getOrgId(caas_credentials)
     if not result['status']:
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
@@ -279,16 +278,16 @@ def main():
     if module.params['imageId']=='': # or null ?
         if module.params['imageName']!='':
             f = { 'datacenterId' : module.params['datacenterId'], 'name' : module.params['imageName'] }
-            uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/image/osImage?'+urllib.urlencode(f)
-            result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
+            uri = '/caas/2.1/'+orgId+'/image/osImage?'+urllib.urlencode(f)
+            result = caasAPI(caas_credentials, uri, '')
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['imageId'] = result['msg']['osImage'][0]['id']
     if not 'networkDomainId' in module.params['networkInfo']:
         if 'networkDomainName' in module.params['networkInfo']:
             f = { 'name' : module.params['networkInfo']['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
-            uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-            result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
+            uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            result = caasAPI(caas_credentials, uri, '')
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['networkInfo']['networkDomainId'] = result['msg']['networkDomain'][0]['id']
@@ -296,28 +295,28 @@ def main():
         if not 'vlanId' in module.params['networkInfo']['primaryNic']:
             if 'vlanName' in module.params['networkInfo']['primaryNic']:
                 f = { 'name' : module.params['networkInfo']['primaryNic']['vlanName']}
-                uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
-                result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, '')
+                uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
+                result = caasAPI(caas_credentials, uri, '')
                 if result['status']:
                     if result['msg']['totalCount']==1:
                         module.params['networkInfo']['primaryNic']['vlanId'] = result['msg']['vlan'][0]['id']
 	
-    serverList = _listServer(module,caas_username,caas_password,caas_apiurl,orgId,True)
+    serverList = _listServer(module,caas_credentials,orgId,True)
 	
    # if state=absent
     if module.params['state']=='absent':
-        has_changed = _executeAction(module, caas_username,caas_password,caas_apiurl,orgId,serverList,'powerOffServer') or has_changed
-        serverList = _listServer(module,caas_username,caas_password,caas_apiurl,orgId,True)
-        has_changed = _executeAction(module, caas_username,caas_password,caas_apiurl,orgId,serverList,'deleteServer') or has_changed
+        has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'powerOffServer') or has_changed
+        serverList = _listServer(module,caas_credentials,orgId,True)
+        has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'deleteServer') or has_changed
 
 	# if state=present
     if module.params['state'] == "present":
         i = serverList['totalCount']
-        uri = module.params['caas_apiurl']+'/caas/2.1/'+orgId+'/server/deployServer'
+        uri = '/caas/2.1/'+orgId+'/server/deployServer'
         module.params['start'] = (module.params['action'] == 'startServer')
         data = json.dumps(module.params)
         while i < module.params['count']:
-            result = caasAPI(module.params['caas_username'],module.params['caas_password'], uri, data)
+            result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
                 module.fail_json(msg=result['msg'])
             else:
@@ -325,9 +324,9 @@ def main():
 	    i += 1			
 
         # Execute Action on Servers
-        has_changed = _executeAction(module, caas_username,caas_password,caas_apiurl,orgId,serverList,module.params['action']) or has_changed
+        has_changed = _executeAction(module, caas_credentials,orgId,serverList,module.params['action']) or has_changed
 		
-    module.exit_json(changed=has_changed, servers=_listServer(module,caas_username,caas_password,caas_apiurl,orgId,module.params['wait']))
+    module.exit_json(changed=has_changed, servers=_listServer(module,caas_credentials,orgId,module.params['wait']))
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':
