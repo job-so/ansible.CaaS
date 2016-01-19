@@ -206,6 +206,11 @@ def main():
 
 	#Check dataCenterId
     #if not datacenterId
+    module.params.pop('_ansible_verbosity', None)
+    module.params.pop('_ansible_diff', None)
+    module.params.pop('_ansible_debug', None)
+    module.params.pop('_ansible_check_mode', None)
+    module.params.pop('_ansible_no_log', None)
 	
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
