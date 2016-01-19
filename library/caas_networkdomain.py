@@ -161,6 +161,11 @@ def main():
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
+    module.params.pop('_ansible_verbosity', None)
+    module.params.pop('_ansible_diff', None)
+    module.params.pop('_ansible_debug', None)
+    module.params.pop('_ansible_check_mode', None)
+    module.params.pop('_ansible_no_log', None)
 	#Check dataCenterId
     #if not datacenterId
 	
