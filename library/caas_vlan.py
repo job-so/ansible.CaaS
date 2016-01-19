@@ -158,13 +158,13 @@ def _listVlan(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
     b = True;
-    while wait and b:
+    while b:
         result = caasAPI(caas_credentials, uri, '')
         vlanList = result['msg']
         b = False
         for (vlan) in vlanList['vlan']:
             logging.debug(vlan['id']+' '+vlan['name']+' '+vlan['state'])
-            if vlan['state'] != "NORMAL":
+            if (vlan['state'] != "NORMAL") and wait:
 		        b = True
         if b:
             time.sleep(5)
@@ -219,12 +219,20 @@ def main():
                     module.params.pop('datacenterId', None)					
 	
     vlanList = _listVlan(module,caas_credentials,orgId,True)
- 	
-   # if state=absent
-    #if state=='absent':
-        #nothing
-	
-	# if state=present
+#ABSENT
+    if state == 'absent':
+        if vlanList['totalCount'] == 1:
+            uri = '/caas/2.1/'+orgId+'/network/deleteVlan'
+            _data = {}
+            _data['id'] = vlanList['vlan'][0]['id']
+            data = json.dumps(_data)
+            result = caasAPI(caas_credentials, uri, data)
+            if not result['status']:
+                module.fail_json(msg=result['msg'])
+            else:
+                has_changed = True
+
+# if state=present
     if state == "present":
         if vlanList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/deployVlan'

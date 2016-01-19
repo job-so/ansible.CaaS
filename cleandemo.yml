@@ -6,10 +6,7 @@
     tasks:
       - name: TearDown WebServers
         caas_server:
-          caas_apiurl: "{{ caas_apiurl }}"
-          caas_username: "{{ caas_username }}"
-          caas_password: "{{ caas_password }}"
-          datacenterId: "{{ caas_datacenter }}"
+          caas_credentials: "{{ caas_credentials }}"
           networkInfo:
               networkDomainName: ansible.CaaS_Sandbox
               primaryNic: 
@@ -18,18 +15,12 @@
           state: absent
       - name: TearDown  DMZ
         caas_vlan:
-          caas_apiurl: "{{ caas_apiurl }}"
-          caas_username: "{{ caas_username }}"
-          caas_password: "{{ caas_password }}"
-          datacenterId: "{{ caas_datacenter }}"
+          caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "ansible.CaaS_Sandbox"
           name: "vlan_webservers"
           state: absent
       - name: TearDown my Nework Domain
         caas_networkdomain:
-          caas_apiurl: "{{ caas_apiurl }}"
-          caas_username: "{{ caas_username }}"
-          caas_password: "{{ caas_password }}"
-          datacenterId: "{{ caas_datacenter }}"
+          caas_credentials: "{{ caas_credentials }}"
           name: "ansible.CaaS_Sandbox"
           state: absent

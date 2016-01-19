@@ -205,13 +205,13 @@ def _listServer(module,caas_credentials,orgId,wait):
     f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
     uri = '/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
     b = True;
-    while wait and b:
+    while b:
         result = caasAPI(caas_credentials, uri, '')
         serverList = result['msg']
         b = False
         for (server) in serverList['server']:
             logging.debug(server['id']+' '+server['name']+' '+server['state'])
-            if server['state'] != "NORMAL":
+            if (server['state'] != "NORMAL") and wait:
 		        b = True
         if b:
             time.sleep(5)

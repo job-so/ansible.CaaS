@@ -172,9 +172,18 @@ def main():
     else:
         module.fail_json(msg=result['msg'])
  	
-   # if state=absent
-    #if state=='absent':
-        #nothing
+#ABSENT
+    if state == 'absent':
+        if networkDomainList['totalCount'] == 1:
+            uri = '/caas/2.1/'+orgId+'/network/deleteNetworkDomain'
+            _data = {}
+            _data['id'] = networkDomainList['networkDomain'][0]['id']
+            data = json.dumps(_data)
+            result = caasAPI(caas_credentials, uri, data)
+            if not result['status']:
+                module.fail_json(msg=result['msg'])
+            else:
+                has_changed = True
 	
 	# if state=present
     if state == "present":

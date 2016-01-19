@@ -10,7 +10,7 @@
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
           name: "ansible.CaaS_Sandbox"
-      - name: Deploy a DMZ
+      - name: Deploy WebServers DMZ
         caas_vlan:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "ansible.CaaS_Sandbox"
@@ -20,6 +20,7 @@
       - name: Deploy WebServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
+          wait: False
           name: "WebServer"
           #state: "absent"
           #action: shutdownServer
@@ -87,6 +88,45 @@
           placement:
             position: "FIRST"
           #enabled: False
+      - name: Get Public IPv4
+        caas_publicip:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+      - name: Setting Load Balancing for WebServers
+        caas_loadbalancer:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "Production.Load.Balancer"
+          #description: "Used as the load balancer for the productionapplications."
+          type: STANDARD,
+          protocol: TCP,
+          #listenerIpAddress: "165.180.12.22"
+          #port: 80
+          #enabled: true
+          connectionLimit: 25000,
+          connectionRateLimit: 2000
+          sourcePortPreservation: PRESERVE
+          #poolId": "afb1fb1a-eab9-43f4-95c2-36a4cdda6cb8",
+          #clientClonePoolId": "033a97dc-ee9b-4808-97ea-50b06624fd16",
+          #persistenceProfileId": "a34ca25c-f3db-11e4-b010-005056806999"
+          #fallbackPersistenceProfileId": "6f2f5d7b-cdd9-4d84-8ad7-999b64a87978",
+          #iruleId": ["2b20abd9-ffdc-11e4-b010-005056806999"],
+          #optimizationProfile": ["TCP"]
+          pool:
+              name: myDevelopmentPool.1
+              #description: "Pool for load balancing development application servers."
+              loadBalanceMethod: ROUND_ROBIN
+              #healthMonitorId: ["01683574-d487-11e4-811f-005056806999","0168546c-d487-11e4-811f-005056806999"]
+              serviceDownAction: "RESELECT"
+              slowRampTime: 10
+              node:
+                  name: myProductionNode.1
+                  #description: "Production Server 1"
+                  ipv4Address: 10.5.2.14
+                  status: ENABLED
+                  #healthMonitorId: 0168b83a-d487-11e4-811f-005056806999
+                  connectionLimit: 20000
+                  connectionRateLimit: 2000
       - name: Add new instances to group WebServers
         add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
         when: item.started
