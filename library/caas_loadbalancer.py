@@ -340,6 +340,19 @@ def main():
                     data = json.dumps(_data)
                     result = caasAPI(caas_credentials, uri, data)
                     if not result['status']: module.fail_json(msg=result['msg'])
+                    else: 
+                        has_changed = True
+                        for info in result['msg']['info']:
+                            if info['name'] == 'nodeId': node['id'] = info['value']
+                    uri = '/caas/2.1/'+orgId+'/networkDomainVip/addPoolMember'
+                    _data = {}
+                    _data['poolId'] = module.params['pool']['id']
+                    _data['nodeId'] = node['id']
+                    _data['port'] = node['port']
+                    _data['status'] = node['status']
+                    data = json.dumps(_data)
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
                     else: has_changed = True
 			
 	
