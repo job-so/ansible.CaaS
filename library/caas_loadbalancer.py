@@ -99,7 +99,7 @@ EXAMPLES = '''
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
-logging.debug("--------------------------------caas_firewallrule---"+str(datetime.datetime.now()))
+logging.debug("--------------------------------caas_loadbalancer---"+str(datetime.datetime.now()))
 
 def _getOrgId(caas_credentials):
     apiuri = '/oec/0.9/myaccount'
@@ -125,6 +125,7 @@ def caasAPI(caas_credentials, uri, data):
     if data == '':
         request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
+        logging.debug(data)
         request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
@@ -154,15 +155,15 @@ def caasAPI(caas_credentials, uri, data):
             retryCount = 9999
     return result
 
-def _listFirewallRule(module,caas_credentials,orgId,wait):
+def _listVirtualListenerRule(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/firewallRule?'+urllib.urlencode(f)
+    uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     b = True;
     while b:
         result = caasAPI(caas_credentials, uri, '')
-        firewallRuleList = result['msg']
+        virtualListenerList = result['msg']
         b = False
-        for (firewallRule) in firewallRuleList['firewallRule']:
+        for (virtualListener) in virtualListenerList['virtualListener']:
             logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
             if (firewallRule['state'] != "NORMAL") and wait:
 		        b = True
@@ -176,16 +177,25 @@ def main():
             caas_credentials = dict(required=True),
             state = dict(default='present', choices=['present', 'absent']),
             wait = dict(default=True),
+            id = dict(default=None),
             name = dict(required=True),
-            action=dict(default='ACCEPT_DECISIVELY', choices = ['ACCEPT_DECISIVELY','DROP']),
-            ipVersion=dict(default='IPV4', choices = ['IPV4','IPV6']),
-            protocol=dict(default='TCP', choices = ['IP', 'ICMP', 'TCP','UDP']),
-            networkDomainId = dict(default=None),
+            description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
             networkDomainName = dict(default=None),
-            source = dict(),
-            destination = dict(),
-            enabled = dict(default=True),
-            placement = dict(),
+            networkDomainId = dict(default=None),
+            type=dict(default='STANDARD', choices = ['STANDARD','PERFORMANCE_LAYER_4']),
+            protocol=dict(default='TCP', choices = ['ANY','TCP','UDP','HTTP']),
+            listenerIpAddress = dict(default=None),
+            port = dict(default=None),
+            enabled = dict(default=True, choices = [True,False]),
+            connectionLimit = dict(type='int',default=25000),
+            connectionRateLimit= dict(type='int',default=2000),
+            sourcePortPreservation=dict(default='PRESERVE', choices = ['PRESERVE','PRESERVE_STRICT','CHANGE']),
+#clientClonePoolId": "033a97dc-ee9b-4808-97ea-50b06624fd16",
+#persistenceProfileId": "a34ca25c-f3db-11e4-b010-005056806999"
+#fallbackPersistenceProfileId": "6f2f5d7b-cdd9-4d84-8ad7-999b64a87978",
+#iruleId": ["2b20abd9-ffdc-11e4-b010-005056806999"],
+            optimizationProfile=dict(type='list',default='[TCP )'), #choices = ['TCP', 'LAN_OPT', 'WAN_OPT', 'MOBILE_OPT', 'TCP_LEGACY', 'SMTP', 'SIP']),
+            pool=dict(),
         )
     )
     if not IMPORT_STATUS:
@@ -216,14 +226,20 @@ def main():
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
 	
-    firewallList = _listFirewallRule(module,caas_credentials,orgId,True)
+    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
+    uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
+    result = caasAPI(caas_credentials, uri, '')
+    if result['status']:
+        virtualListenerList = result['msg']
+    else:
+        module.fail_json(msg=result['msg'])
  	
 #ABSENT
-    if state == 'absent':
-        if firewallList['totalCount'] == 1:
-            uri = '/caas/2.1/'+orgId+'/network/deleteFirewallRule'
+    if state == "absent":
+        if virtualListenerList['totalCount'] == 1:
+            uri = '/caas/2.1/'+orgId+'/networkDomainVip/deleteVirtualListener'
             _data = {}
-            _data['id'] = networkDomainList['networkDomain'][0]['id']
+            _data['id'] = virtualListenerList['virtualListener'][0]['id']
             data = json.dumps(_data)
             result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
@@ -231,42 +247,109 @@ def main():
             else:
                 has_changed = True
 	
-	# if state=present
+#PRESENT
     if state == "present":
-        if firewallList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/network/createFirewallRule'
+        if virtualListenerList['totalCount'] == 1: module.params['id'] = virtualListenerList['virtualListener'][0]['id']
+        if virtualListenerList['totalCount'] < 1:
+            uri = '/caas/2.1/'+orgId+'/networkDomainVip/createVirtualListener'
             _data = {}
             _data['name'] = module.params['name']
-            _data['action'] = module.params['action']
-            _data['ipVersion'] = module.params['ipVersion']
-            _data['protocol'] = module.params['protocol']
+            _data['description'] = module.params['description']
             _data['networkDomainId'] = module.params['networkDomainId']
-            _data['source'] = module.params['source']
-            _data['destination'] = module.params['destination']
+            _data['type'] = module.params['type']
+            _data['protocol'] = module.params['protocol']
+            _data['listenerIpAddress'] = module.params['listenerIpAddress']
+            _data['port'] = module.params['port']
             _data['enabled'] = module.params['enabled']
-            _data['placement'] = module.params['placement']
+            _data['connectionLimit'] = module.params['connectionLimit']
+            _data['connectionRateLimit'] = module.params['connectionRateLimit']
+            _data['sourcePortPreservation'] = module.params['sourcePortPreservation']
+            _data['optimizationProfile'] = module.params['optimizationProfile']
             data = json.dumps(_data)
             result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
                 module.fail_json(msg=result['msg'])
             else:
                 has_changed = True
-        if firewallList['totalCount'] == 1:
-            if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
-                uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
+                for info in result['msg']['info']:
+                    if info['name'] == 'virtualListenerId': module.params['id'] = info['value']
+#        if firewallList['totalCount'] == 1:
+#            if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
+#                uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
+#                _data = {}
+#                _data['id'] = firewallList['firewallRule'][0]['id']
+#                _data['enabled'] = module.params['enabled']
+#                data = json.dumps(_data)
+#                result = caasAPI(caas_credentials, uri, data)
+#                if not result['status']:
+#                    module.fail_json(msg=result['msg'])
+#                else:
+#                    has_changed = True
+        if module.params['pool']:
+#TODO chack if poolid in vip
+            f = { 'name' : module.params['pool']['name'], 'datacenterId' : module.params['datacenterId']}
+            uri = '/caas/2.1/'+orgId+'/networkDomainVip/pool?'+urllib.urlencode(f)
+            result = caasAPI(caas_credentials, uri, '')
+            if result['status']: poolList = result['msg']
+            else: module.fail_json(msg=result['msg'])
+            if poolList['totalCount'] == 1: module.params['pool']['id'] = poolList['pool'][0]['id']
+            if poolList['totalCount'] < 1:
+                uri = '/caas/2.1/'+orgId+'/networkDomainVip/createPool'
                 _data = {}
-                _data['id'] = firewallList['firewallRule'][0]['id']
-                _data['enabled'] = module.params['enabled']
+                _data['networkDomainId'] = module.params['networkDomainId']
+                _data['name'] = module.params['pool']['name']
+                #_data['description'] = module.params['pool']['description']
+                _data['loadBalanceMethod'] = module.params['pool']['loadBalanceMethod']
+                #_data['healthMonitorId'] = module.params['pool']['healthMonitorId']
+                _data['serviceDownAction'] = module.params['pool']['serviceDownAction']
+                _data['slowRampTime'] = module.params['pool']['slowRampTime']
                 data = json.dumps(_data)
                 result = caasAPI(caas_credentials, uri, data)
-                if not result['status']:
-                    module.fail_json(msg=result['msg'])
-                else:
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: 
                     has_changed = True
-
+                    for info in result['msg']['info']:
+                        if info['name'] == 'poolId': module.params['pool']['id'] = info['value']
+                uri = '/caas/2.1/'+orgId+'/networkDomainVip/editVirtualListener'
+                _data = {}
+                #_data['networkDomainId'] = module.params['networkDomainId']
+                _data['id'] = module.params['id']
+                _data['poolId'] = module.params['pool']['id']
+                data = json.dumps(_data)
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+            for node in module.params['pool']['node']:
+                logging.debug("--Node"+str(node))
+                f = { 'name' : node['name'], 'datacenterId' : module.params['datacenterId']}
+                uri = '/caas/2.1/'+orgId+'/networkDomainVip/node?'+urllib.urlencode(f)
+                result = caasAPI(caas_credentials, uri, '')
+                if result['status']: nodeList = result['msg']
+                else: module.fail_json(msg=result['msg'])
+                if nodeList['totalCount'] < 1:
+                    uri = '/caas/2.1/'+orgId+'/networkDomainVip/createNode'
+                    _data = {}
+                    _data['networkDomainId'] = module.params['networkDomainId']
+                    _data['name'] = node['name']
+                    _data['description'] = node['description']
+                    _data['ipv4Address'] = node['ipv4Address']
+                    #_data['ipv6Address'] = node['ipv6Address']
+                    _data['status'] = node['status']
+                    #_data['healthMonitorId'] = node['healthMonitorId']
+                    _data['connectionLimit'] = node['connectionLimit']
+                    _data['connectionRateLimit'] = node['connectionRateLimit']
+                    data = json.dumps(_data)
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
+                    else: has_changed = True
+			
 	
-    firewallRuleList = _listFirewallRule(module,caas_credentials,orgId,wait)
-    module.exit_json(changed=has_changed, firewallRules=firewallRuleList)
+    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
+    uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
+    result = caasAPI(caas_credentials, uri, '')
+    if result['status']: virtualListenerList = result['msg']
+    else: module.fail_json(msg=result['msg'])
+
+    module.exit_json(changed=has_changed, loadBalancers=virtualListenerList)
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':

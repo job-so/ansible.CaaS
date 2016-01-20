@@ -151,21 +151,13 @@ def main():
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
-    module.params.pop('caas_credentials', None)
-
     state = module.params['state']
-    module.params.pop('state', None)
 
     result = _getOrgId(caas_credentials)
     if not result['status']:
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-    module.params.pop('_ansible_verbosity', None)
-    module.params.pop('_ansible_diff', None)
-    module.params.pop('_ansible_debug', None)
-    module.params.pop('_ansible_check_mode', None)
-    module.params.pop('_ansible_no_log', None)
 	#Check dataCenterId
     #if not datacenterId
 	
@@ -194,7 +186,12 @@ def main():
     if state == "present":
         if networkDomainList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/deployNetworkDomain'
-            data = json.dumps(module.params)
+            _data = {}
+            _data['datacenterId'] = module.params['caas_credentials']['datacenter']
+            _data['name'] = module.params['name']
+            _data['description'] = module.params['description']
+            _data['type'] = module.params['type']
+            data = json.dumps(_data)
             result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
                 module.fail_json(msg=result['msg'])
@@ -204,7 +201,7 @@ def main():
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
     uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
     networkDomainList = caasAPI(caas_credentials, uri, '')
-    module.exit_json(changed=has_changed, networkdomain=networkDomainList)
+    module.exit_json(changed=has_changed, networkdomains=networkDomainList['msg'])
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':

@@ -17,11 +17,18 @@ A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.o
   * [caas_credentials.yml](/caas_credentials.yml) : Sample file to fill with your own credentials
 
 ## installation
-  1. Install Ansible
-    1. yum install asciidoc
-    2. yum install python-sphinx
-    2. git clone git://github.com/ansible/ansible.git --recursive
-    2. source ./hacking/env-setup
+  1. Install Ansible on a clean machine (You can use a CENTOS7/64 template on MCP)
+    1. yum update
+	yum install epel-release
+	yum install ansible
+	2. yum install git asciidoc python python-sphinx
+	3. easy_install pip
+	4. pip install paramiko PyYAML Jinja2 httplib2 six
+    4. git clone git://github.com/ansible/ansible.git --recursive
+    5. source ./ansible/hacking/env-setup
   2. Download this repo : 
+    1. git clone git://github.com/job-so/ansible.CaaS
+	2. ln -s /root/ansible.CaaS/library ansible/lib/ansible/modules/extras/cloud/dimension_data
+
   2. Create a credential files
   3. ansible-playbook demo.yml

@@ -191,13 +191,9 @@ def main():
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
-    module.params.pop('caas_credentials', None)
 
     state = module.params['state']
-    module.params.pop('state', None)
-
     wait = module.params['wait']
-    module.params.pop('wait', None)
 
     result = _getOrgId(caas_credentials)
     if not result['status']:
@@ -206,11 +202,6 @@ def main():
 
 	#Check dataCenterId
     #if not datacenterId
-    module.params.pop('_ansible_verbosity', None)
-    module.params.pop('_ansible_diff', None)
-    module.params.pop('_ansible_debug', None)
-    module.params.pop('_ansible_check_mode', None)
-    module.params.pop('_ansible_no_log', None)
 	
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
@@ -220,8 +211,6 @@ def main():
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
-                    module.params.pop('networkDomainName', None)
-                    module.params.pop('datacenterId', None)					
 	
     vlanList = _listVlan(module,caas_credentials,orgId,True)
 #ABSENT
@@ -241,7 +230,13 @@ def main():
     if state == "present":
         if vlanList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/deployVlan'
-            data = json.dumps(module.params)
+            _data = {}
+            _data['name'] = module.params['name']
+            _data['description'] = module.params['description']
+            _data['networkDomainId'] = module.params['networkDomainId']
+            _data['privateIpv4BaseAddress'] = module.params['privateIpv4BaseAddress']
+            _data['privateIpv4PrefixSize'] = module.params['privateIpv4PrefixSize']
+            data = json.dumps(_data)
             result = caasAPI(caas_credentials, uri, data)
             if not result['status']:
                 module.fail_json(msg=result['msg'])

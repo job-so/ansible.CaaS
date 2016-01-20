@@ -10,13 +10,16 @@
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
           name: "ansible.CaaS_Sandbox"
+        register: caas_networkdomain
+#      - name: print debug
+#        debug: var=caas_networkdomain
       - name: Deploy WebServers DMZ
         caas_vlan:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: "ansible.CaaS_Sandbox"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "vlan_webservers"
           privateIpv4BaseAddress: "172.24.42.0"
-        register: vlan_webservers
+        register: caas_vlan_webservers
       - name: Deploy WebServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
@@ -35,7 +38,7 @@
               #speed: STANDARD
           networkInfo:
               #networkDomainId: fd340f41-7f93-4dda-a7f2-e46cc6302613
-              networkDomainName: ansible.CaaS_Sandbox
+              networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
               primaryNic: 
                   #vlanId: 0cd34569-e3b4-46ca-9c86-3e8c2b08d732
                   vlanName: vlan_webservers
@@ -44,13 +47,13 @@
       - name: Disable Default Rule that Drop Any external IPv6 connection
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "CCDEFAULT.DenyExternalInboundIPv6"
           enabled: False
       - name: Add FireWall Rule to allow IPv4 SSH for Ansible
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "ssh_for_ansible"
           #action: "ACCEPT_DECISIVELY"
           #ipVersion: "IPV6"
@@ -66,12 +69,12 @@
             port:
               begin: 22
           placement:
-            position: "FIRST"
+            position: "LAST"
           #enabled: False
       - name: Add FireWall Rule to allow IPv6 SSH for Ansible
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "ssh_for_ansible_to_vlan_webservers"
           action: "ACCEPT_DECISIVELY"
           ipVersion: "IPV6"
@@ -81,52 +84,17 @@
               address: "{{ ansible_all_ipv6_addresses[0] }}"
           destination:
             ip:
-              address: "{{ vlan_webservers.vlans.vlan[0].ipv6Range.address }}"
-              prefixSize: "{{ vlan_webservers.vlans.vlan[0].ipv6Range.prefixSize }}"
+              address: "{{ caas_vlan_webservers.vlans.vlan[0].ipv6Range.address }}"
+              prefixSize: "{{ caas_vlan_webservers.vlans.vlan[0].ipv6Range.prefixSize }}"
             port:
               begin: 22
           placement:
-            position: "FIRST"
+            position: "LAST"
           #enabled: False
       - name: Get Public IPv4
         caas_publicip:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
-      - name: Setting Load Balancing for WebServers
-        caas_loadbalancer:
-          caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
-          name: "Production.Load.Balancer"
-          #description: "Used as the load balancer for the productionapplications."
-          type: STANDARD,
-          protocol: TCP,
-          #listenerIpAddress: "165.180.12.22"
-          #port: 80
-          #enabled: true
-          connectionLimit: 25000,
-          connectionRateLimit: 2000
-          sourcePortPreservation: PRESERVE
-          #poolId": "afb1fb1a-eab9-43f4-95c2-36a4cdda6cb8",
-          #clientClonePoolId": "033a97dc-ee9b-4808-97ea-50b06624fd16",
-          #persistenceProfileId": "a34ca25c-f3db-11e4-b010-005056806999"
-          #fallbackPersistenceProfileId": "6f2f5d7b-cdd9-4d84-8ad7-999b64a87978",
-          #iruleId": ["2b20abd9-ffdc-11e4-b010-005056806999"],
-          #optimizationProfile": ["TCP"]
-          pool:
-              name: myDevelopmentPool.1
-              #description: "Pool for load balancing development application servers."
-              loadBalanceMethod: ROUND_ROBIN
-              #healthMonitorId: ["01683574-d487-11e4-811f-005056806999","0168546c-d487-11e4-811f-005056806999"]
-              serviceDownAction: "RESELECT"
-              slowRampTime: 10
-              node:
-                  name: myProductionNode.1
-                  #description: "Production Server 1"
-                  ipv4Address: 10.5.2.14
-                  status: ENABLED
-                  #healthMonitorId: 0168b83a-d487-11e4-811f-005056806999
-                  connectionLimit: 20000
-                  connectionRateLimit: 2000
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
       - name: Add new instances to group WebServers
         add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
         when: item.started
