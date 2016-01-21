@@ -8,19 +8,50 @@
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
           networkInfo:
+              networkDomainName: ansible.CaaS_Sandbox 
+              #ansible.CaaS_Sandbox
+              primaryNic: 
+                  vlanName: "ansible.CaaS_Sandbox_vlan_webservers"
+          name: "WebServer"
+          state: absent
+      - name: TearDown AppServers
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          networkInfo:
               networkDomainName: ansible.CaaS_Sandbox
               primaryNic: 
-                  vlanName: vlan_webservers
-          name: "WebServer"
+                  vlanName: "ansible.CaaS_Sandbox_vlan_appservers"
+          name: "AppServer"
+          state: absent
+      - name: TearDown DBServers
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          networkInfo:
+              networkDomainName: ansible.CaaS_Sandbox
+              primaryNic: 
+                  vlanName: "ansible.CaaS_Sandbox_vlan_dbservers"
+          name: "DBServer"
           state: absent
       - name: TearDown  DMZ
         caas_vlan:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: "ansible.CaaS_Sandbox"
-          name: "vlan_webservers"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "ansible.CaaS_Sandbox_vlan_webservers"
+          state: absent
+      - name: TearDown  DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "ansible.CaaS_Sandbox_vlan_appservers"
+          state: absent
+      - name: TearDown  DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox
+          name: "ansible.CaaS_Sandbox_vlan_dbservers"
           state: absent
       - name: TearDown my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
-          name: "ansible.CaaS_Sandbox"
+          name: ansible.CaaS_Sandbox
           state: absent

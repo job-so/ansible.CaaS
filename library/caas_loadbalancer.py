@@ -226,7 +226,7 @@ def main():
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
 	
-    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
+    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     result = caasAPI(caas_credentials, uri, '')
     if result['status']:
@@ -287,7 +287,7 @@ def main():
 #                    has_changed = True
         if module.params['pool']:
 #TODO chack if poolid in vip
-            f = { 'name' : module.params['pool']['name'], 'datacenterId' : module.params['datacenterId']}
+            f = { 'name' : module.params['pool']['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
             uri = '/caas/2.1/'+orgId+'/networkDomainVip/pool?'+urllib.urlencode(f)
             result = caasAPI(caas_credentials, uri, '')
             if result['status']: poolList = result['msg']
@@ -320,7 +320,7 @@ def main():
                 if not result['status']: module.fail_json(msg=result['msg'])
             for node in module.params['pool']['node']:
                 logging.debug("--Node"+str(node))
-                f = { 'name' : node['name'], 'datacenterId' : module.params['datacenterId']}
+                f = { 'name' : node['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
                 uri = '/caas/2.1/'+orgId+'/networkDomainVip/node?'+urllib.urlencode(f)
                 result = caasAPI(caas_credentials, uri, '')
                 if result['status']: nodeList = result['msg']
@@ -356,7 +356,7 @@ def main():
                     else: has_changed = True
 			
 	
-    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
+    f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     result = caasAPI(caas_credentials, uri, '')
     if result['status']: virtualListenerList = result['msg']
