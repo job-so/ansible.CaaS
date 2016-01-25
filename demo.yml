@@ -9,7 +9,7 @@
       - name: Deploy my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
-          name: BouyguesTel
+          name: ansible.CaaS_Sandbox
           type: ADVANCED
         register: caas_networkdomain
 #      - name: print debug
