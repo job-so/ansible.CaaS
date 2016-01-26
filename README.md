@@ -4,6 +4,7 @@ Ansible modules for managing Dimension Data Cloud
 A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)
 
 ## modules
+  * [caas_credentials.py](/library/caas_credentials.py) : Check credentials against MCP [(documentation)](/docs/caas_credentials_module.md)
   * [caas_networkdomain.py](/library/caas_networkdomain.py) : Create/Delete Network Domain on MCP [(documentation)](/docs/caas_networkdomain_module.md)
   * [caas_vlan.py](/library/caas_vlan.py) : Create/Delete VLAN on MCP [(documentation)](/docs/caas_vlan_module.md)
   * [caas_server.py](/library/caas_server.py) : Create/Delete Servers on MCP [(documentation)](/docs/caas_server_module.md)
@@ -30,5 +31,11 @@ A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.o
     1. git clone git://github.com/job-so/ansible.CaaS
 	2. ln -s /root/ansible.CaaS/library ansible/lib/ansible/modules/extras/cloud/dimension_data
 
+## How to run a demo
   2. Create a credential files
   3. ansible-playbook demo.yml
+
+## dev : build the documentation
+  1. ansible/make webdocs
+  2. pandoc -s -o caas_credentials_module.md ../../ansible/docsite/rst/caas_credentials_module.rst
+
