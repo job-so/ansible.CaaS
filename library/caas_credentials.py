@@ -30,8 +30,9 @@ DOCUMENTATION = '''
 --- 
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform For now, this module only support MCP 2.0."
-module: caas_server
+  - "Check Dimension Data Managed Cloud Platform credentials"
+  - "This step is optionnal"
+module: caas_credentials
 options: 
   apiurl: 
     description: 
@@ -82,11 +83,10 @@ EXAMPLES = '''
           password: MySecret_KeepItSecret
           datacenterId: EU6 
         register: cas_credentials
+		
 # Check credentials with username/password provided in an external file (recommended)
   - name: Deploy Dimension Data infrastructure  
     hosts: localhost
-    vars:
-      root_password: P$$ssWwrrdGoDd!
     vars_files:
       - /root/caas_credentials.yml
     tasks:
@@ -97,6 +97,7 @@ EXAMPLES = '''
           apiurl: "{{caas_credentials.apiurl}}"
           datacenter: "{{caas_credentials.datacenter}}" 
         register: caas_credentials
+	
 # Content of the external file /root/caas_credentials.yml
 caas_credentials:
     username: firstname.lastname
@@ -105,7 +106,24 @@ caas_credentials:
     datacenter: EU6 
 '''
 
-RESULT = '''
+__RETURN = '''
+caas_credentials: 
+    description: destination file/path
+    returned: success
+    type: string
+    sample: "https://api-eu.dimensiondata.com"
+'''
+
+R_ETURN = '''
+    datacenter: 
+        sample: "EU6"
+    orgId:
+        sample: "4255d938-0bfc-4553-9c68-b61fbd1f4c42"
+    password:
+        sample: "MySecret_KeepItSecret"
+    username:
+        sample: "firstname.lastname"
+
 "caas_credentials": {
     "apiurl": "https://api-eu.dimensiondata.com",
     "datacenter": "EU6",

@@ -33,21 +33,9 @@ description:
   - "Create, Remove Network vlans on Dimension Data Managed Cloud Platform"
 module: caas_vlan
 options: 
-  caas_apiurl: 
+  caas_credentials: 
     description: 
-      - See caas_server for more information
-    required: true
-  caas_datacenter: 
-    description: 
-      - See caas_server for more information
-    required: true
-  caas_password: 
-    description: 
-      - "The associated password"
-    required: true
-  caas_username: 
-    description: 
-      - "Your username credential"
+      - Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)
     required: true
   name: 
     description: 
@@ -174,7 +162,7 @@ def _listVirtualListenerRule(module,caas_credentials,orgId,wait):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            caas_credentials = dict(required=True),
+            caas_credentials = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
             wait = dict(default=True),
             id = dict(default=None),

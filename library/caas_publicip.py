@@ -33,21 +33,9 @@ description:
   - "Create, Remove Network domains on Dimension Data Managed Cloud Platform"
 module: caas_publicip
 options: 
-  caas_apiurl: 
+  caas_credentials: 
     description: 
-      - See caas_server for more information
-    required: true
-  caas_datacenter: 
-    description: 
-      - See caas_server for more information
-    required: true
-  caas_password: 
-    description: 
-      - "The associated password"
-    required: true
-  caas_username: 
-    description: 
-      - "Your username credential"
+      - Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)
     required: true
   name: 
     description: 
@@ -137,7 +125,7 @@ def caasAPI(caas_credentials, uri, data):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            caas_credentials = dict(required=True),
+            caas_credentials = dict(required=True,no_log=True),
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
             state = dict(default='present', choices=['present', 'absent']),

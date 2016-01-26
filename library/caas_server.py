@@ -33,40 +33,9 @@ description:
   - "Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform For now, this module only support MCP 2.0."
 module: caas_server
 options: 
-  caas_apiurl: 
+  caas_credentials: 
     description: 
-      - "Africa (AF) : https://api-mea.dimensiondata.com"
-      - "Asia Pacific (AP) : https://api-ap.dimensiondata.com"
-      - "Australia (AU) : https://api-au.dimensiondata.com"
-      - "Canada(CA) : https://api-canada.dimensiondata.com"
-      - "Europe (EU) : https://api-eu.dimensiondata.com"
-      - "North America (NA) : https://api-na.dimensiondata.com"
-      - "South America (SA) : https://api-latam.dimensiondata.com"
-    required: true
-  datacenterId: 
-    description: 
-      - "You can use your own 'Private MCP', or any public MCP 2.0 below :"
-      - "Asia Pacific (AP) :"
-      - "   AP3 Singapore - Serangoon"
-      - "Australia (AU) :"
-      - "   AU9 Australia - Sydney"
-      - "   AU10  Australia - Melbourne"
-      - "   AU11 New Zealand - Hamilton"
-      - "Europe (EU) :"
-      - "   EU6 Germany - Frankfurt"
-      - "   EU7 Netherland - Amsterdam"
-      - "   EU8 UK - London"
-      - "North America (NA) :"
-      - "   NA9 US - Ashburn"
-      - "   NA12 US - Santa Clara"
-    required: true
-  caas_password: 
-    description: 
-      - "The associated password"
-    required: true
-  caas_username: 
-    description: 
-      - "Your username credential"
+      - Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)
     required: true
   name: 
     description: 
@@ -243,7 +212,7 @@ def _executeAction(module,caas_credentials,orgId,serverList,action):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            caas_credentials = dict(required=True),
+            caas_credentials = dict(required=True,no_log=True),
 			name = dict(required=True),
 			count = dict(type='int', default='1'),
             state = dict(default='present', choices=['present', 'absent']),
@@ -294,7 +263,7 @@ def main():
     if 'primaryNic' in module.params['networkInfo']:
         if not 'vlanId' in module.params['networkInfo']['primaryNic']:
             if 'vlanName' in module.params['networkInfo']['primaryNic']:
-                f = { 'name' : module.params['networkInfo']['primaryNic']['vlanName']}
+                f = { 'name' : module.params['networkInfo']['primaryNic']['vlanName'], 'datacenterId' : module.params['datacenterId']}
                 uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
                 result = caasAPI(caas_credentials, uri, '')
                 if result['status']:

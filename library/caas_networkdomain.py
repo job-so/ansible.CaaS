@@ -33,32 +33,21 @@ description:
   - "Create, Remove Network domains on Dimension Data Managed Cloud Platform"
 module: caas_networkdomain
 options: 
-  caas_apiurl: 
+  caas_credentials: 
     description: 
-      - See caas_server for more information
-    required: true
-  caas_datacenter: 
-    description: 
-      - See caas_server for more information
-    required: true
-  caas_password: 
-    description: 
-      - "The associated password"
-    required: true
-  caas_username: 
-    description: 
-      - "Your username credential"
+      - Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)
     required: true
   name: 
     description: 
-      - "Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters."
+      - "Name that has to be given to the instance"
+      - "Minimum length 1 character Maximum length 75 characters."
     required: true
   state:  
     choices: ['present','absent']
     default: present
     description: 
       - "Should the resource be present or absent."
-      - "Take care : Absent will powerOff and delete all servers."
+      - "Take care : Absent will delete the networkdomain"
   description:
     description:
       - "Maximum length: 255 characters."
@@ -69,15 +58,34 @@ version_added: "1.9"
 
 EXAMPLES = '''
 # Creates a new networkdomain named "ansible.Caas_SandBox", 
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "ansible.Caas_SandBox"
-    register: caas_networkdomain
+    tasks:
+      - name: Deploy my Nework Domain
+        caas_networkdomain:
+          caas_credentials: "{{ caas_credentials }}"
+          name: ansible.CaaS_Sandbox
+          type: ADVANCED
+        register: caas_networkdomain
 '''
-
+RETURN = '''
+            "networkdomains": {
+                "networkDomain": [
+                    {
+                        "createTime": "2016-01-26T16:26:21.000Z",
+                        "datacenterId": "EU6",
+                        "description": "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS",
+                        "id": "4dc7c62c-d2c1-447d-a5de-9a18a9e14c5c",
+                        "name": "ansible.CaaS_Sandbox",
+                        "snatIpv4Address": "168.128.10.72",
+                        "state": "NORMAL",
+                        "type": "ADVANCED"
+                    }
+                ],
+                "pageCount": 1,
+                "pageNumber": 1,
+                "pageSize": 250,
+                "totalCount": 1
+            }
+'''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_networkdomain---"+str(datetime.datetime.now()))
 
@@ -137,7 +145,7 @@ def caasAPI(caas_credentials, uri, data):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            caas_credentials = dict(required=True),
+            caas_credentials = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
             name = dict(required=True),
             description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),

@@ -6,6 +6,15 @@
     vars_files:
       - /root/caas_credentials.yml
     tasks:
+      - name: Check credentials (optionnal Step)
+        caas_credentials:
+          username: "{{caas_credentials.username}}"
+          password: "{{caas_credentials.password}}"
+          apiurl: "{{caas_credentials.apiurl}}"
+          datacenter: "{{caas_credentials.datacenter}}" 
+        register: caas_credentials
+#      - name: print debug
+#        debug: var=caas_credentials
       - name: Deploy my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
@@ -21,6 +30,8 @@
           name: "{{caas_networkdomain.networkdomains.networkDomain[0].name}}_vlan_webservers"
           privateIpv4BaseAddress: "192.168.30.0"
         register: caas_vlan_webservers
+      - name: print debug
+        debug: var=caas_vlan_webservers
       - name: Deploy WebServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
