@@ -63,8 +63,6 @@ Examples
 >     # Check credentials with username/password provided in an external file (recommended)
 >       - name: Deploy Dimension Data infrastructure  
 >         hosts: localhost
->         vars:
->           root_password: P$$ssWwrrdGoDd!
 >         vars_files:
 >           - /root/caas_credentials.yml
 >         tasks:
@@ -83,6 +81,31 @@ Examples
 >         apiurl: https://api-eu.dimensiondata.com
 >         datacenter: EU6 
 
+Return Values
+=============
+
+Common return values are documented here common\_return\_values, the
+following are the fields unique to this module:
+
+<table border=1 cellpadding=4>
+<tr>
+<th class="head">name</th>
+<th class="head">description</th>
+<th class="head">returned</th>
+<th class="head">type</th>
+<th class="head">sample</th>
+</tr>
+
+    <tr>
+    <td> caas_credentials </td>
+    <td>  </td>
+    <td align=center>  </td>
+    <td align=center>  </td>
+    <td align=center>  </td>
+</tr>
+
+</table>
+</br></br>
 This is an Extras Module
 ========================
 
