@@ -59,7 +59,6 @@ Examples
 >               password: MySecret_KeepItSecret
 >               datacenterId: EU6 
 >             register: cas_credentials
->
 >     # Check credentials with username/password provided in an external file (recommended)
 >       - name: Deploy Dimension Data infrastructure  
 >         hosts: localhost
@@ -75,7 +74,6 @@ Examples
 >               apiurl: "{{caas_credentials.apiurl}}"
 >               datacenter: "{{caas_credentials.datacenter}}" 
 >             register: caas_credentials
->
 >     # Content of the external file /root/caas_credentials.yml
 >     caas_credentials:
 >         username: firstname.lastname
