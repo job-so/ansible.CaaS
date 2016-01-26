@@ -98,10 +98,10 @@ following are the fields unique to this module:
 
     <tr>
     <td> caas_credentials </td>
-    <td>  </td>
-    <td align=center>  </td>
-    <td align=center>  </td>
-    <td align=center>  </td>
+    <td> destination file/path </td>
+    <td align=center> success </td>
+    <td align=center> string </td>
+    <td align=center> https://api-eu.dimensiondata.com </td>
 </tr>
 
 </table>
