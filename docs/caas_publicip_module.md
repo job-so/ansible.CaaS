@@ -1,13 +1,13 @@
 ---
 title: |
-    caas\_vlan - Create, Configure, Remove Network Domain on Dimension Data
-    Managed Cloud Platform
+    caas\_publicip - Create, Configure, Remove Network Domain on Dimension
+    Data Managed Cloud Platform
 ...
 
 Synopsis
 ========
 
-Create, Remove Network vlans on Dimension Data Managed Cloud Platform
+Create, Remove Network domains on Dimension Data Managed Cloud Platform
 
 Options
 =======
@@ -37,25 +37,7 @@ Options
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Name that has to be given to the instance</div><div>The name must be unique inside the DataCenter</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
-        <tr>
-<td>networkDomainId<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center.</div></td></tr>
-        <tr>
-<td>networkDomainName<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center.</div></td></tr>
-        <tr>
-<td>privateIpv4BaseAddress<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided.</div><div>If this property is not provided, the VLAN will default to being /24</div></td></tr>
+    <td><div>Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters.</div></td></tr>
         <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -67,13 +49,13 @@ Options
 Examples
 ========
 
->     # Creates a new vlan named "ansible.Caas_SandBox", 
+>     # Creates a new networkdomain named "ansible.Caas_SandBox", 
 >     -caas_networkdomain:
 >         caas_apiurl: "{{ caas_apiurl }}"
 >         caas_username: "{{ caas_username }}"
 >         caas_password: "{{ caas_password }}"
 >         datacenterId: "{{ caas_datacenter }}"
->         name: "vlan_webservers"
+>         name: "ansible.Caas_SandBox"
 >         register: caas_networkdomain
 
 This is an Extras Module

@@ -21,29 +21,11 @@ Options
 <th class="head">comments</th>
 </tr>
         <tr>
-<td>caas_apiurl<br/><div style="font-size: small;"></div></td>
+<td>caas_credentials<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>See caas_server for more information</div></td></tr>
-        <tr>
-<td>caas_datacenter<br/><div style="font-size: small;"></div></td>
-<td>yes</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>See caas_server for more information</div></td></tr>
-        <tr>
-<td>caas_password<br/><div style="font-size: small;"></div></td>
-<td>yes</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The associated password</div></td></tr>
-        <tr>
-<td>caas_username<br/><div style="font-size: small;"></div></td>
-<td>yes</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>Your username credential</div></td></tr>
+    <td><div>Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)</div></td></tr>
         <tr>
 <td>description<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -55,27 +37,52 @@ Options
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters.</div></td></tr>
+    <td><div>Name that has to be given to the instance</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
         <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>present</td>
     <td><ul><li>present</li><li>absent</li></ul></td>
-    <td><div>Should the resource be present or absent.</div><div>Take care : Absent will powerOff and delete all servers.</div></td></tr>
+    <td><div>Should the resource be present or absent.</div><div>Take care : Absent will delete the networkdomain</div></td></tr>
     </table>
 </br>
 Examples
 ========
 
 >     # Creates a new networkdomain named "ansible.Caas_SandBox", 
->     -caas_networkdomain:
->         caas_apiurl: "{{ caas_apiurl }}"
->         caas_username: "{{ caas_username }}"
->         caas_password: "{{ caas_password }}"
->         datacenterId: "{{ caas_datacenter }}"
->         name: "ansible.Caas_SandBox"
->         register: caas_networkdomain
+>         tasks:
+>           - name: Deploy my Nework Domain
+>             caas_networkdomain:
+>               caas_credentials: "{{ caas_credentials }}"
+>               name: ansible.CaaS_Sandbox
+>               type: ADVANCED
+>             register: caas_networkdomain
 
+Return Values
+=============
+
+Common return values are documented here common\_return\_values, the
+following are the fields unique to this module:
+
+<table border=1 cellpadding=4>
+<tr>
+<th class="head">name</th>
+<th class="head">description</th>
+<th class="head">returned</th>
+<th class="head">type</th>
+<th class="head">sample</th>
+</tr>
+
+    <tr>
+    <td> networkdomains </td>
+    <td>  </td>
+    <td align=center>  </td>
+    <td align=center>  </td>
+    <td align=center>  </td>
+</tr>
+
+</table>
+</br></br>
 This is an Extras Module
 ========================
 

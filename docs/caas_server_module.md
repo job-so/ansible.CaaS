@@ -34,35 +34,17 @@ Options
     <td><ul></ul></td>
     <td><div>TBC</div></td></tr>
         <tr>
-<td>caas_apiurl<br/><div style="font-size: small;"></div></td>
+<td>caas_credentials<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Africa (AF) : https://api-mea.dimensiondata.com</div><div>Asia Pacific (AP) : https://api-ap.dimensiondata.com</div><div>Australia (AU) : https://api-au.dimensiondata.com</div><div>Canada(CA) : https://api-canada.dimensiondata.com</div><div>Europe (EU) : https://api-eu.dimensiondata.com</div><div>North America (NA) : https://api-na.dimensiondata.com</div><div>South America (SA) : https://api-latam.dimensiondata.com</div></td></tr>
-        <tr>
-<td>caas_password<br/><div style="font-size: small;"></div></td>
-<td>yes</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The associated password</div></td></tr>
-        <tr>
-<td>caas_username<br/><div style="font-size: small;"></div></td>
-<td>yes</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>Your username credential</div></td></tr>
+    <td><div>Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)</div></td></tr>
         <tr>
 <td>count<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>1</td>
     <td><ul></ul></td>
     <td><div>Number of instances to deploy.  Decreasing this number as no effect.</div></td></tr>
-        <tr>
-<td>datacenterId<br/><div style="font-size: small;"></div></td>
-<td>yes</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>You can use your own 'Private MCP', or any public MCP 2.0 below :</div><div>Asia Pacific (AP) :</div><div>   AP3 Singapore - Serangoon</div><div>Australia (AU) :</div><div>   AU9 Australia - Sydney</div><div>   AU10  Australia - Melbourne</div><div>   AU11 New Zealand - Hamilton</div><div>Europe (EU) :</div><div>   EU6 Germany - Frankfurt</div><div>   EU7 Netherland - Amsterdam</div><div>   EU8 UK - London</div><div>North America (NA) :</div><div>   NA9 US - Ashburn</div><div>   NA12 US - Santa Clara</div></td></tr>
         <tr>
 <td>description<br/><div style="font-size: small;"></div></td>
 <td>no</td>
