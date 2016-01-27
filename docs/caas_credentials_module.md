@@ -51,36 +51,35 @@ Examples
 ========
 
 >     # Check credentials with username/password provided inside playbook (not recommended)
->         tasks:
->           - name: Check credentials (optionnal Step)
->             caas_credentials:
->               apiurl: https://api-eu.dimensiondata.com
->               username: firstname.lastname
->               password: MySecret_KeepItSecret
->               datacenterId: EU6 
->             register: cas_credentials
->
->     # Check credentials with username/password provided in an external file (recommended)
->       - name: Deploy Dimension Data infrastructure  
->         hosts: localhost
->         vars_files:
->           - /root/caas_credentials.yml
->         tasks:
->           - name: Check credentials (optionnal Step)
->             caas_credentials:
->               username: "{{caas_credentials.username}}"
->               password: "{{caas_credentials.password}}"
->               apiurl: "{{caas_credentials.apiurl}}"
->               datacenter: "{{caas_credentials.datacenter}}" 
->             register: caas_credentials
->
->     # Content of the external file /root/caas_credentials.yml
+>     tasks:
+>       - name: Check credentials (optionnal Step)
 >         caas_credentials:
+>             apiurl: https://api-eu.dimensiondata.com
 >             username: firstname.lastname
 >             password: MySecret_KeepItSecret
->             apiurl: https://api-eu.dimensiondata.com
->             datacenter: EU6 
->     ...
+>             datacenterId: EU6 
+>         register: cas_credentials
+>
+>     # Check credentials with username/password provided in an external file (recommended)
+>     - name: Deploy Dimension Data infrastructure  
+>       hosts: localhost
+>       vars_files:
+>         - /root/caas_credentials.yml
+>       tasks:
+>         - name: Check credentials (optionnal Step)
+>           caas_credentials:
+>             username: "{{caas_credentials.username}}"
+>             password: "{{caas_credentials.password}}"
+>             apiurl: "{{caas_credentials.apiurl}}"
+>             datacenter: "{{caas_credentials.datacenter}}" 
+>           register: caas_credentials
+>
+>     # Content of the external file /root/caas_credentials.yml
+>     caas_credentials:
+>         username: firstname.lastname
+>         password: MySecret_KeepItSecret
+>         apiurl: https://api-eu.dimensiondata.com
+>         datacenter: EU6 
 
 Return Values
 =============
