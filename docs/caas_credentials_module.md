@@ -32,79 +32,21 @@ Options
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Y</div><div>o</div><div>u</div><div> </div><div>c</div><div>a</div><div>n</div><div> </div><div>u</div><div>s</div><div>e</div><div> </div><div>y</div><div>o</div><div>u</div><div>r</div><div> </div><div>o</div><div>w</div><div>n</div><div> </div><div>P</div><div>r</div><div>i</div><div>v</div><div>a</div><div>t</div><div>e</div><div> </div><div>M</div><div>C</div><div>P</div><div>,</div><div>o</div><div>r</div><div> </div><div>a</div><div>n</div><div>y</div><div> </div><div>p</div><div>u</div><div>b</div><div>l</div><div>i</div><div>c</div><div> </div><div>M</div><div>C</div><div>P</div><div> </div><div>2</div><div>.</div><div>0</div><div> </div><div>b</div><div>e</div><div>l</div><div>o</div><div>w</div><div>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>s\</div\>\<div\>i\</div\>\<div\>a\</div\>\<div\>
-\</div\>\<div\>P\</div\>\<div\>a\</div\>\<div\>c\</div\>\<div\>i\</div\>\<div\>f\</div\>\<div\>i\</div\>\<div\>c\</div\>\<div\>
-\</div\>\<div\>(\</div\>\<div\>A\</div\>\<div\>P\</div\>\<div\>)\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>P\</div\>\<div\>3\</div\>\<div\>
-\</div\>\<div\>S\</div\>\<div\>i\</div\>\<div\>n\</div\>\<div\>g\</div\>\<div\>a\</div\>\<div\>p\</div\>\<div\>o\</div\>\<div\>r\</div\>\<div\>e\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>S\</div\>\<div\>e\</div\>\<div\>r\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>g\</div\>\<div\>o\</div\>\<div\>o\</div\>\<div\>n\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>P\</div\>\<div\>4\</div\>\<div\>
-\</div\>\<div\>J\</div\>\<div\>a\</div\>\<div\>p\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>T\</div\>\<div\>o\</div\>\<div\>k\</div\>\<div\>y\</div\>\<div\>o\</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>u\</div\>\<div\>s\</div\>\<div\>t\</div\>\<div\>r\</div\>\<div\>a\</div\>\<div\>l\</div\>\<div\>i\</div\>\<div\>a\</div\>\<div\>
-\</div\>\<div\>(\</div\>\<div\>A\</div\>\<div\>U\</div\>\<div\>)\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>U\</div\>\<div\>9\</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>u\</div\>\<div\>s\</div\>\<div\>t\</div\>\<div\>r\</div\>\<div\>a\</div\>\<div\>l\</div\>\<div\>i\</div\>\<div\>a\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>S\</div\>\<div\>y\</div\>\<div\>d\</div\>\<div\>n\</div\>\<div\>e\</div\>\<div\>y\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>U\</div\>\<div\>1\</div\>\<div\>0\</div\>\<div\>
-\</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>u\</div\>\<div\>s\</div\>\<div\>t\</div\>\<div\>r\</div\>\<div\>a\</div\>\<div\>l\</div\>\<div\>i\</div\>\<div\>a\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>M\</div\>\<div\>e\</div\>\<div\>l\</div\>\<div\>b\</div\>\<div\>o\</div\>\<div\>u\</div\>\<div\>r\</div\>\<div\>n\</div\>\<div\>e\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>U\</div\>\<div\>1\</div\>\<div\>1\</div\>\<div\>
-\</div\>\<div\>N\</div\>\<div\>e\</div\>\<div\>w\</div\>\<div\>
-\</div\>\<div\>Z\</div\>\<div\>e\</div\>\<div\>a\</div\>\<div\>l\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>d\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>H\</div\>\<div\>a\</div\>\<div\>m\</div\>\<div\>i\</div\>\<div\>l\</div\>\<div\>t\</div\>\<div\>o\</div\>\<div\>n\</div\>\<div\>
-\</div\>\<div\>E\</div\>\<div\>u\</div\>\<div\>r\</div\>\<div\>o\</div\>\<div\>p\</div\>\<div\>e\</div\>\<div\>
-\</div\>\<div\>(\</div\>\<div\>E\</div\>\<div\>U\</div\>\<div\>)\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>E\</div\>\<div\>U\</div\>\<div\>6\</div\>\<div\>
-\</div\>\<div\>G\</div\>\<div\>e\</div\>\<div\>r\</div\>\<div\>m\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>y\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>F\</div\>\<div\>r\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>k\</div\>\<div\>f\</div\>\<div\>u\</div\>\<div\>r\</div\>\<div\>t\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>E\</div\>\<div\>U\</div\>\<div\>7\</div\>\<div\>
-\</div\>\<div\>N\</div\>\<div\>e\</div\>\<div\>t\</div\>\<div\>h\</div\>\<div\>e\</div\>\<div\>r\</div\>\<div\>l\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>d\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>m\</div\>\<div\>s\</div\>\<div\>t\</div\>\<div\>e\</div\>\<div\>r\</div\>\<div\>d\</div\>\<div\>a\</div\>\<div\>m\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>E\</div\>\<div\>U\</div\>\<div\>8\</div\>\<div\>
-\</div\>\<div\>U\</div\>\<div\>K\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>L\</div\>\<div\>o\</div\>\<div\>n\</div\>\<div\>d\</div\>\<div\>o\</div\>\<div\>n\</div\>\<div\>
-\</div\>\<div\>N\</div\>\<div\>o\</div\>\<div\>r\</div\>\<div\>t\</div\>\<div\>h\</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>m\</div\>\<div\>e\</div\>\<div\>r\</div\>\<div\>i\</div\>\<div\>c\</div\>\<div\>a\</div\>\<div\>
-\</div\>\<div\>(\</div\>\<div\>N\</div\>\<div\>A\</div\>\<div\>)\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>N\</div\>\<div\>A\</div\>\<div\>9\</div\>\<div\>
-\</div\>\<div\>U\</div\>\<div\>S\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>A\</div\>\<div\>s\</div\>\<div\>h\</div\>\<div\>b\</div\>\<div\>u\</div\>\<div\>r\</div\>\<div\>n\</div\>\<div\>
-\</div\>\<div\> \</div\>\<div\>
-\</div\>\<div\>N\</div\>\<div\>A\</div\>\<div\>1\</div\>\<div\>2\</div\>\<div\>
-\</div\>\<div\>U\</div\>\<div\>S\</div\>\<div\>
-\</div\>\<div\>-\</div\>\<div\>
-\</div\>\<div\>S\</div\>\<div\>a\</div\>\<div\>n\</div\>\<div\>t\</div\>\<div\>a\</div\>\<div\>
-\</div\>\<div\>C\</div\>\<div\>l\</div\>\<div\>a\</div\>\<div\>r\</div\>\<div\>a\</div\>\<div\>
-\</div\>\</td\>\</tr\> \<tr\> \<td\>password\<br/\>\<div
-style="font-size: small;"\>\</div\>\</td\> \<td\>yes\</td\>
-\<td\>\</td\> \<td\>\<ul\>\</ul\>\</td\> \<td\>\<div\>Your
-password\</div\>\</td\>\</tr\> \<tr\> \<td\>username\<br/\>\<div
-style="font-size: small;"\>\</div\>\</td\> \<td\>yes\</td\>
-\<td\>\</td\> \<td\>\<ul\>\</ul\>\</td\> \<td\>\<div\>Your
-username\</div\>\</td\>\</tr\> \</table\> \</br\>
-
+    <td><div>You can use your own 'Private MCP', or any public MCP 2.0 below :</div><div>Asia Pacific (AP) :</div><div> AP3 Singapore - Serangoon</div><div>    AP4 Japan - Tokyo</div><div>Australia (AU) :</div><div>   AU9 Australia - Sydney</div><div>   AU10  Australia - Melbourne</div><div>   AU11 New Zealand - Hamilton</div><div>Europe (EU) :</div><div>   EU6 Germany - Frankfurt</div><div>   EU7 Netherland - Amsterdam</div><div>   EU8 UK - London</div><div>North America (NA) :</div><div>   NA9 US - Ashburn</div><div>   NA12 US - Santa Clara</div></td></tr>
+        <tr>
+<td>password<br/><div style="font-size: small;"></div></td>
+<td>yes</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Your password</div></td></tr>
+        <tr>
+<td>username<br/><div style="font-size: small;"></div></td>
+<td>yes</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Your username</div></td></tr>
+    </table>
+</br>
 Examples
 ========
 
