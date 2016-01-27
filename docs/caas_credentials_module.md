@@ -75,11 +75,12 @@ Examples
 >             register: caas_credentials
 >
 >     # Content of the external file /root/caas_credentials.yml
->     caas_credentials:
->         username: firstname.lastname
->         password: MySecret_KeepItSecret
->         apiurl: https://api-eu.dimensiondata.com
->         datacenter: EU6 
+>         caas_credentials:
+>             username: firstname.lastname
+>             password: MySecret_KeepItSecret
+>             apiurl: https://api-eu.dimensiondata.com
+>             datacenter: EU6 
+>     ...
 
 Return Values
 =============
