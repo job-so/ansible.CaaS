@@ -3,14 +3,16 @@ Ansible modules for managing Dimension Data Cloud
 
 A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)
 
+RFTM :-) : For each module, you should find a clear documentation. click on documentation links below.
+
 ## modules
   * [caas_credentials.py](/library/caas_credentials.py) : Check credentials against MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_credentials_module.html)
-  * [caas_networkdomain.py](/library/caas_networkdomain.py) : Create/Delete Network Domain on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_networkdomain_module.md)
-  * [caas_vlan.py](/library/caas_vlan.py) : Create/Delete VLAN on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_vlan_module.md)
-  * [caas_server.py](/library/caas_server.py) : Create/Delete Servers on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_server_module.md)
-  * [caas_firewallrule.py](/library/caas_firewallrule.py) : Create/Delete FireWall rules on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_firewallrule_module.md)
-  * [caas_loadbalancer.py](/library/caas_loadbalancer.py) : Create/Delete Load Balancing config on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_loadbalancer_module.md)
-  * [caas_publicip.py](/library/caas_publicip.py) : Create/Delete Public IP blocks on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_publicip_module.md)
+  * [caas_networkdomain.py](/library/caas_networkdomain.py) : Create/Delete Network Domain on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_networkdomain_module.html)
+  * [caas_vlan.py](/library/caas_vlan.py) : Create/Delete VLAN on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_vlan_module.html)
+  * [caas_server.py](/library/caas_server.py) : Create/Delete Servers on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_server_module.html)
+  * [caas_firewallrule.py](/library/caas_firewallrule.py) : Create/Delete FireWall rules on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_firewallrule_module.html)
+  * [caas_loadbalancer.py](/library/caas_loadbalancer.py) : Create/Delete Load Balancing config on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_loadbalancer_module.html)
+  * [caas_publicip.py](/library/caas_publicip.py) : Create/Delete Public IP blocks on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_publicip_module.html)
 
 ## example
   * [demo.yml](/demo.yml) : Sample Demo Ansible playbook file

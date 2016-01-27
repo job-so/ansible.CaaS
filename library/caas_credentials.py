@@ -45,22 +45,22 @@ options:
       - "South America (SA) : https://api-latam.dimensiondata.com"
     required: true
   datacenterId: 
-    description: > 
-      You can use your own Private MCP, or any public MCP 2.0 below
-        Asia Pacific (AP)
-        AP3 Singapore - Serangoon
-        AP4 Japan - Tokyo
-      Australia (AU)
-        AU9 Australia - Sydney
-        AU10  Australia - Melbourne
-        AU11 New Zealand - Hamilton
-      Europe (EU)
-        EU6 Germany - Frankfurt
-        EU7 Netherland - Amsterdam
-        EU8 UK - London
-      North America (NA) 
-        NA9 US - Ashburn
-        NA12 US - Santa Clara
+    description: 
+      - "You can use your own 'Private MCP', or any public MCP 2.0 below :"
+      - "** Asia Pacific (AP) :"
+      - "**** AP3 Singapore - Serangoon"
+      - "**** AP4 Japan - Tokyo"
+      - "** Australia (AU) :"
+      - "**** AU9 Australia - Sydney"
+      - "**** AU10  Australia - Melbourne"
+      - "**** AU11 New Zealand - Hamilton"
+      - "** Europe (EU) :"
+      - "**** EU6 Germany - Frankfurt"
+      - "**** EU7 Netherland - Amsterdam"
+      - "**** EU8 UK - London"
+      - "**** North America (NA) :"
+      - "**** NA9 US - Ashburn"
+      - "**** NA12 US - Santa Clara"
     required: true
   password: 
     description: 
@@ -76,29 +76,29 @@ version_added: "1.9"
 
 EXAMPLES = '''
 # Check credentials with username/password provided inside playbook (not recommended)
-    tasks:
-      - name: Check credentials (optionnal Step)
-        caas_credentials:
-          apiurl: https://api-eu.dimensiondata.com
-          username: firstname.lastname
-          password: MySecret_KeepItSecret
-          datacenterId: EU6 
-        register: cas_credentials
+tasks:
+  - name: Check credentials (optionnal Step)
+    caas_credentials:
+        apiurl: https://api-eu.dimensiondata.com
+        username: firstname.lastname
+        password: MySecret_KeepItSecret
+        datacenterId: EU6 
+    register: cas_credentials
 		
 # Check credentials with username/password provided in an external file (recommended)
-  - name: Deploy Dimension Data infrastructure  
-    hosts: localhost
-    vars_files:
-      - /root/caas_credentials.yml
-    tasks:
-      - name: Check credentials (optionnal Step)
-        caas_credentials:
-          username: "{{caas_credentials.username}}"
-          password: "{{caas_credentials.password}}"
-          apiurl: "{{caas_credentials.apiurl}}"
-          datacenter: "{{caas_credentials.datacenter}}" 
-        register: caas_credentials
-	
+- name: Deploy Dimension Data infrastructure  
+  hosts: localhost
+  vars_files:
+    - /root/caas_credentials.yml
+  tasks:
+    - name: Check credentials (optionnal Step)
+      caas_credentials:
+        username: "{{caas_credentials.username}}"
+        password: "{{caas_credentials.password}}"
+        apiurl: "{{caas_credentials.apiurl}}"
+        datacenter: "{{caas_credentials.datacenter}}" 
+      register: caas_credentials
+
 # Content of the external file /root/caas_credentials.yml
 caas_credentials:
     username: firstname.lastname
@@ -108,31 +108,24 @@ caas_credentials:
 '''
 
 RETURN = '''
-caas_credentials: 
+dest:
     description: destination file/path
     returned: success
     type: string
-    sample: "https://api-eu.dimensiondata.com"
+    sample: "/path/to/file.txt"
+src:
+    description: source file used for the copy on the target machine
+    returned: changed
+    type: string
+    sample: "/home/httpd/.ansible/tmp/ansible-tmp-1423796390.97-147729857856000/source"
+md5sum:
+    description: md5 checksum of the file after running copy
+    returned: when supported
+    type: string
+    sample: "2a5aeecc61dc98c4d780b14b330e3282"
+...
 '''
 
-RaETURN = '''
-    datacenter: 
-        sample: "EU6"
-    orgId:
-        sample: "4255d938-0bfc-4553-9c68-b61fbd1f4c42"
-    password:
-        sample: "MySecret_KeepItSecret"
-    username:
-        sample: "firstname.lastname"
-
-"caas_credentials": {
-    "apiurl": "https://api-eu.dimensiondata.com",
-    "datacenter": "EU6",
-    "orgId": "4255d938-0bfc-4553-9c68-b61fbd1f4c42",
-    "password": "MySecret_KeepItSecret",
-    "username": "firstname.lastname"
-}
-'''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_credentials---"+str(datetime.datetime.now()))
 
