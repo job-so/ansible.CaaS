@@ -97,11 +97,25 @@ following are the fields unique to this module:
 </tr>
 
     <tr>
-    <td> caas_credentials </td>
+    <td> dest </td>
     <td> destination file/path </td>
     <td align=center> success </td>
     <td align=center> string </td>
-    <td align=center> https://api-eu.dimensiondata.com </td>
+    <td align=center> /path/to/file.txt </td>
+</tr>
+        <tr>
+    <td> src </td>
+    <td> source file used for the copy on the target machine </td>
+    <td align=center> changed </td>
+    <td align=center> string </td>
+    <td align=center> /home/httpd/.ansible/tmp/ansible-tmp-1423796390.97-147729857856000/source </td>
+</tr>
+        <tr>
+    <td> md5sum </td>
+    <td> md5 checksum of the file after running copy </td>
+    <td align=center> when supported </td>
+    <td align=center> string </td>
+    <td align=center> 2a5aeecc61dc98c4d780b14b330e3282 </td>
 </tr>
 
 </table>
