@@ -36,6 +36,8 @@ A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.o
   3. ansible-playbook demo.yml
 
 ## dev : build the documentation
-  1. ansible/make webdocs
-  2. pandoc -s -o caas_credentials_module.md ../../ansible/docsite/rst/caas_credentials_module.rst
+  1. make --directory ~/ansible/ webdocs
+  2. pandoc -s -o ~/ansible.CaaS/docs/caas_credentials_module.md ~/ansible/docsite/rst/caas_credentials_module.rst
+
+  for f in ~/ansible/docsite/rst/caas_*_module.rst; do $g = ${f/'.rst'/'.md'}; $h= ${g/'/ansible/docsite/rst/'/'/ansible.CaaS/docs/'}; echo $h; done
 

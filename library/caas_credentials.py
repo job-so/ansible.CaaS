@@ -45,29 +45,30 @@ options:
       - "South America (SA) : https://api-latam.dimensiondata.com"
     required: true
   datacenterId: 
-    description: 
-      - "You can use your own 'Private MCP', or any public MCP 2.0 below :"
-      - "Asia Pacific (AP) :"
-      - "   AP3 Singapore - Serangoon"
-      - "Australia (AU) :"
-      - "   AU9 Australia - Sydney"
-      - "   AU10  Australia - Melbourne"
-      - "   AU11 New Zealand - Hamilton"
-      - "Europe (EU) :"
-      - "   EU6 Germany - Frankfurt"
-      - "   EU7 Netherland - Amsterdam"
-      - "   EU8 UK - London"
-      - "North America (NA) :"
-      - "   NA9 US - Ashburn"
-      - "   NA12 US - Santa Clara"
+    description: > 
+      You can use your own Private MCP, or any public MCP 2.0 below
+        Asia Pacific (AP)
+        AP3 Singapore - Serangoon
+        AP4 Japan - Tokyo
+      Australia (AU)
+        AU9 Australia - Sydney
+        AU10  Australia - Melbourne
+        AU11 New Zealand - Hamilton
+      Europe (EU)
+        EU6 Germany - Frankfurt
+        EU7 Netherland - Amsterdam
+        EU8 UK - London
+      North America (NA) 
+        NA9 US - Ashburn
+        NA12 US - Santa Clara
     required: true
   password: 
     description: 
-      - "The associated password"
+      - "Your password"
     required: true
   username: 
     description: 
-      - "Your username credential"
+      - "Your username"
     required: true
 short_description: "Check Dimension Data Managed Cloud Platform credentials"
 version_added: "1.9"
@@ -106,7 +107,7 @@ caas_credentials:
     datacenter: EU6 
 '''
 
-__RETURN = '''
+RETURN = '''
 caas_credentials: 
     description: destination file/path
     returned: success
@@ -114,7 +115,7 @@ caas_credentials:
     sample: "https://api-eu.dimensiondata.com"
 '''
 
-R_ETURN = '''
+RaETURN = '''
     datacenter: 
         sample: "EU6"
     orgId:
