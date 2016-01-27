@@ -81,6 +81,31 @@ Examples
 >         apiurl: https://api-eu.dimensiondata.com
 >         datacenter: EU6 
 
+Return Values
+=============
+
+Common return values are documented here common\_return\_values, the
+following are the fields unique to this module:
+
+<table border=1 cellpadding=4>
+<tr>
+<th class="head">name</th>
+<th class="head">description</th>
+<th class="head">returned</th>
+<th class="head">type</th>
+<th class="head">sample</th>
+</tr>
+
+    <tr>
+    <td> caas_credentials </td>
+    <td> destination file/path </td>
+    <td align=center> success </td>
+    <td align=center> string </td>
+    <td align=center> https://api-eu.dimensiondata.com </td>
+</tr>
+
+</table>
+</br></br>
 This is an Extras Module
 ========================
 
