@@ -32,7 +32,7 @@ Options
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>You can use your own 'Private MCP', or any public MCP 2.0 below :</div><div>Asia Pacific (AP) :</div><div> AP3 Singapore - Serangoon</div><div>    AP4 Japan - Tokyo</div><div>Australia (AU) :</div><div>   AU9 Australia - Sydney</div><div>   AU10  Australia - Melbourne</div><div>   AU11 New Zealand - Hamilton</div><div>Europe (EU) :</div><div>   EU6 Germany - Frankfurt</div><div>   EU7 Netherland - Amsterdam</div><div>   EU8 UK - London</div><div>North America (NA) :</div><div>   NA9 US - Ashburn</div><div>   NA12 US - Santa Clara</div></td></tr>
+    <td><div>You can use your own 'Private MCP', or any public MCP 2.0 below :</div><div>Asia Pacific (AP) :</div><div>&amp;nbsp;&amp;nbsp;&amp;nbsp;AP3 Singapore - Serangoon</div><div>&amp;nbsp;&amp;nbsp;&amp;nbsp;AP4 Japan - Tokyo</div><div>Australia (AU) :</div><div>   AU9 Australia - Sydney</div><div>   AU10  Australia - Melbourne</div><div>   AU11 New Zealand - Hamilton</div><div>Europe (EU) :</div><div>   EU6 Germany - Frankfurt</div><div>   EU7 Netherland - Amsterdam</div><div>   EU8 UK - London</div><div>North America (NA) :</div><div>   NA9 US - Ashburn</div><div>   NA12 US - Santa Clara</div></td></tr>
         <tr>
 <td>password<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
