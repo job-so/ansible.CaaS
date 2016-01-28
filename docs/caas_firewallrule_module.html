@@ -54,7 +54,7 @@
   
     <link rel="top" title="Ansible Documentation" href="index.html"/>
         <link rel="up" title="Cloud Modules" href="list_of_cloud_modules.html"/>
-        <link rel="next" title="caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform" href="caas_loadbalancer_module.html"/>
+        <link rel="next" title="caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform" href="caas_loadbalancer_module.html"/>
         <link rel="prev" title="caas_credentials - Check Dimension Data Managed Cloud Platform credentials" href="caas_credentials_module.html"/> 
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -380,8 +380,9 @@
 <li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
 <li><a class="reference internal" href="#options" id="id3">Options</a></li>
 <li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
-<li><a class="reference internal" href="#notes" id="id5">Notes</a></li>
-<li><a class="reference internal" href="#this-is-an-extras-module" id="id6">This is an Extras Module</a></li>
+<li><a class="reference internal" href="#return-values" id="id5">Return Values</a></li>
+<li><a class="reference internal" href="#notes" id="id6">Notes</a></li>
+<li><a class="reference internal" href="#this-is-an-extras-module" id="id7">This is an Extras Module</a></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
@@ -542,7 +543,7 @@
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "ansible.Caas_SandBox"
-          name: "WebDMZ2AppDMZ"
+          name: "Web2App"
           source:
             ip:
               address: 192.168.30.0
@@ -605,15 +606,37 @@
 </div>
 </div></blockquote>
 </div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<p>Common return values are documented here <a class="reference internal" href="common_return_values.html"><em>Common Return Values</em></a>, the following are the fields unique to this module:</p>
+<table border=1 cellpadding=4>
+<tr>
+<th class="head">name</th>
+<th class="head">description</th>
+<th class="head">returned</th>
+<th class="head">type</th>
+<th class="head">sample</th>
+</tr>
+
+    <tr>
+    <td> firewallRules </td>
+    <td> A list of firewallRule (should be one) matching the task parameters. </td>
+    <td align=center> success </td>
+    <td align=center> Dictionary </td>
+    <td align=center> {'totalCount': 1, 'pageNumber': 1, 'firewallRule': [{'datacenterId': 'EU6', 'networkDomainId': '94e50925-2d2f-4727-b137-6d70ce416829', 'protocol': 'TCP', 'name': 'Web2App', 'destination': {'ip': {'prefixSize': 24, 'address': '192.168.40.0'}, 'port': {'begin': 3000}}, 'enabled': True, 'ruleType': 'CLIENT_RULE', 'ipVersion': 'IPV4', 'source': {'ip': {'prefixSize': 24, 'address': '192.168.30.0'}}, 'state': 'NORMAL', 'action': 'ACCEPT_DECISIVELY', 'id': '8455537c-2cb8-482f-8212-f304e0acbaa7'}], 'pageSize': 50, 'pageCount': 1} </td>
+</tr>
+
+</table>
+</br></br></div>
 <div class="section" id="notes">
-<h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : <a class="reference external" href="https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2">https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2</a></p>
 </div>
 </div>
 <div class="section" id="this-is-an-extras-module">
-<h2><a class="toc-backref" href="#id6">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
 <p>For more information on what this means please read <a class="reference internal" href="modules_extra.html"><em>Extras Modules</em></a></p>
 <p>For help in developing on modules, should you be so inclined, please read <a class="reference internal" href="community.html"><em>Community Information &amp; Contributing</em></a>, <a class="reference internal" href="developing_test_pr.html"><em>Helping Testing PRs</em></a> and <a class="reference internal" href="developing_modules.html"><em>Developing Modules</em></a>.</p>
 </div>
@@ -626,7 +649,7 @@
   
     <div class="rst-footer-buttons">
       
-        <a href="caas_loadbalancer_module.html" class="btn btn-neutral float-right" title="caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="caas_loadbalancer_module.html" class="btn btn-neutral float-right" title="caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="caas_credentials_module.html" class="btn btn-neutral" title="caas_credentials - Check Dimension Data Managed Cloud Platform credentials"><span class="icon icon-circle-arrow-left"></span> Previous</a>

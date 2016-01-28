@@ -15,7 +15,7 @@
   <!-- End Google Tag Manager Data Layer -->
 
   
-  <title>caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform &mdash; Ansible Documentation</title>
+  <title>caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform &mdash; Ansible Documentation</title>
   
 
   
@@ -363,31 +363,42 @@
 
           <ul class="wy-breadcrumbs">
   <li><a href="index.html">Docs</a> &raquo;</li>
-  <li><a href="">caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform</a></li>
+  <li><a href="">caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform</a></li>
   
 </ul>
 <hr/>
 
           <div id="page-content">
           
-  <div class="section" id="caas-vlan-create-configure-remove-network-domain-on-dimension-data-managed-cloud-platform">
-<span id="caas-vlan"></span><h1>caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform<a class="headerlink" href="#caas-vlan-create-configure-remove-network-domain-on-dimension-data-managed-cloud-platform" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="caas-loadbalancer-create-configure-remove-load-balancer-instances-on-dimension-data-managed-cloud-platform">
+<span id="caas-loadbalancer"></span><h1>caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform<a class="headerlink" href="#caas-loadbalancer-create-configure-remove-load-balancer-instances-on-dimension-data-managed-cloud-platform" title="Permalink to this headline">¶</a></h1>
 <p class="versionadded">
 <span class="versionmodified">New in version 1.9.</span></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
-<li><a class="reference internal" href="#options" id="id2">Options</a></li>
-<li><a class="reference internal" href="#examples" id="id3">Examples</a></li>
-<li><a class="reference internal" href="#this-is-an-extras-module" id="id4">This is an Extras Module</a></li>
+<li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
+<li><a class="reference internal" href="#options" id="id3">Options</a></li>
+<li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
+<li><a class="reference internal" href="#notes" id="id5">Notes</a></li>
+<li><a class="reference internal" href="#this-is-an-extras-module" id="id6">This is an Extras Module</a></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Create, Remove Network vlans on Dimension Data Managed Cloud Platform</p>
+<p>Create, Configure, Remove LoadBalancer instances on Dimension Data Managed Cloud Platform</p>
+</div>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>a caas_credentials variable, see caas_credentials module.</li>
+<li>a network domain already deployed, see caas_networkdomain module.</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="options">
-<h2><a class="toc-backref" href="#id2">Options</a><a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Options</a><a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <table border=1 cellpadding=4>
 <tr>
 <th class="head">parameter</th>
@@ -415,24 +426,6 @@
     <td><ul></ul></td>
     <td><div>Name that has to be given to the instance</div><div>The name must be unique inside the DataCenter</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
         <tr>
-<td>networkDomainId<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center.</div></td></tr>
-        <tr>
-<td>networkDomainName<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center.</div></td></tr>
-        <tr>
-<td>privateIpv4BaseAddress<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided.</div><div>If this property is not provided, the VLAN will default to being /24</div></td></tr>
-        <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>present</td>
@@ -441,21 +434,21 @@
     </table>
 </br></div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><div class="highlight-YAML"><pre># Creates a new vlan named "ansible.Caas_SandBox",
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "vlan_webservers"
-    register: caas_networkdomain</pre>
+<div><div class="highlight-YAML"><pre>#</pre>
 </div>
 </div></blockquote>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : <a class="reference external" href="https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2">https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2</a></p>
+</div>
+</div>
 <div class="section" id="this-is-an-extras-module">
-<h2><a class="toc-backref" href="#id4">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
 <p>For more information on what this means please read <a class="reference internal" href="modules_extra.html"><em>Extras Modules</em></a></p>
 <p>For help in developing on modules, should you be so inclined, please read <a class="reference internal" href="community.html"><em>Community Information &amp; Contributing</em></a>, <a class="reference internal" href="developing_test_pr.html"><em>Helping Testing PRs</em></a> and <a class="reference internal" href="developing_modules.html"><em>Developing Modules</em></a>.</p>
 </div>
