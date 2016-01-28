@@ -54,7 +54,7 @@
   
     <link rel="top" title="Ansible Documentation" href="index.html"/>
         <link rel="up" title="Cloud Modules" href="list_of_cloud_modules.html"/>
-        <link rel="next" title="caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform" href="caas_vlan_module.html"/>
+        <link rel="next" title="caas_vlan - Create, Configure, Remove VLANs on Dimension Data Managed Cloud Platform" href="caas_vlan_module.html"/>
         <link rel="prev" title="caas_publicip - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform" href="caas_publicip_module.html"/> 
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -377,17 +377,30 @@
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
-<li><a class="reference internal" href="#options" id="id2">Options</a></li>
-<li><a class="reference internal" href="#examples" id="id3">Examples</a></li>
-<li><a class="reference internal" href="#this-is-an-extras-module" id="id4">This is an Extras Module</a></li>
+<li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
+<li><a class="reference internal" href="#options" id="id3">Options</a></li>
+<li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
+<li><a class="reference internal" href="#return-values" id="id5">Return Values</a></li>
+<li><a class="reference internal" href="#notes" id="id6">Notes</a></li>
+<li><a class="reference internal" href="#this-is-an-extras-module" id="id7">This is an Extras Module</a></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform For now, this module only support MCP 2.0.</p>
+<p>Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform</p>
+</div>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>a caas_credentials variable, see caas_credentials module.</li>
+<li>a network domain already deployed, see caas_networkdomain module.</li>
+<li>a vlan already deployed, see caas_vlan module.</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="options">
-<h2><a class="toc-backref" href="#id2">Options</a><a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Options</a><a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <table border=1 cellpadding=4>
 <tr>
 <th class="head">parameter</th>
@@ -399,15 +412,15 @@
         <tr>
 <td>action<br/><div style="font-size: small;"></div></td>
 <td>no</td>
-<td>startServer</td>
+<td></td>
     <td><ul><li>startServer</li><li>shutdownServer</li><li>rebootServer</li><li>resetServer</li><li>powerOffServer</li><li>updateVmwareTools</li><li>upgradeVirtualHardware</li></ul></td>
-    <td><div>Action to perform against all servers.</div><div>startServer : starts non-running Servers</div><div>shutdownServer : performs guest OS initiated shutdown of running Servers (preferable to powerOffServer)</div><div>rebootServer : performs guest OS initiated restart of running Servers (preferable to resetServer)</div><div>resetServer : performs hard reset of running Servers</div><div>powerOffServer : performs hard power off of running Servers</div><div>updateVmwareTools : triggers an update of the VMware Tools software running on the guest OS of the Servers</div><div>upgradeVirtualHardware : triggers an update of the VMware Virtual Hardware. VMware recommend cloning the Server prior to performing the upgrade in case something goes wrong during the upgrade process</div></td></tr>
+    <td><div>Action to perform against all servers.</div><div>** startServer : starts non-running Servers</div><div>** shutdownServer : performs guest OS initiated shutdown of running Servers (preferable to powerOffServer)</div><div>** rebootServer : performs guest OS initiated restart of running Servers (preferable to resetServer)</div><div>** resetServer : performs hard reset of running Servers</div><div>** powerOffServer : performs hard power off of running Servers</div><div>** updateVmwareTools : triggers an update of the VMware Tools software running on the guest OS of the Servers</div><div>** upgradeVirtualHardware : triggers an update of the VMware Virtual Hardware. VMware recommend cloning the Server prior to performing the upgrade in case something goes wrong during the upgrade process</div></td></tr>
         <tr>
 <td>administratorPassword<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>TBC</div></td></tr>
+    <td><div>The administrator password for Windows Servers,</div><div>The root password for Linux Servers.</div></td></tr>
         <tr>
 <td>caas_credentials<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
@@ -419,7 +432,7 @@
 <td>no</td>
 <td>1</td>
     <td><ul></ul></td>
-    <td><div>Number of instances to deploy.  Decreasing this number as no effect.</div></td></tr>
+    <td><div>Number of instances to deploy. This parameter is mutable, however decreasing as no effect.</div></td></tr>
         <tr>
 <td>description<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -430,14 +443,14 @@
 <td>imageId<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
-    <td><ul><li>present</li><li>absent</li></ul></td>
-    <td><div>UUID of the Server Image being used as the target for the new Server deployment</div></td></tr>
+    <td><ul></ul></td>
+    <td><div>The id of the Server Image being used as the target for the new Server deployment</div><div>You can use either imageId or imageName, however one of them must be specified</div></td></tr>
         <tr>
 <td>imageName<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>TBC</div></td></tr>
+    <td><div>The name of the Server Image being used as the target for the new Server deployment</div><div>You can use either imageId or imageName, however one of them must be specified</div></td></tr>
         <tr>
 <td>name<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
@@ -461,32 +474,96 @@
 <td>no</td>
 <td>True</td>
     <td><ul><li>True</li><li>False</li></ul></td>
-    <td><div>TBC</div></td></tr>
+    <td><div>Does the task must wait for the server(s) creation ? or deploy it asynchronously ?</div></td></tr>
     </table>
 </br></div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><div class="highlight-YAML"><pre># Creates a new server named "WebServer" of CentOS 7 with default CPU/RAM/HD,
-#   on Vlan "vlan_webservers", in Network Domain : "ansible.Caas_SandBox"
--caas_server:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "WebServer"
-    imageName: CentOS 7 64-bit 2 CPU
-    administratorPassword: "{{ root_password }}"
-    networkInfo:
-        networkDomainName: ansible.Caas_SandBox
-        primaryNic:
-            vlanName: vlan_webservers
-    register: caas_server</pre>
+<div><div class="highlight-YAML"><pre># Create a new server named "MyWebServer" of CentOS 7 with default CPU/RAM/HD,
+#   with a specific IP (vlan is determined based on this IPv4), in Network Domain : "ansible.Caas_SandBox"
+      - name: Deploy WebServers DMZ
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          name: "MyWebServer"
+          imageName: CentOS 7 64-bit 2 CPU
+          administratorPassword: "{{ root_password }}"
+          networkInfo:
+              networkDomainName: ansible.Caas_SandBox
+              primaryNic:
+                  privateIpv4: 192.168.30.42
+        register: caas_mywebserver
+
+# shutdown this server
+      - name: Deploy WebServers DMZ
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          name: "MyWebServer"
+          action: shutdownServer
+          networkInfo:
+              networkDomainName: ansible.Caas_SandBox
+              primaryNic:
+                  privateIpv4: 192.168.30.42
+
+# teardown this server (no need to PowerOff)
+      - name: Deploy WebServers DMZ
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          name: "MyWebServer"
+          state: absent
+          networkInfo:
+              networkDomainName: ansible.Caas_SandBox
+              primaryNic:
+                  privateIpv4: 192.168.30.42
+
+# Create 2 servers named "WebServer" of CentOS 7 with default CPU/RAM/HD,
+#   automatic IPv4 assignement, in a vlan and a Network Domain referenced from a previous task.
+      - name: Deploy WebServers
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          name: "WebServer"
+          count: 2
+          imageName: CentOS 7 64-bit 2 CPU
+          administratorPassword: "{{ root_password }}"
+          networkInfo:
+              networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+              primaryNic:
+                  vlanName: "{{caas_vlan_webservers.vlans.vlan[0].name}}"
+        register: caas_webservers</pre>
 </div>
 </div></blockquote>
 </div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<p>Common return values are documented here <a class="reference internal" href="common_return_values.html"><em>Common Return Values</em></a>, the following are the fields unique to this module:</p>
+<table border=1 cellpadding=4>
+<tr>
+<th class="head">name</th>
+<th class="head">description</th>
+<th class="head">returned</th>
+<th class="head">type</th>
+<th class="head">sample</th>
+</tr>
+
+    <tr>
+    <td> servers </td>
+    <td> A list of Servers (one, or more) matching the task parameters. </td>
+    <td align=center> success </td>
+    <td align=center> Dictionary </td>
+    <td align=center> {'totalCount': 1, 'pageCount': 1, 'pageNumber': 1, 'pageSize': 250, 'server': [{'softwareLabel': [], 'description': 'Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS', 'started': True, 'networkInfo': {'networkDomainId': '94e50925-2d2f-4727-b137-6d70ce416829', 'primaryNic': {'state': 'NORMAL', 'privateIpv4': '192.168.30.42', 'ipv6': '2a00:47c0:111:1168:82b:fb61:c846:7758', 'vlanName': 'ansible.CaaS_Sandbox_vlan_webservers', 'vlanId': '3a454c87-c8f6-4517-8531-b55f9440449c', 'id': '1ab80e75-ca8b-490f-8105-f17a0e3c78af'}, 'additionalNic': []}, 'sourceImageId': 'd265499b-842d-46b1-a5aa-719971510e06', 'memoryGb': 4, 'vmwareTools': {'apiVersion': 9354, 'runningStatus': 'RUNNING', 'versionStatus': 'CURRENT'}, 'disk': [{'state': 'NORMAL', 'scsiId': 0, 'speed': 'STANDARD', 'id': '3ef2ac30-0b64-4dd1-bd24-a01780ea6b7e', 'sizeGb': 10}], 'createTime': '2016-01-28T15:47:34.000Z', 'deployed': True, 'name': 'MyWebServer', 'cpu': {'coresPerSocket': 1, 'count': 2, 'speed': 'STANDARD'}, 'id': '029383e1-6912-45fb-a604-5c7d2e9e0998', 'datacenterId': 'EU6', 'state': 'NORMAL', 'operatingSystem': {'displayName': 'CENTOS7/64', 'id': 'CENTOS764', 'family': 'UNIX'}, 'virtualHardware': {'upToDate': False, 'version': 'vmx-08'}}]} </td>
+</tr>
+
+</table>
+</br></br></div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id6">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : <a class="reference external" href="https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2">https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2</a></p>
+</div>
+</div>
 <div class="section" id="this-is-an-extras-module">
-<h2><a class="toc-backref" href="#id4">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
 <p>For more information on what this means please read <a class="reference internal" href="modules_extra.html"><em>Extras Modules</em></a></p>
 <p>For help in developing on modules, should you be so inclined, please read <a class="reference internal" href="community.html"><em>Community Information &amp; Contributing</em></a>, <a class="reference internal" href="developing_test_pr.html"><em>Helping Testing PRs</em></a> and <a class="reference internal" href="developing_modules.html"><em>Developing Modules</em></a>.</p>
 </div>
@@ -499,7 +576,7 @@
   
     <div class="rst-footer-buttons">
       
-        <a href="caas_vlan_module.html" class="btn btn-neutral float-right" title="caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="caas_vlan_module.html" class="btn btn-neutral float-right" title="caas_vlan - Create, Configure, Remove VLANs on Dimension Data Managed Cloud Platform"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="caas_publicip_module.html" class="btn btn-neutral" title="caas_publicip - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"><span class="icon icon-circle-arrow-left"></span> Previous</a>

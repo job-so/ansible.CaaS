@@ -394,7 +394,7 @@
 <blockquote>
 <div><ul class="simple">
 <li>a caas_credentials variable, see caas_credentials module.</li>
-<li>a network domain already deployed</li>
+<li>a network domain already deployed, see caas_networkdomain module.</li>
 </ul>
 </div></blockquote>
 </div>
@@ -441,9 +441,9 @@
         <tr>
 <td>privateIpv4BaseAddress<br/><div style="font-size: small;"></div></td>
 <td>no</td>
-<td></td>
+<td>24</td>
     <td><ul></ul></td>
-    <td><div>An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided.</div><div>If this property is not provided, the VLAN will default to being /24</div></td></tr>
+    <td><div>An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided.</div></td></tr>
         <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -494,7 +494,7 @@
 
     <tr>
     <td> vlans </td>
-    <td> A list of networkDomain (should be one) matching the task parameters. </td>
+    <td> A list of VLANs (should be one) matching the task parameters. </td>
     <td align=center> success </td>
     <td align=center> Dictionary </td>
     <td align=center> {'totalCount': 1, 'vlan': [{'ipv6GatewayAddress': '2a00:47c0:111:1168:0:0:0:1', 'description': 'Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS', 'name': 'ansible.CaaS_Sandbox_vlan_webservers', 'ipv6Range': {'prefixSize': 64, 'address': '2a00:47c0:111:1168:0:0:0:0'}, 'id': '3a454c87-c8f6-4517-8531-b55f9440449c', 'datacenterId': 'EU6', 'state': 'NORMAL', 'networkDomain': {'id': '94e50925-2d2f-4727-b137-6d70ce416829', 'name': 'ansible.CaaS_Sandbox'}, 'ipv4GatewayAddress': '192.168.30.1', 'createTime': '2016-01-28T08:49:04.000Z', 'privateIpv4Range': {'prefixSize': 24, 'address': '192.168.30.0'}}], 'pageNumber': 1, 'pageSize': 250, 'pageCount': 1} </td>
