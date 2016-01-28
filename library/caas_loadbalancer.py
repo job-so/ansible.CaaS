@@ -161,6 +161,7 @@ def _listVirtualListenerRule(module,caas_credentials,orgId,wait):
 
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
@@ -229,11 +230,11 @@ def main():
             _data = {}
             _data['id'] = virtualListenerList['virtualListener'][0]['id']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 	
 #PRESENT
     if state == "present":
@@ -254,13 +255,14 @@ def main():
             _data['sourcePortPreservation'] = module.params['sourcePortPreservation']
             _data['optimizationProfile'] = module.params['optimizationProfile']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
-                for info in result['msg']['info']:
-                    if info['name'] == 'virtualListenerId': module.params['id'] = info['value']
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: 
+                    has_changed = True
+                    for info in result['msg']['info']:
+                        if info['name'] == 'virtualListenerId': module.params['id'] = info['value']
 #        if firewallList['totalCount'] == 1:
 #            if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
 #                uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
@@ -292,20 +294,25 @@ def main():
                 _data['serviceDownAction'] = module.params['pool']['serviceDownAction']
                 _data['slowRampTime'] = module.params['pool']['slowRampTime']
                 data = json.dumps(_data)
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
+                if module.check_mode: has_changed=True
                 else: 
-                    has_changed = True
-                    for info in result['msg']['info']:
-                        if info['name'] == 'poolId': module.params['pool']['id'] = info['value']
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
+                    else: 
+                        has_changed = True
+                        for info in result['msg']['info']:
+                           if info['name'] == 'poolId': module.params['pool']['id'] = info['value']
                 uri = '/caas/2.1/'+orgId+'/networkDomainVip/editVirtualListener'
                 _data = {}
                 #_data['networkDomainId'] = module.params['networkDomainId']
                 _data['id'] = module.params['id']
                 _data['poolId'] = module.params['pool']['id']
                 data = json.dumps(_data)
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
+                if module.check_mode: has_changed=True
+                else: 
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
+                    else: has_changed = True
             for node in module.params['pool']['node']:
                 logging.debug("--Node"+str(node))
                 f = { 'name' : node['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
@@ -326,12 +333,14 @@ def main():
                     _data['connectionLimit'] = node['connectionLimit']
                     _data['connectionRateLimit'] = node['connectionRateLimit']
                     data = json.dumps(_data)
-                    result = caasAPI(caas_credentials, uri, data)
-                    if not result['status']: module.fail_json(msg=result['msg'])
+                    if module.check_mode: has_changed=True
                     else: 
-                        has_changed = True
-                        for info in result['msg']['info']:
-                            if info['name'] == 'nodeId': node['id'] = info['value']
+                        result = caasAPI(caas_credentials, uri, data)
+                        if not result['status']: module.fail_json(msg=result['msg'])
+                        else: 
+                            has_changed = True
+                            for info in result['msg']['info']:
+                                if info['name'] == 'nodeId': node['id'] = info['value']
                     uri = '/caas/2.1/'+orgId+'/networkDomainVip/addPoolMember'
                     _data = {}
                     _data['poolId'] = module.params['pool']['id']
@@ -339,11 +348,12 @@ def main():
                     _data['port'] = node['port']
                     _data['status'] = node['status']
                     data = json.dumps(_data)
-                    result = caasAPI(caas_credentials, uri, data)
-                    if not result['status']: module.fail_json(msg=result['msg'])
-                    else: has_changed = True
-			
-	
+                    if module.check_mode: has_changed=True
+                    else: 
+                        result = caasAPI(caas_credentials, uri, data)
+                        if not result['status']: module.fail_json(msg=result['msg'])
+                        else: has_changed = True
+
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     result = caasAPI(caas_credentials, uri, '')

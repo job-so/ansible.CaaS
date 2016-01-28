@@ -160,6 +160,7 @@ def _listFirewallRule(module,caas_credentials,orgId,wait):
 
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
@@ -213,13 +214,13 @@ def main():
             _data = {}
             _data['id'] = networkDomainList['networkDomain'][0]['id']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 	
-	# if state=present
+#PRESENT
     if state == "present":
         if firewallList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/createFirewallRule'
@@ -234,11 +235,11 @@ def main():
             _data['enabled'] = module.params['enabled']
             _data['placement'] = module.params['placement']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
         if firewallList['totalCount'] == 1:
             if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
                 uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
@@ -246,13 +247,12 @@ def main():
                 _data['id'] = firewallList['firewallRule'][0]['id']
                 _data['enabled'] = module.params['enabled']
                 data = json.dumps(_data)
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']:
-                    module.fail_json(msg=result['msg'])
-                else:
-                    has_changed = True
+                if module.check_mode: has_changed=True
+                else: 
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
+                    else: has_changed = True
 
-	
     firewallRuleList = _listFirewallRule(module,caas_credentials,orgId,wait)
     module.exit_json(changed=has_changed, firewallRules=firewallRuleList)
 

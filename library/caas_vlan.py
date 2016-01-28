@@ -160,6 +160,7 @@ def _listVlan(module,caas_credentials,orgId,wait):
 
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
@@ -208,13 +209,13 @@ def main():
             _data = {}
             _data['id'] = vlanList['vlan'][0]['id']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 
-# if state=present
+#PRESENT
     if state == "present":
         if vlanList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/deployVlan'
@@ -225,11 +226,11 @@ def main():
             _data['privateIpv4BaseAddress'] = module.params['privateIpv4BaseAddress']
             _data['privateIpv4PrefixSize'] = module.params['privateIpv4PrefixSize']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 	
     vlanList = _listVlan(module,caas_credentials,orgId,wait)
     module.exit_json(changed=has_changed, vlans=vlanList)

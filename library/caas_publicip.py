@@ -124,6 +124,7 @@ def caasAPI(caas_credentials, uri, data):
 
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
             networkDomainId = dict(default=None),
@@ -178,24 +179,24 @@ def main():
             _data = {}
             _data['id'] = publicIpList['publicIp'][0]['id']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 	
-	# if state=present
+#PRESENT
     if state == "present":
         if publicIpList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/addPublicIpBlock'
             _data = {}
             _data['networkDomainId'] = module.params['networkDomainId']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 	
     f = { 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/network/publicIpBlock?'+urllib.urlencode(f)

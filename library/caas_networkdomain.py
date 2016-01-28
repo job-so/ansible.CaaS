@@ -28,10 +28,16 @@ except ImportError:
 
 DOCUMENTATION = '''
 --- 
-author: "Olivier GROSJEANNE, @job-so"
-description: 
-  - "Create, Remove Network domains on Dimension Data Managed Cloud Platform"
 module: caas_networkdomain
+author: "Olivier GROSJEANNE, @job-so"
+short_description: "Create, Configure, Remove Network Domains on Dimension Data Managed Cloud Platform"
+version_added: "1.9"
+description: 
+  - "Create, configure, Remove Network Domains on Dimension Data Managed Cloud Platform"
+notes:
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+requirements:
+    - a caas_credentials variable, see caas_credentials module.  
 options: 
   caas_credentials: 
     description: 
@@ -52,8 +58,11 @@ options:
     description:
       - "Maximum length: 255 characters."
     default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
-short_description: "Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"
-version_added: "1.9"
+  type:
+    description:
+      - "Type of the network domain, ADVANCED features include Load Balancing capabilities."
+    default: "ESSENTIALS"
+    choices: ['ESSENTIALS', 'ADVANCED']
 '''
 
 EXAMPLES = '''
@@ -66,25 +75,27 @@ EXAMPLES = '''
           type: ADVANCED
         register: caas_networkdomain
 '''
+
 RETURN = '''
-            "networkdomains": {
-                "networkDomain": [
-                    {
-                        "createTime": "2016-01-26T16:26:21.000Z",
-                        "datacenterId": "EU6",
-                        "description": "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS",
-                        "id": "4dc7c62c-d2c1-447d-a5de-9a18a9e14c5c",
-                        "name": "ansible.CaaS_Sandbox",
-                        "snatIpv4Address": "168.128.10.72",
-                        "state": "NORMAL",
-                        "type": "ADVANCED"
-                    }
-                ],
-                "pageCount": 1,
-                "pageNumber": 1,
-                "pageSize": 250,
+        "networkdomains":
+            type: Dictionary
+            returned: success
+            description: A list of networkDomain (should be one) matching the task parameters.
+            sample: 
+                "networkDomain":
+                  - "createTime": "2016-01-26T16:26:21.000Z"
+                    "datacenterId": "EU6"
+                    "description": "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
+                    "id": "4dc7c62c-d2c1-447d-a5de-9a18a9e14c5c"
+                    "name": "ansible.CaaS_Sandbox"
+                    "snatIpv4Address": "168.128.10.72"
+                    "state": "NORMAL"
+                    "type": "ADVANCED"
+                "pageCount": 1
+                "pageNumber": 1
+                "pageSize": 250
                 "totalCount": 1
-            }
+...
 '''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_networkdomain---"+str(datetime.datetime.now()))
@@ -144,6 +155,7 @@ def caasAPI(caas_credentials, uri, data):
 
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
@@ -184,13 +196,12 @@ def main():
             _data = {}
             _data['id'] = networkDomainList['networkDomain'][0]['id']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
-	
-	# if state=present
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
+#PRESENT
     if state == "present":
         if networkDomainList['totalCount'] < 1:
             uri = '/caas/2.1/'+orgId+'/network/deployNetworkDomain'
@@ -200,11 +211,11 @@ def main():
             _data['description'] = module.params['description']
             _data['type'] = module.params['type']
             data = json.dumps(_data)
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
 	
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
     uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)

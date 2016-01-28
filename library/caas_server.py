@@ -62,7 +62,7 @@ options:
       - "updateVmwareTools : triggers an update of the VMware Tools software running on the guest OS of the Servers"
       - "upgradeVirtualHardware : triggers an update of the VMware Virtual Hardware. VMware recommend cloning the Server prior to performing the upgrade in case something goes wrong during the upgrade process"
     choices: ['startServer', 'shutdownServer', 'rebootServer', 'resetServer', 'powerOffServer', 'updateVmwareTools', 'upgradeVirtualHardware']
-    default: "startServer"
+    default: Null
   wait:
     description:
       - "TBC"
@@ -196,27 +196,28 @@ def _executeAction(module,caas_credentials,orgId,serverList,action):
         _data['id'] = server['id']
         data = json.dumps(_data)
         if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True	
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
         if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True	
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
     return has_changed
 	
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
 			name = dict(required=True),
 			count = dict(type='int', default='1'),
             state = dict(default='present', choices=['present', 'absent']),
-            action = dict(default='startServer', choices=['startServer', 'shutdownServer', 'rebootServer', 'resetServer', 'powerOffServer', 'updateVmwareTools', 'upgradeVirtualHardware']),
+            action = dict(default=None, choices=['startServer', 'shutdownServer', 'rebootServer', 'resetServer', 'powerOffServer', 'updateVmwareTools', 'upgradeVirtualHardware']),
             wait = dict(default=True),
             description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
             imageId = dict(default=''),
@@ -272,28 +273,30 @@ def main():
 	
     serverList = _listServer(module,caas_credentials,orgId,True)
 	
-   # if state=absent
+#ABSENT
     if module.params['state']=='absent':
-        has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'powerOffServer') or has_changed
-        serverList = _listServer(module,caas_credentials,orgId,True)
-        has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'deleteServer') or has_changed
+        if serverList['totalCount']>1:
+            has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'powerOffServer') or has_changed
+            serverList = _listServer(module,caas_credentials,orgId,True)
+            has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'deleteServer') or has_changed
 
-	# if state=present
+#PRESENT
     if module.params['state'] == "present":
         i = serverList['totalCount']
         uri = '/caas/2.1/'+orgId+'/server/deployServer'
         module.params['start'] = (module.params['action'] == 'startServer')
         data = json.dumps(module.params)
         while i < module.params['count']:
-            result = caasAPI(caas_credentials, uri, data)
-            if not result['status']:
-                module.fail_json(msg=result['msg'])
-            else:
-                has_changed = True
-	    i += 1			
+            if module.check_mode: has_changed=True
+            else: 
+                result = caasAPI(caas_credentials, uri, data)
+                if not result['status']: module.fail_json(msg=result['msg'])
+                else: has_changed = True
+            i += 1			
 
         # Execute Action on Servers
-        has_changed = _executeAction(module, caas_credentials,orgId,serverList,module.params['action']) or has_changed
+        if module.params['action']!=None:
+            has_changed = _executeAction(module, caas_credentials,orgId,serverList,module.params['action']) or has_changed
 		
     module.exit_json(changed=has_changed, servers=_listServer(module,caas_credentials,orgId,module.params['wait']))
 
