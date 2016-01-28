@@ -506,6 +506,36 @@
     <td><ul></ul></td>
     <td><div>For an MCP 2.0 request, a networkInfo element is required. networkInfo identifies the Network Domain to which the Server will be deployed.</div><div>It contains a primaryNic element defining the required NIC for the Server and optional additionalNic elements defining any additional VLAN connections for the Server.</div><div>Each NIC must contain either a VLAN ID (vlanId) OR a Private IPv4 address (privateIpv4) from the target VLAN which the NIC will associate the Server with.</div></td></tr>
         <tr>
+<td>networkInfo.networkDomainId<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The id of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkInfo.networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>networkInfo.networkDomainName<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The name of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkInfo.networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>networkInfo.primaryNic.privateIpv4<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>RFC1918 Dot-decimal representation of an IPv4 address.</div><div>For example: “192.168.30.42”. Must be unique within the Network Domain.</div><div>You can use either networkInfo.primaryNic.privateIpv4 or networkInfo.primaryNic.vlanId or networkInfo.primaryNic.vlanName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>networkInfo.primaryNic.vlanId<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The id of a Vlan belonging within the same Network Domain.</div><div>You can use either networkInfo.primaryNic.privateIpv4 or networkInfo.primaryNic.vlanId or networkInfo.primaryNic.vlanName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>networkInfo.primaryNic.vlanName<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The name of a Vlan belonging within the same Network Domain.</div><div>You can use either networkInfo.primaryNic.privateIpv4 or networkInfo.primaryNic.vlanId or networkInfo.primaryNic.vlanName, however one of them must be specified</div></td></tr>
+        <tr>
 <td>start<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>True</td>
