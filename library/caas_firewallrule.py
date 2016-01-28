@@ -28,10 +28,17 @@ except ImportError:
 
 DOCUMENTATION = '''
 --- 
+module: caas_firewallrule
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Remove Network vlans on Dimension Data Managed Cloud Platform"
-module: caas_vlan
+  - "Create, Configure, Remove Firewall Rules on Dimension Data Managed Cloud Platform"
+short_description: "Create, Configure, Remove Firewall Rules on Dimension Data Managed Cloud Platform"
+version_added: "1.9"
+notes:
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+requirements:
+    - a caas_credentials variable, see caas_credentials module.  
+    - a network domain already deployed, see caas_networkdomain module.
 options: 
   caas_credentials: 
     description: 
@@ -39,8 +46,7 @@ options:
     required: true
   name: 
     description: 
-      - "Name that has to be given to the instance"
-      - "The name must be unique inside the DataCenter"
+      - "Name that has to be given to the rule"
       - "Minimum length 1 character Maximum length 75 characters."
     required: true
   state:  
@@ -53,37 +59,157 @@ options:
     description:
       - "Maximum length: 255 characters."
     default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
+  wait:
+    description:
+      - "Does the task must wait for the firewall rule creation ? or deploy it asynchronously ?"
+    choices: [true,false]
+    default: true
   networkDomainId:
     description:
-      - "The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
+      - "The id of a Network Domain belonging within the same MCP 2.0 data center."
+      - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
     default: null
   networkDomainName:
     description:
-      - "The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
+      - "The name of a Network Domain belonging within the same MCP 2.0 data center."
+      - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
     default: null
-  privateIpv4BaseAddress:
+  action:
     description:
-      - "RFC1918 Dot-decimal representation of an IPv4 address."
-      - "For example: “10.0.4.0”. Must be unique within the Network Domain."
-    default: null
-  privateIpv4BaseAddress:
+      - "Accept or Drop ?"
+    choices: ['ACCEPT_DECISIVELY','DROP']
+    default: ACCEPT_DECISIVELY
+  ipVersion:
     description:
-      - "An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided."
-      - "If this property is not provided, the VLAN will default to being /24"
+      - "IPv4 or IPv6 ?"
+    choices: ['IPV4','IPV6']
+    default: IPV4
+  protocol:
+    description:
+      - "IP or ICMP or TCP or UDP ?"
+    choices: ['IP', 'ICMP', 'TCP', 'UDP']
+    default: TCP
+  enabled:
+    description:
+      - "enabled or disabled ?"
+      - "This parameter is mutable (ie may be changed on an existiong rule)"
+    choices: [True, False]
+    default: True
+  source.ip.address:
+    description:
+      - "The source.ip fields are used to limit the range of sources of network traffic allowed by the Firewall Rule. Three possible values :"
+      - "1) ANY, in which case prefixSize is not used and source traffic is acceptable from any IP address."
+      - "2) A valid IPv4 or IPv6 address depending on the ipVersion value selected, in which case traffic will be permitted from that specific IP address."
+      - "3) A valid IPv4 or IPv6 network address depending on the ipVersion value selected, with a prefixSize."
     default: null
-short_description: "Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"
-version_added: "1.9"
+  source.ip.prefixSize:
+    description:
+      - "To define a range of addresses from which traffic will be permitted."
+    default: null
+  source.port.begin:
+    description:
+      - "source.port fields are only expected if TCP or UDP is selected as the protocol."
+      - "To define a single port, supply the source.port.begin field by itself."
+    default: null
+  source.port.end:
+    description:
+      - "To define a range of ports, supply both the source.port.begin and source.port.end fields."
+    default: null
+  destination.ip.address:
+    description:
+      - "same as source.ip.address"
+      - "Note that it is NOT possible to specify ANY for both the ource.ip.address and destination.ip.address if ipVersion is set to IPv6."
+    default: null
+  destination.ip.prefixSize:
+    description:
+      - "same as source.ip.prefixSize"
+    default: null
+  destination.port.begin:
+    description:
+      - "same as source.port.begin"
+      - "Note that a port range can only be specified on either the source or destination - not both."
+    default: null
+  destination.port.end:
+    description:
+      - "same as source.port.end"
+    default: null
+  placement.position:
+    description:
+      - "FIRST, LAST, BEFORE or AFTER ?"
+    choices: ['FIRST', 'LAST', 'BEFORE', 'AFTER']
+    default: null
+  placement.relativeToRule:
+    description:
+      - "If placement is set to BEFORE or AFTER, a relativeToRule field must be provided. The value of this should contain the name of an existing CLIENT_RULE on the Firewall Policy for the same Network Domain."
+    default: null
 '''
 
 EXAMPLES = '''
-# Creates a new vlan named "ansible.Caas_SandBox", 
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "vlan_webservers"
-    register: caas_networkdomain
+# Creates a new firewall rule to allow traffic between 192.168.30.0/24 to 192.168.40.0/24 on tcp/3000 
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "ansible.Caas_SandBox"
+          name: "WebDMZ2AppDMZ"
+          source:
+            ip:
+              address: 192.168.30.0
+              prefixSize: 24
+          destination:
+            ip:
+              address: 192.168.40.0
+              prefixSize: 24
+            port:
+              begin: 3000
+          placement:
+            position: "FIRST"
+
+# Same rule with references from previous tasks.
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "Web2App"
+          source:
+            ip:
+              address: "{{ caas_vlan_webservers.vlans.vlan[0].privateIpv4Range.address }}"
+              prefixSize: "{{ caas_vlan_webservers.vlans.vlan[0].privateIpv4Range.prefixSize }}"
+          destination:
+            ip:
+              address: "{{ caas_vlan_appservers.vlans.vlan[0].privateIpv4Range.address }}"
+              prefixSize: "{{ caas_vlan_appservers.vlans.vlan[0].privateIpv4Range.prefixSize }}"
+            port:
+              begin: 3000
+          placement:
+            position: "FIRST"
+
+# Disabling Default Rule that Drop Any external IPv6 connection
+# Needed to allow ansible traffic to hosts after infrastructure deployment 
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "CCDEFAULT.DenyExternalInboundIPv6"
+          enabled: False
+
+# IPv6 rule from localhost (ansible machine) to a vlan deployed in a previous task.
+# Needed to allow ansible traffic to hosts after infrastructure deployment
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "ssh_for_ansible_to_vlan_webservers"
+          action: "ACCEPT_DECISIVELY"
+          ipVersion: "IPV6"
+          protocol: "TCP"
+          source:
+            ip:
+              address: "{{ ansible_all_ipv6_addresses[0] }}"
+          destination:
+            ip:
+              address: "{{ caas_vlan_webservers.vlans.vlan[0].ipv6Range.address }}"
+              prefixSize: "{{ caas_vlan_webservers.vlans.vlan[0].ipv6Range.prefixSize }}"
+            port:
+              begin: 22
+          placement:
+            position: "LAST"
+
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
@@ -113,7 +239,7 @@ def caasAPI(caas_credentials, uri, data):
     if data == '':
         request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
-        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+        request = urllib2.Request(caas_credentials['apiurl'] + uri, data)
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
@@ -153,7 +279,7 @@ def _listFirewallRule(module,caas_credentials,orgId,wait):
         for (firewallRule) in firewallRuleList['firewallRule']:
             logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
             if (firewallRule['state'] != "NORMAL") and wait:
-		        b = True
+                b = True
         if b:
             time.sleep(5)
     return firewallRuleList
@@ -173,14 +299,14 @@ def main():
             networkDomainName = dict(default=None),
             source = dict(),
             destination = dict(),
-            enabled = dict(default=True),
+            enabled = dict(default=True, choices = [True, False]),
             placement = dict(),
         )
     )
     if not IMPORT_STATUS:
         module.fail_json(msg='missing dependencies for this module')
     has_changed = False
-	
+
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
@@ -193,9 +319,9 @@ def main():
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-	#Check dataCenterId
+    #Check dataCenterId
     #if not datacenterId
-	
+
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
@@ -204,9 +330,9 @@ def main():
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
-	
+
     firewallList = _listFirewallRule(module,caas_credentials,orgId,True)
- 	
+ 
 #ABSENT
     if state == 'absent':
         if firewallList['totalCount'] == 1:
@@ -219,7 +345,7 @@ def main():
                 result = caasAPI(caas_credentials, uri, data)
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
-	
+
 #PRESENT
     if state == "present":
         if firewallList['totalCount'] < 1:

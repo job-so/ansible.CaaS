@@ -28,10 +28,17 @@ except ImportError:
 
 DOCUMENTATION = '''
 --- 
+module: caas_vlan
+short_description: "Create, Configure, Remove VLANs on Dimension Data Managed Cloud Platform"
+version_added: "1.9"
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Remove Network vlans on Dimension Data Managed Cloud Platform"
-module: caas_vlan
+  - "Create, Configure, Remove Network Network VLANs on Dimension Data Managed Cloud Platform"
+notes:
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+requirements:
+    - a caas_credentials variable, see caas_credentials module.  
+    - a network domain already deployed, see caas_networkdomain module.
 options: 
   caas_credentials: 
     description: 
@@ -48,18 +55,25 @@ options:
     default: present
     description: 
       - "Should the resource be present or absent."
-      - "Take care : Absent will powerOff and delete all servers."
+      - "Take care : Absent will delete the Vlan."
+  wait:
+    description:
+      - "Does the task must wait for the vlan creation ? or deploy it asynchronously ?"
+    choices: [true,false]
+    default: true
   description:
     description:
       - "Maximum length: 255 characters."
     default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
   networkDomainId:
     description:
-      - "The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
+      - "The id of a Network Domain belonging within the same MCP 2.0 data center."
+      - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
     default: null
   networkDomainName:
     description:
-      - "The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
+      - "The name of a Network Domain belonging within the same MCP 2.0 data center."
+      - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
     default: null
   privateIpv4BaseAddress:
     description:
@@ -69,21 +83,57 @@ options:
   privateIpv4BaseAddress:
     description:
       - "An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided."
-      - "If this property is not provided, the VLAN will default to being /24"
-    default: null
-short_description: "Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"
-version_added: "1.9"
+    default: "24"
 '''
 
 EXAMPLES = '''
-# Creates a new vlan named "ansible.Caas_SandBox", 
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "vlan_webservers"
-    register: caas_networkdomain
+# Create a new vlan named "vlan_webservers" in network domain "ansible.Caas_SandBox", 
+      - name: Deploy WebServers DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "ansible.Caas_SandBox"
+          name: "vlan_webservers"
+          privateIpv4BaseAddress: "192.168.30.0"
+        register: caas_vlan_webservers
+# Create a new vlan named {{networkDomainName}}_vlan_webserver in a network domain referenced from a previous task.
+      - name: Deploy WebServers DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "{{caas_networkdomain.networkdomains.networkDomain[0].name}}_vlan_webservers"
+          privateIpv4BaseAddress: "192.168.30.0"
+        register: caas_vlan_webservers
+'''
+
+RETURN = '''
+        "vlans": 
+            type: Dictionary
+            returned: success
+            description: A list of VLANs (should be one) matching the task parameters.
+            sample: 
+                "pageCount": 1
+                "pageNumber": 1
+                "pageSize": 250
+                "totalCount": 1
+                "vlan":
+                  - "createTime": "2016-01-28T08:49:04.000Z"
+                    "datacenterId": "EU6"
+                    "description": "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
+                    "id": "3a454c87-c8f6-4517-8531-b55f9440449c"
+                    "ipv4GatewayAddress": "192.168.30.1"
+                    "ipv6GatewayAddress": "2a00:47c0:111:1168:0:0:0:1"
+                    "ipv6Range":
+                        "address": "2a00:47c0:111:1168:0:0:0:0"
+                        "prefixSize": 64
+                    "name": "ansible.CaaS_Sandbox_vlan_webservers"
+                    "networkDomain":
+                        "id": "94e50925-2d2f-4727-b137-6d70ce416829"
+                        "name": "ansible.CaaS_Sandbox"
+                    "privateIpv4Range":
+                        "address": "192.168.30.0"
+                        "prefixSize": 24
+                    "state": "NORMAL"
+...
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
@@ -170,7 +220,7 @@ def main():
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
             privateIpv4BaseAddress = dict(default=None),
-            privateIpv4PrefixSize = dict(default=None),
+            privateIpv4PrefixSize = dict(default=24),
         )
     )
     if not IMPORT_STATUS:
