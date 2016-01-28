@@ -149,7 +149,7 @@ EXAMPLES = '''
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "ansible.Caas_SandBox"
-          name: "WebDMZ2AppDMZ"
+          name: "Web2App"
           source:
             ip:
               address: 192.168.30.0
@@ -210,6 +210,40 @@ EXAMPLES = '''
           placement:
             position: "LAST"
 
+'''
+
+RETURN = '''
+        "firewallRules":
+            type: Dictionary
+            returned: success
+            description: A list of firewallRule (should be one) matching the task parameters.
+            sample: 
+                "firewallRule":
+                  - "action": "ACCEPT_DECISIVELY"
+                    "datacenterId": "EU6"
+                    "destination":
+                        "ip":
+                            "address": "192.168.40.0"
+                            "prefixSize": 24
+                        "port":
+                            "begin": 3000
+                    "enabled": true
+                    "id": "8455537c-2cb8-482f-8212-f304e0acbaa7"
+                    "ipVersion": "IPV4"
+                    "name": "Web2App"
+                    "networkDomainId": "94e50925-2d2f-4727-b137-6d70ce416829"
+                    "protocol": "TCP"
+                    "ruleType": "CLIENT_RULE"
+                    "source":
+                        "ip":
+                            "address": "192.168.30.0"
+                            "prefixSize": 24
+                    "state": "NORMAL"
+                "pageCount": 1
+                "pageNumber": 1
+                "pageSize": 50
+                "totalCount": 1
+...
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)

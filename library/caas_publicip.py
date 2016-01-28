@@ -28,42 +28,26 @@ except ImportError:
 
 DOCUMENTATION = '''
 --- 
+module: caas_publicip
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Remove Network domains on Dimension Data Managed Cloud Platform"
-module: caas_publicip
+  - "Get or Release Public IP addresses on Dimension Data Managed Cloud Platform"
+short_description: "Get or Release Public IP addresses on Dimension Data Managed Cloud Platform"
+version_added: "1.9"
+notes:
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+requirements:
+    - a caas_credentials variable, see caas_credentials module.  
+    - a network domain already deployed, see caas_networkdomain module.
 options: 
   caas_credentials: 
     description: 
       - Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)
     required: true
-  name: 
-    description: 
-      - "Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters."
-    required: true
-  state:  
-    choices: ['present','absent']
-    default: present
-    description: 
-      - "Should the resource be present or absent."
-      - "Take care : Absent will powerOff and delete all servers."
-  description:
-    description:
-      - "Maximum length: 255 characters."
-    default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
-short_description: "Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"
-version_added: "1.9"
 '''
 
 EXAMPLES = '''
-# Creates a new networkdomain named "ansible.Caas_SandBox", 
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "ansible.Caas_SandBox"
-    register: caas_networkdomain
+# 
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)

@@ -35,7 +35,7 @@ version_added: "1.9"
 description: 
   - "Create, configure, Remove Network Domains on Dimension Data Managed Cloud Platform"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
 options: 
@@ -66,7 +66,7 @@ options:
 '''
 
 EXAMPLES = '''
-# Creates a new networkdomain named "ansible.Caas_SandBox", 
+# Create a new networkdomain named "ansible.Caas_SandBox", 
     tasks:
       - name: Deploy my Nework Domain
         caas_networkdomain:

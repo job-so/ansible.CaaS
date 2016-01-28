@@ -35,7 +35,7 @@ author: "Olivier GROSJEANNE, @job-so"
 description: 
   - "Create, Configure, Remove Network Network VLANs on Dimension Data Managed Cloud Platform"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
     - a network domain already deployed, see caas_networkdomain module.
