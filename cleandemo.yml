@@ -4,12 +4,17 @@
     vars_files:
       - /root/caas_credentials.yml
     tasks:
+      - name: TearDown LoadBalencer
+        caas_loadbalancer:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: ansible.CaaS_Sandbox 
+          name: "WebServers.Load.Balancer"
+          state: absent
       - name: TearDown WebServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
           networkInfo:
               networkDomainName: ansible.CaaS_Sandbox 
-              #ansible.CaaS_Sandbox
               primaryNic: 
                   vlanName: "ansible.CaaS_Sandbox_vlan_webservers"
           name: "WebServer"
