@@ -28,10 +28,17 @@ except ImportError:
 
 DOCUMENTATION = '''
 --- 
+module: caas_loadbalancer
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Remove Network vlans on Dimension Data Managed Cloud Platform"
-module: caas_vlan
+  - "Create, Configure, Remove LoadBalancer instances on Dimension Data Managed Cloud Platform"
+short_description: "Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform"
+version_added: "1.9"
+notes:
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+requirements:
+    - a caas_credentials variable, see caas_credentials module.  
+    - a network domain already deployed, see caas_networkdomain module.
 options: 
   caas_credentials: 
     description: 
@@ -53,37 +60,10 @@ options:
     description:
       - "Maximum length: 255 characters."
     default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
-  networkDomainId:
-    description:
-      - "The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
-    default: null
-  networkDomainName:
-    description:
-      - "The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center."
-    default: null
-  privateIpv4BaseAddress:
-    description:
-      - "RFC1918 Dot-decimal representation of an IPv4 address."
-      - "For example: “10.0.4.0”. Must be unique within the Network Domain."
-    default: null
-  privateIpv4BaseAddress:
-    description:
-      - "An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided."
-      - "If this property is not provided, the VLAN will default to being /24"
-    default: null
-short_description: "Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform"
-version_added: "1.9"
 '''
 
 EXAMPLES = '''
-# Creates a new vlan named "ansible.Caas_SandBox", 
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "vlan_webservers"
-    register: caas_networkdomain
+#
 '''
 
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
@@ -114,7 +94,7 @@ def caasAPI(caas_credentials, uri, data):
         request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
         logging.debug(data)
-        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+        request = urllib2.Request(caas_credentials['apiurl'] + uri, data)
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
@@ -154,7 +134,7 @@ def _listVirtualListenerRule(module,caas_credentials,orgId,wait):
         for (virtualListener) in virtualListenerList['virtualListener']:
             logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
             if (firewallRule['state'] != "NORMAL") and wait:
-		        b = True
+                b = True
         if b:
             time.sleep(5)
     return firewallRuleList
@@ -190,7 +170,7 @@ def main():
     if not IMPORT_STATUS:
         module.fail_json(msg='missing dependencies for this module')
     has_changed = False
-	
+
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
@@ -203,9 +183,9 @@ def main():
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-	#Check dataCenterId
+#Check dataCenterId
     #if not datacenterId
-	
+
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
@@ -214,7 +194,7 @@ def main():
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
-	
+
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     result = caasAPI(caas_credentials, uri, '')
@@ -222,10 +202,11 @@ def main():
         virtualListenerList = result['msg']
     else:
         module.fail_json(msg=result['msg'])
- 	
+ 
 #ABSENT
     if state == "absent":
         if virtualListenerList['totalCount'] == 1:
+            #Delete Virtual Listener
             uri = '/caas/2.1/'+orgId+'/networkDomainVip/deleteVirtualListener'
             _data = {}
             _data['id'] = virtualListenerList['virtualListener'][0]['id']
@@ -235,7 +216,35 @@ def main():
                 result = caasAPI(caas_credentials, uri, data)
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
-	
+            if virtualListenerList['virtualListener'][0]['poolId']!='':
+                #List associated Nodes
+                f = { 'poolId' : virtualListenerList['virtualListener'][0]['poolId'] }
+                uri = '/caas/2.1/'+orgId+'/networkDomainVip/poolMember?'+urllib.urlencode(f)
+                result = caasAPI(caas_credentials, uri, '')
+                if result['status']: poolMembers = result['msg']
+                else: module.fail_json(msg=result['msg'])
+                #Delete associated Pool
+                uri = '/caas/2.1/'+orgId+'/networkDomainVip/deletePool'
+                _data = {}
+                _data['id'] = virtualListenerList['virtualListener'][0]['poolId']
+                data = json.dumps(_data)
+                if module.check_mode: has_changed=True
+                else: 
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
+                    else: has_changed = True
+                #Delete associated Nodes
+                i = 0
+                uri = '/caas/2.1/'+orgId+'/networkDomainVip/deleteNode'
+                data = json.dumps(module.params)
+                while i < poolMembers['totalCount']:
+                    if module.check_mode: has_changed=True
+                    else: 
+                        result = caasAPI(caas_credentials, uri, data)
+                        if not result['status']: module.fail_json(msg=result['msg'])
+                        else: has_changed = True
+                    i += 1
+
 #PRESENT
     if state == "present":
         if virtualListenerList['totalCount'] == 1: module.params['id'] = virtualListenerList['virtualListener'][0]['id']
