@@ -39,7 +39,9 @@ RFTM :-) : For each module, you should find a clear documentation. click on docu
 
 ## dev : build the documentation
   1. make --directory ~/ansible/ webdocs
-  2. for f in ~/ansible/docsite/rst/caas_*_module.rst; do g=${f/.rst/.md}; h=${g/'/ansible/docsite/rst/'/'/ansible.CaaS/docs/'}; pandoc -s -o $h $f; done
+  2. Rst Documentation : ~/ansible/docsite/
+  3. HTML Dcumentation : cp  ~/ansible/docsite/htmlout/caas_*.html ~/ansible.CaaS/docs/
+  4. MARKDOWN Documentation : for f in ~/ansible/docsite/rst/caas_*_module.rst; do g=${f/.rst/.md}; h=${g/'/ansible/docsite/rst/'/'/ansible.CaaS/docs/'}; pandoc -s -o $h $f; done
 
 
 
