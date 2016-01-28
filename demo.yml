@@ -170,6 +170,9 @@
               begin: 3000
           placement:
             position: "FIRST"
+        register: caas_firewallrule
+      - name: print debug
+        debug: var=caas_firewallrule
       - name: Wait for SSH to come up
         wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=600 state=started
         #when: item.started
