@@ -434,11 +434,41 @@
     <td><ul></ul></td>
     <td><div>Number of instances to deploy. This parameter is mutable, however decreasing as no effect.</div></td></tr>
         <tr>
+<td>cpu<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Can be used to override CPU values inherited from the source Server Image (imageName or imageId)</div></td></tr>
+        <tr>
+<td>cpu.coresPerSocket<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Must must be an integer factor of CPU count.</div><div>The default and recommended value for cores per socket is 1.</div></td></tr>
+        <tr>
+<td>cpu.count<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Overrides the number of CPUs specified on the source Server Image.</div><div>Note the relationship between this value and the coresPerSocket value.</div></td></tr>
+        <tr>
+<td>cpu.speed<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Determines the CPU Speed to be used across all of the CPUs on the Server</div></td></tr>
+        <tr>
 <td>description<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS</td>
     <td><ul></ul></td>
     <td><div>Maximum length: 255 characters.</div></td></tr>
+        <tr>
+<td>disk<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Optional disk elements can be used to define the disk speed that each disk on the Server – inherited from the source Server Image - will be deployed to</div><div>disk.scsiId and disk.speed</div></td></tr>
         <tr>
 <td>imageId<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -452,6 +482,18 @@
     <td><ul></ul></td>
     <td><div>The name of the Server Image being used as the target for the new Server deployment</div><div>You can use either imageId or imageName, however one of them must be specified</div></td></tr>
         <tr>
+<td>memoryGb<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Can be used to override the memory value inherited from the source Server Image (imageName or imageId)</div></td></tr>
+        <tr>
+<td>microsoftTimeZone<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>For use with Microsoft Windows source Server Images (imageId) only.</div><div>For the exact value to use please refer to the table of time zone indexes in Microsoft Technet</div></td></tr>
+        <tr>
 <td>name<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
 <td></td>
@@ -463,6 +505,12 @@
 <td></td>
     <td><ul></ul></td>
     <td><div>For an MCP 2.0 request, a networkInfo element is required. networkInfo identifies the Network Domain to which the Server will be deployed.</div><div>It contains a primaryNic element defining the required NIC for the Server and optional additionalNic elements defining any additional VLAN connections for the Server.</div><div>Each NIC must contain either a VLAN ID (vlanId) OR a Private IPv4 address (privateIpv4) from the target VLAN which the NIC will associate the Server with.</div></td></tr>
+        <tr>
+<td>start<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>True</td>
+    <td><ul><li>True</li><li>False</li></ul></td>
+    <td><div>True indicates that the Server will be started following deployment.</div></td></tr>
         <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
@@ -505,7 +553,7 @@
               primaryNic:
                   privateIpv4: 192.168.30.42
 
-# teardown this server (no need to PowerOff)
+# teardown this server (no need to ShutDown/PowerOff)
       - name: Deploy WebServers DMZ
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
