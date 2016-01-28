@@ -15,7 +15,7 @@
   <!-- End Google Tag Manager Data Layer -->
 
   
-  <title>caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform &mdash; Ansible Documentation</title>
+  <title>caas_firewallrule - Create, Configure, Remove Firewall Rules on Dimension Data Managed Cloud Platform &mdash; Ansible Documentation</title>
   
 
   
@@ -363,31 +363,42 @@
 
           <ul class="wy-breadcrumbs">
   <li><a href="index.html">Docs</a> &raquo;</li>
-  <li><a href="">caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform</a></li>
+  <li><a href="">caas_firewallrule - Create, Configure, Remove Firewall Rules on Dimension Data Managed Cloud Platform</a></li>
   
 </ul>
 <hr/>
 
           <div id="page-content">
           
-  <div class="section" id="caas-vlan-create-configure-remove-network-domain-on-dimension-data-managed-cloud-platform">
-<span id="caas-vlan"></span><h1>caas_vlan - Create, Configure, Remove Network Domain on Dimension Data Managed Cloud Platform<a class="headerlink" href="#caas-vlan-create-configure-remove-network-domain-on-dimension-data-managed-cloud-platform" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="caas-firewallrule-create-configure-remove-firewall-rules-on-dimension-data-managed-cloud-platform">
+<span id="caas-firewallrule"></span><h1>caas_firewallrule - Create, Configure, Remove Firewall Rules on Dimension Data Managed Cloud Platform<a class="headerlink" href="#caas-firewallrule-create-configure-remove-firewall-rules-on-dimension-data-managed-cloud-platform" title="Permalink to this headline">¶</a></h1>
 <p class="versionadded">
 <span class="versionmodified">New in version 1.9.</span></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
-<li><a class="reference internal" href="#options" id="id2">Options</a></li>
-<li><a class="reference internal" href="#examples" id="id3">Examples</a></li>
-<li><a class="reference internal" href="#this-is-an-extras-module" id="id4">This is an Extras Module</a></li>
+<li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
+<li><a class="reference internal" href="#options" id="id3">Options</a></li>
+<li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
+<li><a class="reference internal" href="#notes" id="id5">Notes</a></li>
+<li><a class="reference internal" href="#this-is-an-extras-module" id="id6">This is an Extras Module</a></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Create, Remove Network vlans on Dimension Data Managed Cloud Platform</p>
+<p>Create, Configure, Remove Firewall Rules on Dimension Data Managed Cloud Platform</p>
+</div>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>a caas_credentials variable, see caas_credentials module.</li>
+<li>a network domain already deployed, see caas_networkdomain module.</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="options">
-<h2><a class="toc-backref" href="#id2">Options</a><a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Options</a><a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <table border=1 cellpadding=4>
 <tr>
 <th class="head">parameter</th>
@@ -396,6 +407,12 @@
 <th class="head">choices</th>
 <th class="head">comments</th>
 </tr>
+        <tr>
+<td>action<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>ACCEPT_DECISIVELY</td>
+    <td><ul><li>ACCEPT_DECISIVELY</li><li>DROP</li></ul></td>
+    <td><div>Accept or Drop ?</div></td></tr>
         <tr>
 <td>caas_credentials<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
@@ -409,53 +426,194 @@
     <td><ul></ul></td>
     <td><div>Maximum length: 255 characters.</div></td></tr>
         <tr>
+<td>destination.ip.address<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>same as source.ip.address</div><div>Note that it is NOT possible to specify ANY for both the ource.ip.address and destination.ip.address if ipVersion is set to IPv6.</div></td></tr>
+        <tr>
+<td>destination.ip.prefixSize<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>same as source.ip.prefixSize</div></td></tr>
+        <tr>
+<td>destination.port.begin<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>same as source.port.begin</div><div>Note that a port range can only be specified on either the source or destination - not both.</div></td></tr>
+        <tr>
+<td>destination.port.end<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>same as source.port.end</div></td></tr>
+        <tr>
+<td>enabled<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>True</td>
+    <td><ul><li>True</li><li>False</li></ul></td>
+    <td><div>enabled or disabled ?</div><div>This parameter is mutable (ie may be changed on an existiong rule)</div></td></tr>
+        <tr>
+<td>ipVersion<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>IPV4</td>
+    <td><ul><li>IPV4</li><li>IPV6</li></ul></td>
+    <td><div>IPv4 or IPv6 ?</div></td></tr>
+        <tr>
 <td>name<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Name that has to be given to the instance</div><div>The name must be unique inside the DataCenter</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
+    <td><div>Name that has to be given to the rule</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
         <tr>
 <td>networkDomainId<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>The id of a Network Domain belonging to {org-id} within the same MCP 2.0 data center.</div></td></tr>
+    <td><div>The id of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
         <tr>
 <td>networkDomainName<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>The name of a Network Domain belonging to {org-id} within the same MCP 2.0 data center.</div></td></tr>
+    <td><div>The name of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
         <tr>
-<td>privateIpv4BaseAddress<br/><div style="font-size: small;"></div></td>
+<td>placement.position<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul><li>FIRST</li><li>LAST</li><li>BEFORE</li><li>AFTER</li></ul></td>
+    <td><div>FIRST, LAST, BEFORE or AFTER ?</div></td></tr>
+        <tr>
+<td>placement.relativeToRule<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided.</div><div>If this property is not provided, the VLAN will default to being /24</div></td></tr>
+    <td><div>If placement is set to BEFORE or AFTER, a relativeToRule field must be provided. The value of this should contain the name of an existing CLIENT_RULE on the Firewall Policy for the same Network Domain.</div></td></tr>
+        <tr>
+<td>protocol<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>TCP</td>
+    <td><ul><li>IP</li><li>ICMP</li><li>TCP</li><li>UDP</li></ul></td>
+    <td><div>IP or ICMP or TCP or UDP ?</div></td></tr>
+        <tr>
+<td>source.ip.address<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The source.ip fields are used to limit the range of sources of network traffic allowed by the Firewall Rule. Three possible values :</div><div>1) ANY, in which case prefixSize is not used and source traffic is acceptable from any IP address.</div><div>2) A valid IPv4 or IPv6 address depending on the ipVersion value selected, in which case traffic will be permitted from that specific IP address.</div><div>3) A valid IPv4 or IPv6 network address depending on the ipVersion value selected, with a prefixSize.</div></td></tr>
+        <tr>
+<td>source.ip.prefixSize<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>To define a range of addresses from which traffic will be permitted.</div></td></tr>
+        <tr>
+<td>source.port.begin<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>source.port fields are only expected if TCP or UDP is selected as the protocol.</div><div>To define a single port, supply the source.port.begin field by itself.</div></td></tr>
+        <tr>
+<td>source.port.end<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>To define a range of ports, supply both the source.port.begin and source.port.end fields.</div></td></tr>
         <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>present</td>
     <td><ul><li>present</li><li>absent</li></ul></td>
     <td><div>Should the resource be present or absent.</div><div>Take care : Absent will powerOff and delete all servers.</div></td></tr>
+        <tr>
+<td>wait<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>True</td>
+    <td><ul><li>True</li><li>False</li></ul></td>
+    <td><div>Does the task must wait for the firewall rule creation ? or deploy it asynchronously ?</div></td></tr>
     </table>
 </br></div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><div class="highlight-YAML"><pre># Creates a new vlan named "ansible.Caas_SandBox",
--caas_networkdomain:
-    caas_apiurl: "{{ caas_apiurl }}"
-    caas_username: "{{ caas_username }}"
-    caas_password: "{{ caas_password }}"
-    datacenterId: "{{ caas_datacenter }}"
-    name: "vlan_webservers"
-    register: caas_networkdomain</pre>
+<div><div class="highlight-YAML"><pre># Creates a new firewall rule to allow traffic between 192.168.30.0/24 to 192.168.40.0/24 on tcp/3000
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "ansible.Caas_SandBox"
+          name: "WebDMZ2AppDMZ"
+          source:
+            ip:
+              address: 192.168.30.0
+              prefixSize: 24
+          destination:
+            ip:
+              address: 192.168.40.0
+              prefixSize: 24
+            port:
+              begin: 3000
+          placement:
+            position: "FIRST"
+
+# Same rule with references from previous tasks.
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "Web2App"
+          source:
+            ip:
+              address: "{{ caas_vlan_webservers.vlans.vlan[0].privateIpv4Range.address }}"
+              prefixSize: "{{ caas_vlan_webservers.vlans.vlan[0].privateIpv4Range.prefixSize }}"
+          destination:
+            ip:
+              address: "{{ caas_vlan_appservers.vlans.vlan[0].privateIpv4Range.address }}"
+              prefixSize: "{{ caas_vlan_appservers.vlans.vlan[0].privateIpv4Range.prefixSize }}"
+            port:
+              begin: 3000
+          placement:
+            position: "FIRST"
+
+# Disabling Default Rule that Drop Any external IPv6 connection
+# Needed to allow ansible traffic to hosts after infrastructure deployment
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "CCDEFAULT.DenyExternalInboundIPv6"
+          enabled: False
+
+# IPv6 rule from localhost (ansible machine) to a vlan deployed in a previous task.
+# Needed to allow ansible traffic to hosts after infrastructure deployment
+        caas_firewallrule:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          name: "ssh_for_ansible_to_vlan_webservers"
+          action: "ACCEPT_DECISIVELY"
+          ipVersion: "IPV6"
+          protocol: "TCP"
+          source:
+            ip:
+              address: "{{ ansible_all_ipv6_addresses[0] }}"
+          destination:
+            ip:
+              address: "{{ caas_vlan_webservers.vlans.vlan[0].ipv6Range.address }}"
+              prefixSize: "{{ caas_vlan_webservers.vlans.vlan[0].ipv6Range.prefixSize }}"
+            port:
+              begin: 22
+          placement:
+            position: "LAST"</pre>
 </div>
 </div></blockquote>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and example : <a class="reference external" href="https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2">https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2</a></p>
+</div>
+</div>
 <div class="section" id="this-is-an-extras-module">
-<h2><a class="toc-backref" href="#id4">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
 <p>For more information on what this means please read <a class="reference internal" href="modules_extra.html"><em>Extras Modules</em></a></p>
 <p>For help in developing on modules, should you be so inclined, please read <a class="reference internal" href="community.html"><em>Community Information &amp; Contributing</em></a>, <a class="reference internal" href="developing_test_pr.html"><em>Helping Testing PRs</em></a> and <a class="reference internal" href="developing_modules.html"><em>Developing Modules</em></a>.</p>
 </div>
