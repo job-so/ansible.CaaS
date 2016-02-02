@@ -47,6 +47,8 @@ options:
   datacenterId: 
     description: 
       - "You can use your own 'Private MCP', or any public MCP 2.0 below :"
+      - "** Africa (AF) :"
+      - "**** AF3 South Africa - Johannesburg"
       - "** Asia Pacific (AP) :"
       - "**** AP3 Singapore - Serangoon"
       - "**** AP4 Japan - Tokyo"
