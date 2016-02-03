@@ -216,9 +216,9 @@ def main():
                 result = caasAPI(caas_credentials, uri, data)
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
-            if virtualListenerList['virtualListener'][0]['poolId']!='':
+            if virtualListenerList['virtualListener'][0]['pool']['id']!='':
                 #List associated Nodes
-                f = { 'poolId' : virtualListenerList['virtualListener'][0]['poolId'] }
+                f = { 'poolId' : virtualListenerList['virtualListener'][0]['pool']['id'] }
                 uri = '/caas/2.1/'+orgId+'/networkDomainVip/poolMember?'+urllib.urlencode(f)
                 result = caasAPI(caas_credentials, uri, '')
                 if result['status']: poolMembers = result['msg']
@@ -226,7 +226,7 @@ def main():
                 #Delete associated Pool
                 uri = '/caas/2.1/'+orgId+'/networkDomainVip/deletePool'
                 _data = {}
-                _data['id'] = virtualListenerList['virtualListener'][0]['poolId']
+                _data['id'] = virtualListenerList['virtualListener'][0]['pool']['id']
                 data = json.dumps(_data)
                 if module.check_mode: has_changed=True
                 else: 
@@ -236,10 +236,11 @@ def main():
                 #Delete associated Nodes
                 i = 0
                 uri = '/caas/2.1/'+orgId+'/networkDomainVip/deleteNode'
-                data = json.dumps(module.params)
                 while i < poolMembers['totalCount']:
                     if module.check_mode: has_changed=True
                     else: 
+                        _data['id'] = poolMembers['poolMember'][i]['node']['id']
+                        data = json.dumps(_data)
                         result = caasAPI(caas_credentials, uri, data)
                         if not result['status']: module.fail_json(msg=result['msg'])
                         else: has_changed = True
