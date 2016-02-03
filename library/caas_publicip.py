@@ -106,6 +106,22 @@ def caasAPI(caas_credentials, uri, data):
             retryCount = 9999
     return result
 
+def _listPublicIpBlock(module,caas_credentials,orgId):
+    f = { 'networkDomainId' : module.params['networkDomainId']}
+    uri = '/caas/2.1/'+orgId+'/network/publicIpBlock?'+urllib.urlencode(f)
+    result = caasAPI(caas_credentials, uri, '')
+    if result['status']:
+        publicIpList = result['msg']
+        i = 0
+        totalPublicIp = 0
+        while i < publicIpList['totalCount']:
+            totalPublicIp += publicIpList['publicIpBlock'][i]['size']
+            i += 1
+        publicIpList['totalPublicIp'] = totalPublicIp
+    else:
+        module.fail_json(msg=result['msg'])
+    return publicIpList
+
 def main():
     module = AnsibleModule(
         supports_check_mode=True,
@@ -113,8 +129,7 @@ def main():
             caas_credentials = dict(required=True,no_log=True),
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
-            state = dict(default='present', choices=['present', 'absent']),
-            baseip = dict(required=False),
+            minFreePublicIpv4Address = dict(required=False,default=1),
         )
     )
     if not IMPORT_STATUS:
@@ -125,9 +140,6 @@ def main():
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
     module.params.pop('caas_credentials', None)
-
-    state = module.params['state']
-    module.params.pop('state', None)
 
     result = _getOrgId(caas_credentials)
     if not result['status']:
@@ -145,47 +157,58 @@ def main():
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
-                    module.params.pop('networkDomainName', None)
-                    module.params.pop('datacenterId', None)					
-	
-    f = { 'baseIp' : module.params['baseip'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/publicIpBlock?'+urllib.urlencode(f)
+
+    publicIpList = _listPublicIpBlock(module,caas_credentials,orgId)
+
+    f = { 'networkDomainId' : module.params['networkDomainId']}
+    uri = '/caas/2.1/'+orgId+'/network/reservedPublicIpv4Address?'+urllib.urlencode(f)
     result = caasAPI(caas_credentials, uri, '')
     if result['status']:
-        publicIpList = result['msg']
+        reservedPublicIpv4Address = result['msg']
+        logging.debug("   reservedPublicIpv4Address:"+str(reservedPublicIpv4Address['totalCount']))
     else:
         module.fail_json(msg=result['msg'])
- 	
-#ABSENT
-    if state == 'absent':
-        if publicIpList['totalCount'] == 1:
-            uri = '/caas/2.1/'+orgId+'/network/removePublicIpBlock'
-            _data = {}
-            _data['id'] = publicIpList['publicIp'][0]['id']
-            data = json.dumps(_data)
-            if module.check_mode: has_changed=True
-            else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+    
+#RELEASE
+    if module.params['minFreePublicIpv4Address'] < (publicIpList['totalPublicIp'] - reservedPublicIpv4Address['totalCount']):
+        i = 0
+        while i < publicIpList['totalCount']:
+            b = True
+            j = 0
+            while j < reservedPublicIpv4Address['totalCount']:
+                if reservedPublicIpv4Address['ip'][j]['ipBlockId']==publicIpList['publicIpBlock'][i]['id']: b = False
+                j += 1
+            if b and (module.params['minFreePublicIpv4Address'] <= (publicIpList['totalPublicIp'] - publicIpList['publicIpBlock'][i]['size'] - reservedPublicIpv4Address['totalCount'])):
+                uri = '/caas/2.1/'+orgId+'/network/removePublicIpBlock'
+                _data = {}
+                _data['id'] = publicIpList['publicIpBlock'][i]['id']
+                data = json.dumps(_data)
+                if module.check_mode: 
+                    has_changed=True
+                else: 
+                    result = caasAPI(caas_credentials, uri, data)
+                    if not result['status']: module.fail_json(msg=result['msg'])
+                    else: 
+                        has_changed = True
+                        publicIpList['totalPublicIp'] -= publicIpList['publicIpBlock'][i]['size']
+            i += 1
 	
-#PRESENT
-    if state == "present":
-        if publicIpList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/network/addPublicIpBlock'
-            _data = {}
-            _data['networkDomainId'] = module.params['networkDomainId']
-            data = json.dumps(_data)
-            if module.check_mode: has_changed=True
+#GET
+    logging.debug("   minFreePublicIpv4Address/totalPublicIp/reservedPublicIpv4Address:"+str(module.params['minFreePublicIpv4Address'])+"/"+str(publicIpList['totalPublicIp'])+"/"+str(reservedPublicIpv4Address['totalCount']))
+    while module.params['minFreePublicIpv4Address'] > (publicIpList['totalPublicIp'] - reservedPublicIpv4Address['totalCount']):
+        uri = '/caas/2.1/'+orgId+'/network/addPublicIpBlock'
+        _data = {}
+        _data['networkDomainId'] = module.params['networkDomainId']
+        data = json.dumps(_data)
+        if module.check_mode: has_changed=True
+        else: 
+            result = caasAPI(caas_credentials, uri, data)
+            if not result['status']: module.fail_json(msg=result['msg'])
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
-	
-    f = { 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/publicIpBlock?'+urllib.urlencode(f)
-    result = caasAPI(caas_credentials, uri, '')
-    module.exit_json(changed=has_changed, publicIp=result)
+                has_changed = True
+                publicIpList = _listPublicIpBlock(module,caas_credentials,orgId)
+
+    module.exit_json(changed=has_changed, publicIpList=publicIpList, reservedPublicIpv4Address=reservedPublicIpv4Address)
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':
