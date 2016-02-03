@@ -218,6 +218,19 @@ EXAMPLES = '''
               primaryNic: 
                   vlanName: "{{caas_vlan_webservers.vlans.vlan[0].name}}"
         register: caas_webservers
+# and add this 2 new servers to Ansible dynamic inventoy (Group : WebServers)
+      - name: Add new instances to group WebServers
+        add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
+        when: item.started
+        with_items: caas_webservers.servers.server
+#you can now apply roles ands tasks, as usual
+  - name: Configure Web Servers
+    hosts: WebServers
+    vars_files:
+      - /root/main.yml
+    roles:
+      - { role: my.apache }
+      - { role: my.php }
 '''
 
 RETURN = '''
@@ -447,8 +460,8 @@ def main():
     serverList = _listServer(module,caas_credentials,orgId,True)
 	
 #ABSENT
-    if module.params['state']=='absent':
-        if serverList['totalCount']>1:
+    if (module.params['state']=='absent') and (serverList != None):
+        if serverList['totalCount']>=1:
             has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'powerOffServer') or has_changed
             serverList = _listServer(module,caas_credentials,orgId,True)
             has_changed = _executeAction(module, caas_credentials, orgId, serverList, 'deleteServer') or has_changed
