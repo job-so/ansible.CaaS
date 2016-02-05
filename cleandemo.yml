@@ -1,62 +1,69 @@
 ---
   - name: Clean Dimension Data infrastructure  
     hosts: localhost
+    vars:
+        networkDomainName: ansible.CaaS_Sandbox
     vars_files:
       - /root/caas_credentials.yml
     tasks:
       - name: TearDown LoadBalencer
         caas_loadbalancer:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox 
+          networkDomainName: "{{ networkDomainName }}"
           name: "WebServers.Load.Balancer"
           state: absent
+      - name: Release PublicIP
+        caas_publicip:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          minFreePublicIpv4Address: 0
       - name: TearDown WebServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
           networkInfo:
-              networkDomainName: ansible.CaaS_Sandbox 
+              networkDomainName: "{{ networkDomainName }}"
               primaryNic: 
-                  vlanName: "ansible.CaaS_Sandbox_vlan_webservers"
+                  vlanName: "{{ networkDomainName }}_vlan_webservers"
           name: "WebServer"
           state: absent
       - name: TearDown AppServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
           networkInfo:
-              networkDomainName: ansible.CaaS_Sandbox
+              networkDomainName: "{{ networkDomainName }}"
               primaryNic: 
-                  vlanName: "ansible.CaaS_Sandbox_vlan_appservers"
+                  vlanName: "{{ networkDomainName }}_vlan_appservers"
           name: "AppServer"
           state: absent
       - name: TearDown DBServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
           networkInfo:
-              networkDomainName: ansible.CaaS_Sandbox
+              networkDomainName: "{{ networkDomainName }}"
               primaryNic: 
-                  vlanName: "ansible.CaaS_Sandbox_vlan_dbservers"
+                  vlanName: "{{ networkDomainName }}_vlan_dbservers"
           name: "DBServer"
           state: absent
       - name: TearDown  DMZ
         caas_vlan:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
-          name: "ansible.CaaS_Sandbox_vlan_webservers"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "{{ networkDomainName }}_vlan_webservers"
           state: absent
       - name: TearDown  DMZ
         caas_vlan:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
-          name: "ansible.CaaS_Sandbox_vlan_appservers"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "{{ networkDomainName }}_vlan_appservers"
           state: absent
       - name: TearDown  DMZ
         caas_vlan:
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: ansible.CaaS_Sandbox
-          name: "ansible.CaaS_Sandbox_vlan_dbservers"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "{{ networkDomainName }}_vlan_dbservers"
           state: absent
       - name: TearDown my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
-          name: ansible.CaaS_Sandbox
+          name: "{{ networkDomainName }}"
           state: absent

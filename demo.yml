@@ -32,19 +32,19 @@
         register: caas_vlan_webservers
       - name: print debug
         debug: var=caas_vlan_webservers
-      - name: Deploy WebServers DMZ
-        caas_server:
-          caas_credentials: "{{ caas_credentials }}"
-          name: "MyWebServer"
-          imageName: CentOS 7 64-bit 2 CPU
-          administratorPassword: "{{ root_password }}"
-          networkInfo:
-              networkDomainName: ansible.Caas_SandBox
-              primaryNic: 
-                  privateIpv4: 192.168.30.42
-        register: caas_mywebserver
-      - name: print debug
-        debug: var=caas_mywebserver
+#      - name: Deploy WebServers DMZ
+#        caas_server:
+#          caas_credentials: "{{ caas_credentials }}"
+#          name: "MyWebServer"
+#          imageName: CentOS 7 64-bit 2 CPU
+#          administratorPassword: "{{ root_password }}"
+#          networkInfo:
+#              networkDomainName: ansible.Caas_SandBox
+#              primaryNic: 
+#                  privateIpv4: 192.168.30.42
+#        register: caas_mywebserver
+#      - name: print debug
+#        debug: var=caas_mywebserver
       - name: Deploy WebServers
         caas_server:
           caas_credentials: "{{ caas_credentials }}"
@@ -173,14 +173,32 @@
         register: caas_firewallrule
       - name: print debug
         debug: var=caas_firewallrule
-      - name: Wait for SSH to come up
-        wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=600 state=started
+      - name: Wait for WebServers end of deployment
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          name: "WebServer"
+          count: 2
+          imageName: CentOS 7 64-bit 2 CPU
+          administratorPassword: "{{ root_password }}"
+          networkInfo:
+              networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+              primaryNic: 
+                  vlanName: "{{caas_vlan_webservers.vlans.vlan[0].name}}"
+        register: caas_webservers
+      #- name: Wait for SSH to come up
+      #  wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=9000 state=started
         #when: item.started
-        with_items: caas_webservers.servers.server
+      #  with_items: caas_webservers.servers.server
+      #- pause: seconds=30
       - name: Get Public IPv4
         caas_publicip:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          #minFreePublicIpv4Address: 1
+        register: caas_publicp
+      - name: print debug
+        debug: var=caas_publicp
+      - pause:
       - name: Setting Load Balancing for WebServers
         caas_loadbalancer:
           caas_credentials: "{{ caas_credentials }}"
