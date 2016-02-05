@@ -35,7 +35,7 @@ version_added: "1.9"
 description: 
   - "Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
     - a network domain already deployed, see caas_networkdomain module.
@@ -316,7 +316,7 @@ def caasAPI(caas_credentials, uri, data):
     if data == '':
         request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
-        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+        request    = urllib2.Request(caas_credentials['apiurl'] + uri, data)
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
@@ -346,7 +346,7 @@ def caasAPI(caas_credentials, uri, data):
     return result
 
 def _listServer(module,caas_credentials,orgId,wait):
-	# List Servers with this Name, in this networkDomain, in this vlanId
+    # List Servers with this Name, in this networkDomain, in this vlanId
     if 'vlanId' in module.params['networkInfo']['primaryNic']:
         f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'vlanId' : module.params['networkInfo']['primaryNic']['vlanId'], 'name' : module.params['name']}
     else: 
@@ -363,7 +363,7 @@ def _listServer(module,caas_credentials,orgId,wait):
         for (server) in serverList['server']:
             logging.debug(server['id']+' '+server['name']+' '+server['state'])
             if (server['state'] != "NORMAL") and wait:
-		        b = True
+                b = True
         if b:
             time.sleep(5)
     return serverList
@@ -390,14 +390,14 @@ def _executeAction(module,caas_credentials,orgId,serverList,action):
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
     return has_changed
-	
+    
 def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec = dict(
             caas_credentials = dict(required=True,no_log=True),
-			name = dict(required=True),
-			count = dict(type='int', default='1'),
+            name = dict(required=True),
+            count = dict(type='int', default='1'),
             state = dict(default='present', choices=['present', 'absent']),
             start = dict(default=True, choices=[True,False]),
             action = dict(default=None, choices=['startServer', 'shutdownServer', 'rebootServer', 'resetServer', 'powerOffServer', 'updateVmwareTools', 'upgradeVirtualHardware']),
@@ -409,14 +409,14 @@ def main():
             networkInfo = dict(),
             cpu = dict(),
             memoryGb = dict(default=None),
-			disk = dict(),
+            disk = dict(),
             microsoftTimeZone = dict(default=None),
         )
     )
     if not IMPORT_STATUS:
         module.fail_json(msg='missing dependencies for this module')
     has_changed = False
-	
+    
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
@@ -427,10 +427,7 @@ def main():
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-	#Check dataCenterId
-    #if not datacenterId
-	
-	# resolve imageId, networkId, vlanId
+    # resolve imageId, networkId, vlanId
     if module.params['imageId']== None:
         if module.params['imageName']!=None:
             f = { 'datacenterId' : module.params['datacenterId'], 'name' : module.params['imageName'] }
@@ -456,9 +453,9 @@ def main():
                 if result['status']:
                     if result['msg']['totalCount']==1:
                         module.params['networkInfo']['primaryNic']['vlanId'] = result['msg']['vlan'][0]['id']
-	
+    
     serverList = _listServer(module,caas_credentials,orgId,True)
-	
+    
 #ABSENT
     if (module.params['state']=='absent') and (serverList != None):
         if serverList['totalCount']>=1:
@@ -477,12 +474,12 @@ def main():
                 result = caasAPI(caas_credentials, uri, data)
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
-            i += 1			
+            i += 1            
 
         # Execute Action on Servers
         if module.params['action']!=None:
             has_changed = _executeAction(module, caas_credentials,orgId,serverList,module.params['action']) or has_changed
-		
+        
     module.exit_json(changed=has_changed, servers=_listServer(module,caas_credentials,orgId,module.params['wait']))
 
 from ansible.module_utils.basic import *

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8 -*-
-
+    
 # This module is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -86,7 +86,7 @@ EXAMPLES = '''
             password: MySecret_KeepItSecret
             datacenterId: EU6 
         register: cas_credentials
-		
+        
 # Check credentials with username/password provided in an external file (recommended)
   - name: Deploy Dimension Data infrastructure  
     hosts: localhost
@@ -157,22 +157,19 @@ def main():
     if not IMPORT_STATUS:
         module.fail_json(msg='missing dependencies for this module')
     has_changed = False
-	
+    
     # Check Authentication and get OrgId
     caas_credentials = {}
     caas_credentials['apiurl'] = module.params['apiurl']
     caas_credentials['datacenter'] = module.params['datacenter']
     caas_credentials['username'] = module.params['username']
     caas_credentials['password'] = module.params['password']
-	
+    
     result = _getOrgId(caas_credentials)
     if not result['status']:
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-	#Check dataCenterId
-    #if not datacenterId
-	
     module.exit_json(changed=has_changed, apiurl=caas_credentials['apiurl'], datacenter=caas_credentials['datacenter'], username=caas_credentials['username'], password=caas_credentials['password'], orgId=orgId)
 
 from ansible.module_utils.basic import *

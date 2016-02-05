@@ -35,7 +35,7 @@ author: "Olivier GROSJEANNE, @job-so"
 description: 
   - "Create, Configure, Remove Network Network VLANs on Dimension Data Managed Cloud Platform"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
     - a network domain already deployed, see caas_networkdomain module.
@@ -163,7 +163,7 @@ def caasAPI(caas_credentials, uri, data):
     if data == '':
         request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
-        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+        request    = urllib2.Request(caas_credentials['apiurl'] + uri, data)
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
@@ -203,7 +203,7 @@ def _listVlan(module,caas_credentials,orgId,wait):
         for (vlan) in vlanList['vlan']:
             logging.debug(vlan['id']+' '+vlan['name']+' '+vlan['state'])
             if (vlan['state'] != "NORMAL") and wait:
-		        b = True
+                b = True
         if b:
             time.sleep(5)
     return vlanList
@@ -226,7 +226,7 @@ def main():
     if not IMPORT_STATUS:
         module.fail_json(msg='missing dependencies for this module')
     has_changed = False
-	
+    
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
@@ -239,9 +239,6 @@ def main():
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-	#Check dataCenterId
-    #if not datacenterId
-	
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
@@ -250,7 +247,7 @@ def main():
             if result['status']:
                 if result['msg']['totalCount']==1:
                     module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
-	
+    
     vlanList = _listVlan(module,caas_credentials,orgId,True)
 #ABSENT
     if state == 'absent':
@@ -281,7 +278,7 @@ def main():
                 result = caasAPI(caas_credentials, uri, data)
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
-	
+    
     vlanList = _listVlan(module,caas_credentials,orgId,wait)
     module.exit_json(changed=has_changed, vlans=vlanList)
 

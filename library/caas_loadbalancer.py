@@ -35,7 +35,7 @@ description:
 short_description: "Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform"
 version_added: "1.9"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
     - a network domain already deployed, see caas_networkdomain module.
@@ -182,9 +182,6 @@ def main():
     if not result['status']:
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
-
-#Check dataCenterId
-    #if not datacenterId
 
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:

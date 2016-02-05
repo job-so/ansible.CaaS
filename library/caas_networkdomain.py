@@ -35,7 +35,7 @@ version_added: "1.9"
 description: 
   - "Create, configure, Remove Network Domains on Dimension Data Managed Cloud Platform"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)"
+  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
 options: 
@@ -124,7 +124,7 @@ def caasAPI(caas_credentials, uri, data):
     if data == '':
         request = urllib2.Request(caas_credentials['apiurl'] + uri)
     else:
-        request	= urllib2.Request(caas_credentials['apiurl'] + uri, data)
+        request    = urllib2.Request(caas_credentials['apiurl'] + uri, data)
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_header("Content-Type", "application/json")
@@ -167,7 +167,7 @@ def main():
     if not IMPORT_STATUS:
         module.fail_json(msg='missing dependencies for this module')
     has_changed = False
-	
+    
     # Check Authentication and get OrgId
     caas_credentials = module.params['caas_credentials']
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
@@ -178,9 +178,6 @@ def main():
         module.fail_json(msg=result['msg'])
     orgId = result['orgId']
 
-	#Check dataCenterId
-    #if not datacenterId
-	
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
     uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
     result = caasAPI(caas_credentials, uri, '')
@@ -188,7 +185,7 @@ def main():
         networkDomainList = result['msg']
     else:
         module.fail_json(msg=result['msg'])
- 	
+     
 #ABSENT
     if state == 'absent':
         if networkDomainList['totalCount'] == 1:
@@ -216,7 +213,7 @@ def main():
                 result = caasAPI(caas_credentials, uri, data)
                 if not result['status']: module.fail_json(msg=result['msg'])
                 else: has_changed = True
-	
+    
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
     uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
     networkDomainList = caasAPI(caas_credentials, uri, '')
