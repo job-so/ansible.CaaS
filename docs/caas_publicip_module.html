@@ -380,8 +380,9 @@
 <li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
 <li><a class="reference internal" href="#options" id="id3">Options</a></li>
 <li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
-<li><a class="reference internal" href="#notes" id="id5">Notes</a></li>
-<li><a class="reference internal" href="#this-is-an-extras-module" id="id6">This is an Extras Module</a></li>
+<li><a class="reference internal" href="#return-values" id="id5">Return Values</a></li>
+<li><a class="reference internal" href="#notes" id="id6">Notes</a></li>
+<li><a class="reference internal" href="#this-is-an-extras-module" id="id7">This is an Extras Module</a></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
@@ -413,24 +414,94 @@
 <td></td>
     <td><ul></ul></td>
     <td><div>Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)</div></td></tr>
+        <tr>
+<td>minFreePublicIpv4Address<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>1</td>
+    <td><ul></ul></td>
+    <td><div>The number of Public (ie internet) ipv4 you would like to have available to this networkDomain.</div><div>If this parameter is higher than current ipv4 available, the module will reserve new ip.</div><div>If this parameter is lower than current ipv4 available, the module will try to release existing (and not used) ip blocks.</div><div>Setting this parameter to 0 will release all ip blocks if there is no nat or no load balancer setup in this networkdomain.</div></td></tr>
+        <tr>
+<td>networkDomainId<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The id of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>networkDomainName<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The name of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
     </table>
 </br></div>
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><div class="highlight-YAML"><pre>#</pre>
+<div><div class="highlight-YAML"><pre># Ensure that there is at least 1 public ipv4 available
+      - name: Get Public IPv4
+        caas_publicip:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+# Reserve at least 4 public ipv4
+      - name: Get Public IPv4
+        caas_publicip:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          minFreePublicIpv4Address: 4
+# Release all unused public ipv4 blocks
+      - name: Get Public IPv4
+        caas_publicip:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          minFreePublicIpv4Address: 0</pre>
 </div>
 </div></blockquote>
 </div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<p>Common return values are documented here <a class="reference internal" href="common_return_values.html"><em>Common Return Values</em></a>, the following are the fields unique to this module:</p>
+<table border=1 cellpadding=4>
+<tr>
+<th class="head">name</th>
+<th class="head">description</th>
+<th class="head">returned</th>
+<th class="head">type</th>
+<th class="head">sample</th>
+</tr>
+
+    <tr>
+    <td> freePublicIpv4Address </td>
+    <td> The number of available public ip in the networkdomain </td>
+    <td align=center> success </td>
+    <td align=center> integer </td>
+    <td align=center> 1 </td>
+</tr>
+        <tr>
+    <td> reservedPublicIpv4Address </td>
+    <td> A list of reserved (ie used) public ip in the networkdomain. </td>
+    <td align=center> success </td>
+    <td align=center> Dictionary </td>
+    <td align=center> {'ip': [{'datacenterId': 'EU6', 'ipBlockId': '813e916e-18e1-11e5-8d4f-180373fb68df', 'networkDomainId': 'cdb307d2-4438-4adf-8918-2ebc25ca27d2', 'value': '168.128.12.234'}], 'pageCount': 1, 'pageNumber': 1, 'pageSize': 250, 'totalCount': 1} </td>
+</tr>
+        <tr>
+    <td> publicIpBlocks </td>
+    <td> A list of public IP blocks in the networkdomain. </td>
+    <td align=center> success </td>
+    <td align=center> Dictionary </td>
+    <td align=center> {'totalCount': 1, 'totalPublicIp': 2, 'pageNumber': 1, 'pageSize': 250, 'pageCount': 1, 'publicIpBlock': [{'datacenterId': 'EU6', 'networkDomainId': 'cdb307d2-4438-4adf-8918-2ebc25ca27d2', 'size': 2, 'baseIp': '168.128.12.234', 'state': 'NORMAL', 'createTime': '2016-02-04T06:10:03.000Z', 'id': '813e916e-18e1-11e5-8d4f-180373fb68df'}]} </td>
+</tr>
+
+</table>
+</br></br></div>
 <div class="section" id="notes">
-<h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : <a class="reference external" href="https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2">https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2</a></p>
+<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : <a class="reference external" href="https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5">https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5</a></p>
 </div>
 </div>
 <div class="section" id="this-is-an-extras-module">
-<h2><a class="toc-backref" href="#id6">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">This is an Extras Module</a><a class="headerlink" href="#this-is-an-extras-module" title="Permalink to this headline">¶</a></h2>
 <p>For more information on what this means please read <a class="reference internal" href="modules_extra.html"><em>Extras Modules</em></a></p>
 <p>For help in developing on modules, should you be so inclined, please read <a class="reference internal" href="community.html"><em>Community Information &amp; Contributing</em></a>, <a class="reference internal" href="developing_test_pr.html"><em>Helping Testing PRs</em></a> and <a class="reference internal" href="developing_modules.html"><em>Developing Modules</em></a>.</p>
 </div>
@@ -464,7 +535,7 @@
 
   <p>
   &copy; Copyright 2016 <a href="http://ansible.com">Ansible, Inc.</a>.
-    Last updated on Jan 28, 2016.
+    Last updated on Feb 09, 2016.
   </p>
 
 Ansible docs are generated from <a href="https://github.com/ansible/ansible">GitHub sources</A> using <A HREF="http://sphinx-doc.org/">Sphinx</A> using a theme provided by <a href="http://readthedocs.org">Read the Docs</a>. . Module documentation is not edited directly, but is generated from the source code for the modules.  To submit an update to module docs, edit the 'DOCUMENTATION' metadata in the <A HREF="https://github.com/ansible/ansible-modules-core">core</A> and <A HREF="https://github.com/ansible/ansible-modules-extras">extras</A> modules source repositories. 

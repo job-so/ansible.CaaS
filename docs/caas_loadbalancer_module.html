@@ -414,11 +414,35 @@
     <td><ul></ul></td>
     <td><div>Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)</div></td></tr>
         <tr>
+<td>connectionLimit<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>25000</td>
+    <td><ul></ul></td>
+    <td><div>An integer in the range 1 -MAX_VIRTUAL_LISTENER_CONNECTION_LIMIT. See Data Centers features/property</div></td></tr>
+        <tr>
+<td>connectionRateLimit<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>2000</td>
+    <td><ul></ul></td>
+    <td><div>An integer in the range 1 -MAX_VIRTUAL_LISTENER_CONNECTION_RATE_LIMIT. See Data Centers features/property</div></td></tr>
+        <tr>
 <td>description<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS</td>
     <td><ul></ul></td>
     <td><div>Maximum length: 255 characters.</div></td></tr>
+        <tr>
+<td>enabled<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>True</td>
+    <td><ul><li>True</li><li>False</li></ul></td>
+    <td><div>Must be one of true or false, where true indicates that the Virtual Listener will permit traffic to flow to its Pool and/or Client Clone Pool.</div></td></tr>
+        <tr>
+<td>listenerIpAddress<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>Must be a valid IPv4 in dot-decimal notation (x.x.x.x).</div><div>listenerIpAddress can be one of two types:</div><div>Public: listenerIpAddress is *optional for creating a Public IP address Virtual Listener. If not supplied, the “Public” type below is assumed, and an available public IP is picked up from public ip blocks. see <span class='module'>caas_publicip</span></div><div>Private: listenerIpAddress is *required to create a Private IP address Virtual Listener.</div></td></tr>
         <tr>
 <td>name<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
@@ -426,11 +450,89 @@
     <td><ul></ul></td>
     <td><div>Name that has to be given to the instance</div><div>The name must be unique inside the DataCenter</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
         <tr>
+<td>networkDomainId<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The id of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>networkDomainName<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>The name of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
+        <tr>
+<td>optimizationProfile<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>['TCP']</td>
+    <td><ul><li>TCP</li><li>LAN_OPT</li><li>WAN_OPT</li><li>MOBILE_OPT</li><li>TCP_LEGACY</li><li>SMTP</li><li>SIP</li></ul></td>
+    <td><div>An optimizationProfile can only be included for certain type and protocol combinations:</div><div>1. STANDARD/TCP: optimizationProfile is required for this combination and must be one of: TCP, LAN_OPT, WAN_OPT, MOBILE_OPT, TCP_LEGACY.</div><div>2. STANDARD/UDP: SMTP or SIP.</div></td></tr>
+        <tr>
+<td>pool.description<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>{{description}}</td>
+    <td><ul></ul></td>
+    <td><div>Maximum length: 255 characters.</div></td></tr>
+        <tr>
+<td>pool.healthMonitorId<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>NOT IMPLEMENTED</div></td></tr>
+        <tr>
+<td>pool.loadBalanceMethod<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>ROUND_ROBIN</td>
+    <td><ul><li>ROUND_ROBIN</li><li>LEAST_CONNECTIONS_MEMBER</li><li>LEAST_CONNECTIONS_NODE</li><li>OBSERVED_MEMBER</li><li>OBSERVED_NODE</li><li>PREDICTIVE_MEMBER</li><li>PREDICTIVE_NODE</li></ul></td>
+    <td><div>Must be one of choices.</div></td></tr>
+        <tr>
+<td>pool.name<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>{{name}}.pool</td>
+    <td><ul></ul></td>
+    <td><div>Must be alphanumeric with the following exceptions permitted '_' (underscore) and '.' (full stop / period)</div></td></tr>
+        <tr>
+<td>pool.serviceDownAction<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>RESELECT</td>
+    <td><ul><li>NONE</li><li>DROP</li><li>RESELECT</li></ul></td>
+    <td><div>Must be one of choices.</div></td></tr>
+        <tr>
+<td>pool.slowRampTime<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>30</td>
+    <td><ul></ul></td>
+    <td><div>An integer in the range 1-120 (seconds).</div></td></tr>
+        <tr>
+<td>port<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td></td>
+    <td><ul></ul></td>
+    <td><div>An integer in the range 1-65535</div><div>If port is not supplied it will be taken to mean 'Any Port'.</div></td></tr>
+        <tr>
+<td>protocol<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>TCP</td>
+    <td><ul><li>ANY</li><li>TCP</li><li>UDP</li><li>HTTP</li></ul></td>
+    <td><div>The permitted range of values for protocol is governed by the choice of the type property.</div><div>For STANDARD type, protocol must be one of: ANY, TCP, UDP</div><div>For PERFORMANCE_LAYER_4 type, protocol must be one of: ANY, TCP, UDP, HTTP</div></td></tr>
+        <tr>
+<td>sourcePortPreservation<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>PRESERVE</td>
+    <td><ul><li>PRESERVE</li><li>PRESERVE_STRICT</li><li>CHANGE</li></ul></td>
+    <td><div>Must be one of choices.</div></td></tr>
+        <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>present</td>
     <td><ul><li>present</li><li>absent</li></ul></td>
     <td><div>Should the resource be present or absent.</div><div>Take care : Absent will powerOff and delete all servers.</div></td></tr>
+        <tr>
+<td>type<br/><div style="font-size: small;"></div></td>
+<td>no</td>
+<td>STANDARD</td>
+    <td><ul><li>STANDARD</li><li>PERFORMANCE_LAYER_4</li></ul></td>
+    <td><div>Must be one of choices.</div></td></tr>
     </table>
 </br></div>
 <div class="section" id="examples">
@@ -444,7 +546,7 @@
 <h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : <a class="reference external" href="https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2">https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2</a></p>
+<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : <a class="reference external" href="https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5">https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5</a></p>
 </div>
 </div>
 <div class="section" id="this-is-an-extras-module">
@@ -482,7 +584,7 @@
 
   <p>
   &copy; Copyright 2016 <a href="http://ansible.com">Ansible, Inc.</a>.
-    Last updated on Jan 28, 2016.
+    Last updated on Feb 09, 2016.
   </p>
 
 Ansible docs are generated from <a href="https://github.com/ansible/ansible">GitHub sources</A> using <A HREF="http://sphinx-doc.org/">Sphinx</A> using a theme provided by <a href="http://readthedocs.org">Read the Docs</a>. . Module documentation is not edited directly, but is generated from the source code for the modules.  To submit an update to module docs, edit the 'DOCUMENTATION' metadata in the <A HREF="https://github.com/ansible/ansible-modules-core">core</A> and <A HREF="https://github.com/ansible/ansible-modules-extras">extras</A> modules source repositories. 
