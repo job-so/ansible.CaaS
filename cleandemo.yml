@@ -6,7 +6,7 @@
     vars_files:
       - /root/caas_credentials.yml
     tasks:
-      - name: TearDown LoadBalencer
+      - name: TearDown LoadBalancer
         caas_loadbalancer:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ networkDomainName }}"

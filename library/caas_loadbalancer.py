@@ -60,6 +60,91 @@ options:
     description:
       - "Maximum length: 255 characters."
     default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
+  networkDomainId:
+    description:
+      - "The id of a Network Domain belonging within the same MCP 2.0 data center."
+      - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
+    default: null
+  networkDomainName:
+    description:
+      - "The name of a Network Domain belonging within the same MCP 2.0 data center."
+      - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
+    default: null
+  type:
+    choices: ['STANDARD','PERFORMANCE_LAYER_4']
+    default: STANDARD
+    description: 
+      - "Must be one of choices."
+  protocol:
+    choices: ['ANY','TCP','UDP','HTTP']
+    default: TCP
+    description: 
+      - "The permitted range of values for protocol is governed by the choice of the type property."
+      - "For STANDARD type, protocol must be one of: ANY, TCP, UDP"
+      - "For PERFORMANCE_LAYER_4 type, protocol must be one of: ANY, TCP, UDP, HTTP"
+  listenerIpAddress:
+    description:
+      - "Must be a valid IPv4 in dot-decimal notation (x.x.x.x)."
+      - "listenerIpAddress can be one of two types:"
+      - "Public: listenerIpAddress is *optional for creating a Public IP address Virtual Listener. If not supplied, the “Public” type below is assumed, and an available public IP is picked up from public ip blocks. see M(caas_publicip)"
+      - "Private: listenerIpAddress is *required to create a Private IP address Virtual Listener."
+    default: null
+  port:
+    description:
+      - "An integer in the range 1-65535"
+      - "If port is not supplied it will be taken to mean 'Any Port'."
+    default: null
+  enabled:
+    choices: ['True','False']
+    default: True
+    description: 
+      - "Must be one of true or false, where true indicates that the Virtual Listener will permit traffic to flow to its Pool and/or Client Clone Pool."
+  connectionLimit:
+    default: 25000
+    description: 
+      - "An integer in the range 1 -MAX_VIRTUAL_LISTENER_CONNECTION_LIMIT. See Data Centers features/property"
+  connectionRateLimit:
+    default: 2000
+    description: 
+      - "An integer in the range 1 -MAX_VIRTUAL_LISTENER_CONNECTION_RATE_LIMIT. See Data Centers features/property"
+  sourcePortPreservation:
+    choices: ['PRESERVE','PRESERVE_STRICT','CHANGE']
+    default: PRESERVE
+    description: 
+      - "Must be one of choices."
+  optimizationProfile:
+    choices: ['TCP', 'LAN_OPT', 'WAN_OPT', 'MOBILE_OPT', 'TCP_LEGACY', 'SMTP', 'SIP']
+    default: [TCP]
+    description: 
+      - "An optimizationProfile can only be included for certain type and protocol combinations:"
+      - "1. STANDARD/TCP: optimizationProfile is required for this combination and must be one of: TCP, LAN_OPT, WAN_OPT, MOBILE_OPT, TCP_LEGACY."
+      - "2. STANDARD/UDP: SMTP or SIP."
+  pool.name:
+    default: "{{name}}.pool"
+    description: 
+      - "Must be alphanumeric with the following exceptions permitted '_' (underscore) and '.' (full stop / period)"
+  pool.description:
+    default: "{{description}}"
+    description: 
+      - "Maximum length: 255 characters."
+  pool.loadBalanceMethod:
+    choices: ['ROUND_ROBIN','LEAST_CONNECTIONS_MEMBER','LEAST_CONNECTIONS_NODE','OBSERVED_MEMBER','OBSERVED_NODE','PREDICTIVE_MEMBER','PREDICTIVE_NODE']
+    default: ROUND_ROBIN
+    description: 
+      - "Must be one of choices."
+  pool.healthMonitorId:
+    default: null
+    description: 
+      - "NOT IMPLEMENTED"
+  pool.serviceDownAction:
+    choices: ['NONE', 'DROP', 'RESELECT']
+    default: RESELECT
+    description: 
+      - "Must be one of choices."
+  pool.slowRampTime:
+    default: 30
+    description: 
+      - "An integer in the range 1-120 (seconds)."
 '''
 
 EXAMPLES = '''
@@ -163,7 +248,7 @@ def main():
 #persistenceProfileId": "a34ca25c-f3db-11e4-b010-005056806999"
 #fallbackPersistenceProfileId": "6f2f5d7b-cdd9-4d84-8ad7-999b64a87978",
 #iruleId": ["2b20abd9-ffdc-11e4-b010-005056806999"],
-            optimizationProfile=dict(type='list',default='[TCP )'), #choices = ['TCP', 'LAN_OPT', 'WAN_OPT', 'MOBILE_OPT', 'TCP_LEGACY', 'SMTP', 'SIP']),
+            optimizationProfile=dict(type='list',default='TCP'), #choices = ['TCP', 'LAN_OPT', 'WAN_OPT', 'MOBILE_OPT', 'TCP_LEGACY', 'SMTP', 'SIP']),
             pool=dict(),
         )
     )
@@ -270,20 +355,9 @@ def main():
                     has_changed = True
                     for info in result['msg']['info']:
                         if info['name'] == 'virtualListenerId': module.params['id'] = info['value']
-#        if firewallList['totalCount'] == 1:
-#            if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
-#                uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
-#                _data = {}
-#                _data['id'] = firewallList['firewallRule'][0]['id']
-#                _data['enabled'] = module.params['enabled']
-#                data = json.dumps(_data)
-#                result = caasAPI(caas_credentials, uri, data)
-#                if not result['status']:
-#                    module.fail_json(msg=result['msg'])
-#                else:
-#                    has_changed = True
         if module.params['pool']:
 #TODO chack if poolid in vip
+            if not 'name' in module.params['pool']: module.params['pool']['name']= module.params['name']+'.pool'
             f = { 'name' : module.params['pool']['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
             uri = '/caas/2.1/'+orgId+'/networkDomainVip/pool?'+urllib.urlencode(f)
             result = caasAPI(caas_credentials, uri, '')
@@ -295,11 +369,15 @@ def main():
                 _data = {}
                 _data['networkDomainId'] = module.params['networkDomainId']
                 _data['name'] = module.params['pool']['name']
-                #_data['description'] = module.params['pool']['description']
-                _data['loadBalanceMethod'] = module.params['pool']['loadBalanceMethod']
+                if 'description' in module.params['pool']: _data['description'] = module.params['pool']['description']
+                else: _data['description'] = module.params['description']
+                if 'loadBalanceMethod' in module.params['pool']: _data['loadBalanceMethod'] = module.params['pool']['loadBalanceMethod']
+                else: _data['loadBalanceMethod'] = 'ROUND_ROBIN'
                 #_data['healthMonitorId'] = module.params['pool']['healthMonitorId']
-                _data['serviceDownAction'] = module.params['pool']['serviceDownAction']
-                _data['slowRampTime'] = module.params['pool']['slowRampTime']
+                if 'serviceDownAction' in module.params['pool']: _data['serviceDownAction'] = module.params['pool']['serviceDownAction']
+                else: _data['serviceDownAction'] = 'RESELECT'
+                if 'slowRampTime' in module.params['pool']: _data['slowRampTime'] = module.params['pool']['slowRampTime']
+                else: _data['slowRampTime'] = 30
                 data = json.dumps(_data)
                 if module.check_mode: has_changed=True
                 else: 
@@ -311,7 +389,6 @@ def main():
                            if info['name'] == 'poolId': module.params['pool']['id'] = info['value']
                 uri = '/caas/2.1/'+orgId+'/networkDomainVip/editVirtualListener'
                 _data = {}
-                #_data['networkDomainId'] = module.params['networkDomainId']
                 _data['id'] = module.params['id']
                 _data['poolId'] = module.params['pool']['id']
                 data = json.dumps(_data)

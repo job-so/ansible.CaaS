@@ -198,24 +198,23 @@
         register: caas_publicp
       - name: print debug
         debug: var=caas_publicp
-      - pause:
       - name: Setting Load Balancing for WebServers
         caas_loadbalancer:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "WebServers.Load.Balancer"
-          type: STANDARD
-          protocol: TCP
-          port: 80
-          connectionLimit: 25000
-          connectionRateLimit: 2000
-          sourcePortPreservation: PRESERVE
-          optimizationProfile: ["TCP"]
+#          type: STANDARD
+#          protocol: TCP
+#          port: 80
+#          connectionLimit: 25000
+#          connectionRateLimit: 2000
+#          sourcePortPreservation: PRESERVE
+#          optimizationProfile: [TCP]
           pool:
-              name: webservers.pool
-              loadBalanceMethod: ROUND_ROBIN
-              serviceDownAction: "RESELECT"
-              slowRampTime: 10
+#              name: webservers.pool
+#              loadBalanceMethod: ROUND_ROBIN
+#              serviceDownAction: "RESELECT"
+#              slowRampTime: 10
               node:
                 - name: "webservers.node_{{item.name}}_{{item.networkInfo.primaryNic.privateIpv4}}"
                   description: "WebServer"
