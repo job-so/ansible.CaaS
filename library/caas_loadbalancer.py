@@ -114,7 +114,7 @@ options:
       - "Must be one of choices."
   optimizationProfile:
     choices: ['TCP', 'LAN_OPT', 'WAN_OPT', 'MOBILE_OPT', 'TCP_LEGACY', 'SMTP', 'SIP']
-    default: [TCP]
+    default: TCP
     description: 
       - "An optimizationProfile can only be included for certain type and protocol combinations:"
       - "1. STANDARD/TCP: optimizationProfile is required for this combination and must be one of: TCP, LAN_OPT, WAN_OPT, MOBILE_OPT, TCP_LEGACY."

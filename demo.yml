@@ -209,7 +209,7 @@
 #          connectionLimit: 25000
 #          connectionRateLimit: 2000
 #          sourcePortPreservation: PRESERVE
-#          optimizationProfile: [TCP]
+#          optimizationProfile: TCP
           pool:
 #              name: webservers.pool
 #              loadBalanceMethod: ROUND_ROBIN
