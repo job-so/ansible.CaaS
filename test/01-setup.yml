@@ -6,10 +6,10 @@
     tasks:
       - name: Check credentials (optionnal Step)
         caas_credentials:
-          username: "{{ lookup ('env','caas_credentials.username') }}"
-          password: "{{ lookup ('env','caas_credentials.password') }}"
-          apiurl: "{{ lookup ('env','caas_credentials.apiurl') }}"
-          datacenter: "{{ lookup ('env','caas_credentials.datacenter') }}" 
+          username: "{{ lookup ('env','caas_username') }}"
+          password: "{{ lookup ('env','caas_password') }}"
+          apiurl: "{{ lookup ('env','caas_apiurl') }}"
+          datacenter: "{{ lookup ('env','caas_datacenter') }}" 
         register: caas_credentials
       - name: Deploy my Nework Domain
         caas_networkdomain:
