@@ -4,13 +4,13 @@
     vars:
       root_password: P$$ssWwrrdGoDd!
     tasks:
-#      - name: Check credentials (optionnal Step)
-#        caas_credentials:
-#          username: "{{ lookup ('env','caas_credentials.username') }}"
-#          password: "{{ lookup ('env',caas_credentials.password') }}"
-#          apiurl: "{{ lookup ('env',caas_credentials.apiurl') }}"
-#          datacenter: "{{ lookup ('env',caas_credentials.datacenter') }}" 
-#        register: caas_credentials
+      - name: Check credentials (optionnal Step)
+        caas_credentials:
+          username: "{{ lookup ('env','caas_credentials.username') }}"
+          password: "{{ lookup ('env',caas_credentials.password') }}"
+          apiurl: "{{ lookup ('env',caas_credentials.apiurl') }}"
+          datacenter: "{{ lookup ('env',caas_credentials.datacenter') }}" 
+        register: caas_credentials
       - name: Deploy my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
