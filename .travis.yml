@@ -5,7 +5,7 @@ python:
   #- "3.5"
 before_install:
  - git clone git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
-# - source /home/travis/build/ansible/hacking/env-setup
+ - source /home/travis/build/ansible/hacking/env-setup
 script:
   - pwd
   - ls
@@ -13,3 +13,4 @@ script:
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
+  - ansible-playbook demo.yml
