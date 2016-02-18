@@ -11,6 +11,7 @@
           apiurl: "{{ lookup ('env','caas_apiurl') }}"
           datacenter: "{{ lookup ('env','caas_datacenter') }}" 
         register: caas_credentials
+      - debug: var=caas_credentials
       - name: Deploy my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"

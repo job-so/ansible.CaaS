@@ -13,15 +13,12 @@ env:
     - caas_datacenter="EU6"
 before_install:
  - pip install paramiko PyYAML jinja2 httplib2 passlib nose mock
- - git clone git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
+ - git clone --branche=stable-2.0 git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
  - source /home/travis/build/ansible/hacking/env-setup
  - ln -s /home/travis/build/job-so/ansible.CaaS/library /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
 script:
-  - ls /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
-  - pwd
-  - ls
-  - ls /home/travis
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
+  - ansible-playbook --version
   - ansible-playbook test/01-setup.yml
