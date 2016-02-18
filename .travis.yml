@@ -15,6 +15,7 @@ before_install:
  - source /home/travis/build/ansible/hacking/env-setup
  - ln -s library /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
 script:
+  - ls /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
   - pwd
   - ls
   - ls /home/travis
