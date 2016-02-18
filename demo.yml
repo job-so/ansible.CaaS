@@ -240,8 +240,11 @@
         with_items: caas_appservers.servers.server
   - name: Configure Web Servers
     hosts: WebServers
-    vars_files:
-      - /root/main.yml
+    vars:
+      apache_listen_port: 80
+      apache_vhosts:
+        - {servername: "example.com", documentroot: "/var/www/vhosts/example_com"}
+      php_packages: ["php","php-cli","php-devel","php-pdo"]
     roles:
       - { role: geerlingguy.apache }
       - { role: geerlingguy.php }
@@ -252,8 +255,11 @@
       - git: repo=https://github.com/job-so/ansible.CaaS.demo.webserver.git dest=/var/www/vhosts/example_com
   - name: Configure App Servers
     hosts: AppServers
-    vars_files:
-      - /root/main.yml
+    vars:
+      nodejs_forever: true
+      nodejs_npm_global_packages:
+        - name: express
+        - name: mongodb
     roles:
       - { role: geerlingguy.nodejs }
   - name: Deploy and run Application
