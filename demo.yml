@@ -238,33 +238,33 @@
         wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=600 state=started
         #when: item.started
         with_items: caas_appservers.servers.server
-  - name: Configure Web Servers
-    hosts: WebServers
-    vars:
-      apache_listen_port: 80
-      apache_vhosts:
-        - {servername: "example.com", documentroot: "/var/www/vhosts/example_com"}
-      php_packages: ["php","php-cli","php-devel","php-pdo"]
-    roles:
-      - { role: geerlingguy.apache }
-      - { role: geerlingguy.php }
-  - name: Deploy Web Site
-    hosts: WebServers
-    tasks:
-      - yum: name=git
-      - git: repo=https://github.com/job-so/ansible.CaaS.demo.webserver.git dest=/var/www/vhosts/example_com
-  - name: Configure App Servers
-    hosts: AppServers
-    vars:
-      nodejs_forever: true
-      nodejs_npm_global_packages:
-        - name: express
-        - name: mongodb
-    roles:
-      - { role: geerlingguy.nodejs }
-  - name: Deploy and run Application
-    hosts: AppServers
-    tasks:
-      - yum: name=git
-      - git: repo=https://github.com/job-so/ansible.CaaS.demo.appserver.git dest=/root/app
-      - command: forever start /root/app/app.js
+#  - name: Configure Web Servers
+#    hosts: WebServers
+#    vars:
+#      apache_listen_port: 80
+#      apache_vhosts:
+#        - {servername: "example.com", documentroot: "/var/www/vhosts/example_com"}
+#      php_packages: ["php","php-cli","php-devel","php-pdo"]
+#    roles:
+#      - { role: geerlingguy.apache }
+#      - { role: geerlingguy.php }
+#  - name: Deploy Web Site
+#    hosts: WebServers
+#    tasks:
+#      - yum: name=git
+#      - git: repo=https://github.com/job-so/ansible.CaaS.demo.webserver.git dest=/var/www/vhosts/example_com
+#  - name: Configure App Servers
+#    hosts: AppServers
+#    vars:
+#      nodejs_forever: true
+#      nodejs_npm_global_packages:
+#        - name: express
+#        - name: mongodb
+#    roles:
+#      - { role: geerlingguy.nodejs }
+#  - name: Deploy and run Application
+#    hosts: AppServers
+#    tasks:
+#      - yum: name=git
+#      - git: repo=https://github.com/job-so/ansible.CaaS.demo.appserver.git dest=/root/app
+#      - command: forever start /root/app/app.js
