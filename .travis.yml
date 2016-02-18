@@ -4,11 +4,10 @@ python:
   - "2.7"
   #- "3.5"
 before_install:
- - git clone git://github.com/ansible/ansible.git --recursive
- - source ansible/hacking/env-setup
+ - git clone git://github.com/ansible/ansible.git --recursive ansible
+ - source ~/ansible/hacking/env-setup
 script:
   - ls
-  - cd ansible.CaaS
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
