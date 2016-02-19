@@ -76,7 +76,7 @@ def rst_ify(text):
         t = _MODULE.sub(r':ref:`' + r"\1 <\1>" + r"`", t)
         t = _URL.sub(r"\1", t)
         t = _CONST.sub(r'``' + r"\1" + r"``", t)
-    except Exception as e:
+    except Exception, e:
         raise AnsibleError("Could not process (%s) : %s" % (str(text), str(e)))
 
     return t
