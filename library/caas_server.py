@@ -222,7 +222,7 @@ EXAMPLES = '''
       - name: Add new instances to group WebServers
         add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
         when: item.started
-        with_items: caas_webservers.servers.server
+        with_items: "{{caas_webservers.servers.server}}"
 #you can now apply roles ands tasks, as usual
   - name: Configure Web Servers
     hosts: WebServers
