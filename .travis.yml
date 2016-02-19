@@ -15,8 +15,7 @@ before_install:
  - source /home/travis/build/ansible/hacking/env-setup
  - ln -s /home/travis/build/job-so/ansible.CaaS/library /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
 script:
-  - sed "s/firstname.lastname/$caas_username/g" test/caas_credentials.yml
-  - sed "s/MySecret_KeepItSecret/$caas_password/g" test/caas_credentials.yml
+  - sed -e "s/firstname.lastname/$caas_username/g" -e "s/MySecret_KeepItSecret/$caas_password/g" caas_credentials.yml > test/caas_credentials.yml
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
