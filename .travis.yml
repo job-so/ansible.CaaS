@@ -19,10 +19,9 @@ before_install:
  - ln -s /home/travis/build/job-so/ansible.CaaS/library /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
 script:
   - sed -e "s/firstname.lastname/$caas_username/g" -e "s/MySecret_KeepItSecret/$caas_password/g" caas_credentials.yml > test/caas_credentials.yml
-  - mkdir /etc/ansible
-  - echo 127.0.0.1 > /etc/ansible/hosts
+  - echo 127.0.0.1 > hosts
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
   - ansible-playbook --version
-  - ansible-playbook test/01-setup.yml
+  - ansible-playbook -i ./hosts test/01-setup.yml
