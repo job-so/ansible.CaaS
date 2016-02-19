@@ -1,4 +1,4 @@
-[![Build status](https://travis-ci.org/job-so/ansible.CaaS.svg)](https://travis-ci.org/job-so/ansible.CaaS)  ![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)
+[![Build status](https://travis-ci.org/job-so/ansible.CaaS.svg)](https://travis-ci.org/job-so/ansible.CaaS)  ![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)![Python 2.6](https://img.shields.io/badge/python-2.6-blue.svg)![Python 2.4](https://img.shields.io/badge/python-2.4-blue.svg)
 # ansible.CaaS
 Ansible modules for managing Dimension Data Cloud
 
