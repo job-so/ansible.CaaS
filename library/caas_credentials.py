@@ -139,7 +139,7 @@ def _getOrgId(caas_credentials):
         ns = {'directory': 'http://oec.api.opsource.net/schemas/directory'}
         result['orgId'] = root.find('directory:orgId',ns).text
         result['status'] = True
-    except urllib2.URLError as e:
+    except urllib2.URLError, e:
         result['msg'] = e.reason
     except urllib2.HTTPError, e:
         result['msg'] = e.read()
