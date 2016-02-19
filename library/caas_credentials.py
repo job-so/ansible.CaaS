@@ -151,7 +151,7 @@ def main():
             apiurl = dict(required=True),
             datacenter = dict(required=True),
             username = dict(required=True),
-            password = dict(required=True),
+            password = dict(required=True,no_log=True),
         )
     )
     if not IMPORT_STATUS:

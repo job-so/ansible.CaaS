@@ -219,10 +219,10 @@
         add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=AppServers
         #when: item.started
         with_items: caas_appservers.servers.server
-      - name: Wait for SSH to come up
-        wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=600 state=started
+#      - name: Wait for SSH to come up
+#        wait_for: host="{{ item.networkInfo.primaryNic.ipv6 }}" port=22 timeout=600 state=started
         #when: item.started
-        with_items: caas_appservers.servers.server
+#        with_items: caas_appservers.servers.server
 #  - name: Configure Web Servers
 #    hosts: WebServers
 #    vars:
