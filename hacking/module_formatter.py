@@ -232,7 +232,7 @@ def too_old(added):
         added_tokens = str(added).split(".")
         readded = added_tokens[0] + "." + added_tokens[1]
         added_float = float(readded)
-    except ValueError as e:
+    except ValueError, e:
         warnings.warn("Could not parse %s: %s" % (added, str(e)))
         return False
     return (added_float < TO_OLD_TO_BE_NOTABLE)
@@ -324,7 +324,7 @@ def process_module(module, options, env, template, outputname, module_map, alias
 
     try:
         text = template.render(doc)
-    except Exception as e:
+    except Exception, e:
         raise AnsibleError("Failed to render doc for %s: %s" % (fname, str(e)))
     write_data(text, options, outputname, module)
     return doc['short_description']
