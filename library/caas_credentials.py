@@ -52,6 +52,7 @@ options:
       - "** Asia Pacific (AP) :"
       - "**** AP3 Singapore - Serangoon"
       - "**** AP4 Japan - Tokyo"
+      - "**** AP5 China - Hong Kong"
       - "** Australia (AU) :"
       - "**** AU9 Australia - Sydney"
       - "**** AU10  Australia - Melbourne"
