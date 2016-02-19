@@ -14,12 +14,14 @@ env:
     - ansible_branche=stable-2.0 caas_networkdomain=ansible2.0.CaaS_travis-ci
 before_install:
  - pip install paramiko PyYAML jinja2 httplib2 passlib nose mock
+ - pip install git+https://github.com/sivel/ansible-testing.git#egg=ansible_testing
  - git clone --branch=$ansible_branche git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
  - source /home/travis/build/ansible/hacking/env-setup
  - ln -s /home/travis/build/job-so/ansible.CaaS/library /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
 script:
   - sed -e "s/firstname.lastname/$caas_username/g" -e "s/MySecret_KeepItSecret/$caas_password/g" caas_credentials.yml > test/caas_credentials.yml
   - touch hosts
+  - python2.4 -m compileall -fq .
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
