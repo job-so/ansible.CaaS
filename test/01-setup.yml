@@ -15,7 +15,7 @@
       - name: Deploy my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
-          name: ansible.CaaS_travis-ci
+          name: {{ lookup ('env','caas_networkdomain') }}
           type: ADVANCED
         register: caas_networkdomain
       - name: Deploy WebServers DMZ

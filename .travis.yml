@@ -10,8 +10,8 @@ env:
   #caas_password
     - secure: "QC52ccqrkvkKcXpDq7WjYoMPkUQZdNFBz4gBmpm8N13H9esemL+oMTGIms+5tn3LFrOODnwc4V5lPT9+U1bs6INu2ORJs/G3fNsOuM07QLR+47xKKRBN8KdMPRY09ael46RAP1obxwXmghKa/LlRBfzSIcGiA0P0rtFd6CLqSuk41T0TNGbLFJlibP/VBSIN+GF9PU2mj/LRqAaZ3XaAyV9vKrfbqF3hIOBun8cYg9/8p1Fq7PCaB5MzmNCd9oIt2FL3EArm6ovitFoAaknFbWWp36FiTiez1tPmq2YPtGbE3Jz8yljlYA11bVR04UOvqTdhv63m1Yj+hm1C4OVvYEaUN/S6IXelYOkaZClGJFXwCi5Uz/pY0a6uLIo3ZXCRtUKg+cEr1oiVhlcn29fwJMl/c1NFKmk5ewN3640nzsa/TpaGKvWb9bMUvk4eda8GF5CZqDIRZ07iJXvFzxj+MYbNxkcKEhShHqJma8GD6u38yrTZf/gA6FomEuP5N4BTE1dMB0zhSD1lwzi7WW/4QkvunChpRv5oinEt3CbJnfKJojsd61OM+pq72YosA0W1bDPagg6thIXkNuTR9Gx1ofCSJMeWgMqZq+D+iUSsn0ln+5v8dukqzLeay4FhmfzQKiB3f29Wv+AD1EWnpKKEyLh+mAggtI3s6nQN3VvJObQ="
   matrix:
-    - ansible_branche=stable-1.9
-    - ansible_branche=stable-2.0
+    - ansible_branche=stable-1.9 caas_networkdomain=ansible.CaaS_travis-ci-1.9
+    - ansible_branche=stable-2.0 caas_networkdomain=ansible.CaaS_travis-ci-2.0
 before_install:
  - pip install paramiko PyYAML jinja2 httplib2 passlib nose mock
  - git clone --branch=$ansible_branche git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
@@ -19,6 +19,7 @@ before_install:
  - ln -s /home/travis/build/job-so/ansible.CaaS/library /home/travis/build/ansible/lib/ansible/modules/extras/cloud/dimension_data
 script:
   - sed -e "s/firstname.lastname/$caas_username/g" -e "s/MySecret_KeepItSecret/$caas_password/g" caas_credentials.yml > test/caas_credentials.yml
+  - echo 127.0.0.1 > /etc/ansible/hosts
   - python2.6 -m compileall -fq .
   - python2.7 -m compileall -fq .
   #- python3.5 -m compileall -fq .
