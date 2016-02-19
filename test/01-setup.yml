@@ -12,7 +12,6 @@
           password: "{{caas_credentials.password}}"
           apiurl: "{{caas_credentials.apiurl}}"
           datacenter: "{{caas_credentials.datacenter}}" 
-        register: caas_credentials
       - name: Deploy my Nework Domain
         caas_networkdomain:
           caas_credentials: "{{ caas_credentials }}"
