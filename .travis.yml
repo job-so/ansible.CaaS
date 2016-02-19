@@ -2,7 +2,6 @@ sudo: false
 language: python
 python:
   - "2.7"
-  - "2.7"
   #- "3.5"
 env:
   global: 
@@ -10,8 +9,9 @@ env:
     - secure: "a2CDr9D5rm0nPv63uDB4yxwwHciACJ0Sb59FF9/rzHO82wmCmGuc5dmDkhJ/Enzct4eI1/6Z6Kni43R/CkzQVGC1HVefKXWA6YOOhUfYOn1WWRCpvurwvtlTyPGDzIFF537bwBXGzNA/YdbDyKk15rWnyt0oprVIqYiSrddXNU8X+osOG91QpRA+c4peOF5jv/OeLccP206D5YvwjyjM05Ins5qPHFKwJZGoJAPdO+xAEthFXqkbqoPKgMRGRQ5lAVjMdLmae5SsMm9HpoeeZ0YZ1YXsuSB9Yrx1UL7wbfohcwEo84yr1Kxlgm99iFr575Rx27Ij7QhghphrdA6J4nUkms0j7CAltaq4iNouHE+oHdTU6kNT4ST6BQGhNYYP4miz7PYlFjG2LO0FxKF9XCzJNBYMLnhM3asMhThM6AGHHvHCh0beCNFZWBW5q9PY4AI96eIbWgdUuVEdOVNLbeKnCz0Sk4nGTFLGygeaZoVZcbh1l206YD8amy/mksWWx57pk5grnofszeBxM1mH07wxtGfKRZIA14rbLOSW18djnsx2+4leUSTzZESrxQ7QPH68Y4BQJpYFC7KF92DvnGOxOC63fXlnbzHwCZB+sqTF+tNTC6zsZSwCR0aPumK/F3dO6IgNE0oc67EVAVr0iwfRDJByiI4F5eAXnZ67XAY="
   #caas_password
     - secure: "QC52ccqrkvkKcXpDq7WjYoMPkUQZdNFBz4gBmpm8N13H9esemL+oMTGIms+5tn3LFrOODnwc4V5lPT9+U1bs6INu2ORJs/G3fNsOuM07QLR+47xKKRBN8KdMPRY09ael46RAP1obxwXmghKa/LlRBfzSIcGiA0P0rtFd6CLqSuk41T0TNGbLFJlibP/VBSIN+GF9PU2mj/LRqAaZ3XaAyV9vKrfbqF3hIOBun8cYg9/8p1Fq7PCaB5MzmNCd9oIt2FL3EArm6ovitFoAaknFbWWp36FiTiez1tPmq2YPtGbE3Jz8yljlYA11bVR04UOvqTdhv63m1Yj+hm1C4OVvYEaUN/S6IXelYOkaZClGJFXwCi5Uz/pY0a6uLIo3ZXCRtUKg+cEr1oiVhlcn29fwJMl/c1NFKmk5ewN3640nzsa/TpaGKvWb9bMUvk4eda8GF5CZqDIRZ07iJXvFzxj+MYbNxkcKEhShHqJma8GD6u38yrTZf/gA6FomEuP5N4BTE1dMB0zhSD1lwzi7WW/4QkvunChpRv5oinEt3CbJnfKJojsd61OM+pq72YosA0W1bDPagg6thIXkNuTR9Gx1ofCSJMeWgMqZq+D+iUSsn0ln+5v8dukqzLeay4FhmfzQKiB3f29Wv+AD1EWnpKKEyLh+mAggtI3s6nQN3VvJObQ="
-  - ansible_branche=stable-2.0
-  - ansible_branche=stable-1.9
+  matrix:
+    - ansible_branche=stable-1.9
+    - ansible_branche=stable-2.0
 before_install:
  - pip install paramiko PyYAML jinja2 httplib2 passlib nose mock
  - git clone --branch=$ansible_branche git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
