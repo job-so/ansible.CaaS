@@ -19,6 +19,10 @@ env:
   matrix:
     - ansible_branche=stable-1.9 caas_networkdomain=ansible1.9.CaaS_travis-ci
     - ansible_branche=stable-2.0 caas_networkdomain=ansible2.0.CaaS_travis-ci
+    - ansible_branche=devel caas_networkdomain=ansibledevel.CaaS_travis-ci
+install:
+  - pip install git+https://github.com/ansible/ansible.git@devel#egg=ansible
+  - pip install git+https://github.com/sivel/ansible-testing.git#egg=ansible_testing
 before_install:
  - pip install paramiko PyYAML jinja2 httplib2 passlib nose mock
  - pip install git+https://github.com/sivel/ansible-testing.git#egg=ansible_testing
@@ -34,3 +38,19 @@ script:
   #- python3.5 -m compileall -fq .
   - ansible-playbook --version
   - ansible-playbook -i ./hosts test/01-setup.yml
+  
+# From ansible/modules-extras
+  - ansible-validate-modules --exclude 'cloud/amazon/sns_topic\.py|cloud/centurylink/clc_aa_policy\.py|cloud/centurylink/clc_alert_policy\.py|cloud/centurylink/clc_blueprint_package\.py|cloud/centurylink/clc_firewall_policy\.py|cloud/centurylink/clc_group\.py|cloud/centurylink/clc_loadbalancer\.py|cloud/centurylink/clc_modify_server\.py|cloud/centurylink/clc_publicip\.py|cloud/centurylink/clc_server\.py|cloud/centurylink/clc_server_snapshot\.py|cloud/docker/docker_login\.py|messaging/rabbitmq_binding\.py|messaging/rabbitmq_exchange\.py|messaging/rabbitmq_queue\.py|monitoring/circonus_annotation\.py|network/snmp_facts\.py|notification/sns\.py' .
+  
+# From ansible/ansible
+# urllib2's defaults are not secure enough for us
+  - ./test/code-smell/replace-urlopen.sh .
+  - ./test/code-smell/use-compat-six.sh lib
+  - ./test/code-smell/boilerplate.sh
+  - ./test/code-smell/required-and-default-attributes.sh
+  - if test x"$TOXENV" != x'py24' ; then tox ; fi
+  - if test x"$TOXENV" = x'py24' ; then python2.4 -V && python2.4 -m compileall -fq -x 'module_utils/(a10|rax|openstack|ec2|gce).py' lib/ansible/module_utils ; fi
+  #- make -C docsite all
+  - if test x"$INTEGRATION" = x'yes' ; then source ./hacking/env-setup && cd test/integration/ && make parsing && make test_var_precedence && make unicode ; fi
+after_success:
+  - coveralls
