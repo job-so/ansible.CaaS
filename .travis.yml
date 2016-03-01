@@ -21,7 +21,7 @@ env:
     - ansible_branche=stable-2.0 caas_networkdomain=ansible2.0.CaaS_travis-ci
 #    - ansible_branche=devel caas_networkdomain=ansibledevel.CaaS_travis-ci
 before_install:
- - pip install paramiko PyYAML jinja2 httplib2 passlib nose mock
+ - pip install tox paramiko PyYAML jinja2 httplib2 passlib nose mock
 install:
  - git clone --branch=$ansible_branche git://github.com/ansible/ansible.git --recursive /home/travis/build/ansible
  - pip install git+https://github.com/sivel/ansible-testing.git#egg=ansible_testing
@@ -42,10 +42,11 @@ script:
   
 # From ansible/ansible
 # urllib2's defaults are not secure enough for us
-  - /home/travis/build/ansible/test/code-smell/replace-urlopen.sh .
-  #- /home/travis/build/ansible/test/code-smell/use-compat-six.sh lib
-  - /home/travis/build/ansible/test/code-smell/boilerplate.sh
-  - /home/travis/build/ansible/test/code-smell/required-and-default-attributes.sh
+  - cd /home/travis/build/ansible
+  - ./test/code-smell/replace-urlopen.sh .
+  - ./test/code-smell/use-compat-six.sh lib
+  - ./test/code-smell/boilerplate.sh
+  - ./test/code-smell/required-and-default-attributes.sh
   - if test x"$TOXENV" != x'py24' ; then tox ; fi
   - if test x"$TOXENV" = x'py24' ; then python2.4 -V && python2.4 -m compileall -fq -x 'module_utils/(a10|rax|openstack|ec2|gce).py' lib/ansible/module_utils ; fi
   #- make -C docsite all
