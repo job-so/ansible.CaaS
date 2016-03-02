@@ -20,7 +20,6 @@ try:
     import logging
     import base64
     import urllib
-    import urllib2
     import xml.etree.ElementTree as ET
     IMPORT_STATUS = True
 except ImportError:
@@ -100,58 +99,46 @@ RETURN = '''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_networkdomain---"+str(datetime.datetime.now()))
 
-def _getOrgId(caas_credentials):
+def _getOrgId(module, caas_credentials):
     apiuri = '/oec/0.9/myaccount'
-    request = urllib2.Request(caas_credentials['apiurl'] + apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    result = {}
-    result['status'] = False
-    try:
-        response = urllib2.urlopen(request).read()
-        root = ET.fromstring(response)
+    headers = { "Authorization": "Basic %s" % (base64string) }
+    response, info = fetch_url(module, url, headers=headers) 
+    if info['status'] == 200:
+        root = ET.fromstring(response.read())
         ns = {'directory': 'http://oec.api.opsource.net/schemas/directory'}
-        result['orgId'] = root.find('directory:orgId',ns).text
-        result['status'] = True
-    except urllib2.URLError, e:
-        result['msg'] = e.reason
-    except urllib2.HTTPError, e:
-        result['msg'] = e.read()
-    return result
-
-def caasAPI(caas_credentials, uri, data):
-    logging.debug(uri)
-    if data == '':
-        request = urllib2.Request(caas_credentials['apiurl'] + uri)
+        return root.find('directory:orgId',ns).text
     else:
-        request    = urllib2.Request(caas_credentials['apiurl'] + uri, data)
+	    module.fail_json(msg=info['msg'])
+
+def caasAPI(module, caas_credentials, apiuri, data):
+    logging.debug(apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    request.add_header("Content-Type", "application/json")
+    headers = { "Authorization": "Basic %s" % (base64string), "Content-Type": "application/json"}
     result = {}
     result['status'] = False
     retryCount = 0
     while (result['status'] == False) and (retryCount < 5*6):
-        try:
-            response = urllib2.urlopen(request)
-            result['msg'] = json.loads(response.read())
-            result['status'] = True
-        except urllib2.HTTPError, e:
-            if e.code == 400:
-                result['msg'] = json.loads(e.read())
-                if result['msg']['responseCode'] == "RESOURCE_BUSY":
+        if data == '':
+            response, info = fetch_url(module, url, headers=headers) 
+        else:
+            response, info = fetch_url(module, url, headers=headers, data=data) 
+        msg = json.loads(response.read())
+        status = True
+        if info['status'] == 200:
+            return msg
+        else:
+            if info['status'] == 400:
+                if msg['responseCode'] == "RESOURCE_BUSY":
                     logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
                     time.sleep(10)
                     retryCount += 1
                 else:
-                    retryCount = 9999
+                    module.fail_json(msg=msg)
             else:
-                retryCount = 9999
-                result['msg'] = str(e.code) + e.reason + e.read()
-        except urllib2.URLError, e:
-            result['msg'] = str(e.code)
-            retryCount = 9999
-    return result
+                module.fail_json(msg=info['msg'])
 
 def main():
     module = AnsibleModule(
@@ -173,18 +160,11 @@ def main():
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
     state = module.params['state']
 
-    result = _getOrgId(caas_credentials)
-    if not result['status']:
-        module.fail_json(msg=result['msg'])
-    orgId = result['orgId']
+    orgId = _getOrgId(module, caas_credentials)
 
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
     uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-    result = caasAPI(caas_credentials, uri, '')
-    if result['status']:
-        networkDomainList = result['msg']
-    else:
-        module.fail_json(msg=result['msg'])
+    networkDomainList = caasAPI(module,caas_credentials, uri, '')
      
 #ABSENT
     if state == 'absent':
@@ -195,9 +175,8 @@ def main():
             data = json.dumps(_data)
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
 #PRESENT
     if state == "present":
         if networkDomainList['totalCount'] < 1:
@@ -210,15 +189,16 @@ def main():
             data = json.dumps(_data)
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
     
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
     uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-    networkDomainList = caasAPI(caas_credentials, uri, '')
-    module.exit_json(changed=has_changed, networkdomains=networkDomainList['msg'])
+    networkDomainList = caasAPI(module,caas_credentials, uri, '')
+    module.exit_json(changed=has_changed, networkdomains=networkDomainList)
 
+# import module snippets
 from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 if __name__ == '__main__':
     main()

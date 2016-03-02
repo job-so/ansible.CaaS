@@ -20,7 +20,6 @@ try:
     import logging
     import base64
     import urllib
-    import urllib2
     import xml.etree.ElementTree as ET
     IMPORT_STATUS = True
 except ImportError:
@@ -126,24 +125,18 @@ username:
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_credentials---"+str(datetime.datetime.now()))
 
-def _getOrgId(caas_credentials):
+def _getOrgId(module, caas_credentials):
     apiuri = '/oec/0.9/myaccount'
-    request = urllib2.Request(caas_credentials['apiurl'] + apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    result = {}
-    result['status'] = False
-    try:
-        response = urllib2.urlopen(request).read()
-        root = ET.fromstring(response)
+    headers = { "Authorization": "Basic %s" % (base64string) }
+    response, info = fetch_url(module, url, headers=headers) 
+    if info['status'] == 200:
+        root = ET.fromstring(response.read())
         ns = {'directory': 'http://oec.api.opsource.net/schemas/directory'}
-        result['orgId'] = root.find('directory:orgId',ns).text
-        result['status'] = True
-    except urllib2.URLError, e:
-        result['msg'] = e.reason
-    except urllib2.HTTPError, e:
-        result['msg'] = e.read()
-    return result
+        return root.find('directory:orgId',ns).text
+    else:
+	    module.fail_json(msg=info['msg'])
 
 def main():
     module = AnsibleModule(
@@ -166,13 +159,12 @@ def main():
     caas_credentials['username'] = module.params['username']
     caas_credentials['password'] = module.params['password']
     
-    result = _getOrgId(caas_credentials)
-    if not result['status']:
-        module.fail_json(msg=result['msg'])
-    orgId = result['orgId']
+    orgId = _getOrgId(module,caas_credentials)
 
     module.exit_json(changed=has_changed, apiurl=caas_credentials['apiurl'], datacenter=caas_credentials['datacenter'], username=caas_credentials['username'], password=caas_credentials['password'], orgId=orgId)
 
+# import module snippets
 from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 if __name__ == '__main__':
     main()

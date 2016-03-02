@@ -20,7 +20,6 @@ try:
     import logging
     import base64
     import urllib
-    import urllib2
     import xml.etree.ElementTree as ET
     IMPORT_STATUS = True
 except ImportError:
@@ -249,66 +248,54 @@ RETURN = '''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_firewallrule---"+str(datetime.datetime.now()))
 
-def _getOrgId(caas_credentials):
+def _getOrgId(module, caas_credentials):
     apiuri = '/oec/0.9/myaccount'
-    request = urllib2.Request(caas_credentials['apiurl'] + apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    result = {}
-    result['status'] = False
-    try:
-        response = urllib2.urlopen(request).read()
-        root = ET.fromstring(response)
+    headers = { "Authorization": "Basic %s" % (base64string) }
+    response, info = fetch_url(module, url, headers=headers) 
+    if info['status'] == 200:
+        root = ET.fromstring(response.read())
         ns = {'directory': 'http://oec.api.opsource.net/schemas/directory'}
-        result['orgId'] = root.find('directory:orgId',ns).text
-        result['status'] = True
-    except urllib2.URLError, e:
-        result['msg'] = e.reason
-    except urllib2.HTTPError, e:
-        result['msg'] = e.read()
-    return result
-
-def caasAPI(caas_credentials, uri, data):
-    logging.debug(uri)
-    if data == '':
-        request = urllib2.Request(caas_credentials['apiurl'] + uri)
+        return root.find('directory:orgId',ns).text
     else:
-        request = urllib2.Request(caas_credentials['apiurl'] + uri, data)
+	    module.fail_json(msg=info['msg'])
+
+def caasAPI(module, caas_credentials, apiuri, data):
+    logging.debug(apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    request.add_header("Content-Type", "application/json")
+    headers = { "Authorization": "Basic %s" % (base64string), "Content-Type": "application/json"}
     result = {}
     result['status'] = False
     retryCount = 0
     while (result['status'] == False) and (retryCount < 5*6):
-        try:
-            response = urllib2.urlopen(request)
-            result['msg'] = json.loads(response.read())
-            result['status'] = True
-        except urllib2.HTTPError, e:
-            if e.code == 400:
-                result['msg'] = json.loads(e.read())
-                if result['msg']['responseCode'] == "RESOURCE_BUSY":
+        if data == '':
+            response, info = fetch_url(module, url, headers=headers) 
+        else:
+            response, info = fetch_url(module, url, headers=headers, data=data) 
+        msg = json.loads(response.read())
+        status = True
+        if info['status'] == 200:
+            return msg
+        else:
+            if info['status'] == 400:
+                if msg['responseCode'] == "RESOURCE_BUSY":
                     logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
                     time.sleep(10)
                     retryCount += 1
                 else:
-                    retryCount = 9999
+                    module.fail_json(msg=msg)
             else:
-                retryCount = 9999
-                result['msg'] = str(e.code) + e.reason + e.read()
-        except urllib2.URLError, e:
-            result['msg'] = str(e.code)
-            retryCount = 9999
-    return result
+                module.fail_json(msg=info['msg'])
 
 def _listFirewallRule(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.1/'+orgId+'/network/firewallRule?'+urllib.urlencode(f)
     b = True;
     while b:
-        result = caasAPI(caas_credentials, uri, '')
-        firewallRuleList = result['msg']
+        result = caasAPI(module,caas_credentials, uri, '')
+        firewallRuleList = result
         b = False
         for (firewallRule) in firewallRuleList['firewallRule']:
             logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
@@ -348,19 +335,15 @@ def main():
     wait = module.params['wait']
     state = module.params['state']
 
-    result = _getOrgId(caas_credentials)
-    if not result['status']:
-        module.fail_json(msg=result['msg'])
-    orgId = result['orgId']
+    orgId = _getOrgId(module,caas_credentials)
 
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
             uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-            result = caasAPI(caas_credentials, uri, '')
-            if result['status']:
-                if result['msg']['totalCount']==1:
-                    module.params['networkDomainId'] = result['msg']['networkDomain'][0]['id']
+            result = caasAPI(module,caas_credentials, uri, '')
+            if result['totalCount']==1:
+                module.params['networkDomainId'] = result['networkDomain'][0]['id']
 
     firewallList = _listFirewallRule(module,caas_credentials,orgId,True)
  
@@ -373,9 +356,8 @@ def main():
             data = json.dumps(_data)
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
 
 #PRESENT
     if state == "present":
@@ -394,9 +376,8 @@ def main():
             data = json.dumps(_data)
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
         if firewallList['totalCount'] == 1:
             if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
                 uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
@@ -406,13 +387,14 @@ def main():
                 data = json.dumps(_data)
                 if module.check_mode: has_changed=True
                 else: 
-                    result = caasAPI(caas_credentials, uri, data)
-                    if not result['status']: module.fail_json(msg=result['msg'])
-                    else: has_changed = True
+                    result = caasAPI(module,caas_credentials, uri, data)
+                    has_changed = True
 
     firewallRuleList = _listFirewallRule(module,caas_credentials,orgId,wait)
     module.exit_json(changed=has_changed, firewallRules=firewallRuleList)
 
+# import module snippets
 from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 if __name__ == '__main__':
     main()

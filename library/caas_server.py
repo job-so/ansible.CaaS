@@ -20,7 +20,6 @@ try:
     import logging
     import base64
     import urllib
-    import urllib2
     import xml.etree.ElementTree as ET
     IMPORT_STATUS = True
 except ImportError:
@@ -292,58 +291,46 @@ RETURN = '''
 logging.basicConfig(filename='caas.log',level=logging.DEBUG)
 logging.debug("--------------------------------caas_server---"+str(datetime.datetime.now()))
 
-def _getOrgId(caas_credentials):
+def _getOrgId(module, caas_credentials):
     apiuri = '/oec/0.9/myaccount'
-    request = urllib2.Request(caas_credentials['apiurl'] + apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    result = {}
-    result['status'] = False
-    try:
-        response = urllib2.urlopen(request).read()
-        root = ET.fromstring(response)
+    headers = { "Authorization": "Basic %s" % (base64string) }
+    response, info = fetch_url(module, url, headers=headers) 
+    if info['status'] == 200:
+        root = ET.fromstring(response.read())
         ns = {'directory': 'http://oec.api.opsource.net/schemas/directory'}
-        result['orgId'] = root.find('directory:orgId',ns).text
-        result['status'] = True
-    except urllib2.URLError, e:
-        result['msg'] = e.reason
-    except urllib2.HTTPError, e:
-        result['msg'] = e.read()
-    return result
-
-def caasAPI(caas_credentials, uri, data):
-    logging.debug(uri)
-    if data == '':
-        request = urllib2.Request(caas_credentials['apiurl'] + uri)
+        return root.find('directory:orgId',ns).text
     else:
-        request    = urllib2.Request(caas_credentials['apiurl'] + uri, data)
+	    module.fail_json(msg=info['msg'])
+
+def caasAPI(module, caas_credentials, apiuri, data):
+    logging.debug(apiuri)
+    url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    request.add_header("Content-Type", "application/json")
+    headers = { "Authorization": "Basic %s" % (base64string), "Content-Type": "application/json"}
     result = {}
     result['status'] = False
     retryCount = 0
     while (result['status'] == False) and (retryCount < 5*6):
-        try:
-            response = urllib2.urlopen(request)
-            result['msg'] = json.loads(response.read())
-            result['status'] = True
-        except urllib2.HTTPError, e:
-            if e.code == 400:
-                result['msg'] = json.loads(e.read())
-                if result['msg']['responseCode'] == "RESOURCE_BUSY":
+        if data == '':
+            response, info = fetch_url(module, url, headers=headers) 
+        else:
+            response, info = fetch_url(module, url, headers=headers, data=data) 
+        msg = json.loads(response.read())
+        status = True
+        if info['status'] == 200:
+            return msg
+        else:
+            if info['status'] == 400:
+                if msg['responseCode'] == "RESOURCE_BUSY":
                     logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
                     time.sleep(10)
                     retryCount += 1
                 else:
-                    retryCount = 9999
+                    module.fail_json(msg=msg)
             else:
-                retryCount = 9999
-                result['msg'] = str(e.code) + e.reason + e.read()
-        except urllib2.URLError, e:
-            result['msg'] = str(e.code)
-            retryCount = 9999
-    return result
+                module.fail_json(msg=info['msg'])
 
 def _listServer(module,caas_credentials,orgId,wait):
     # List Servers with this Name, in this networkDomain, in this vlanId
@@ -357,8 +344,8 @@ def _listServer(module,caas_credentials,orgId,wait):
     uri = '/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
     b = True;
     while b:
-        result = caasAPI(caas_credentials, uri, '')
-        serverList = result['msg']
+        result = caasAPI(module,caas_credentials, uri, '')
+        serverList = result
         b = False
         for (server) in serverList['server']:
             logging.debug(server['id']+' '+server['name']+' '+server['state'])
@@ -380,15 +367,13 @@ def _executeAction(module,caas_credentials,orgId,serverList,action):
         if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
         if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
     return has_changed
     
 def main():
@@ -422,37 +407,31 @@ def main():
     module.params['datacenterId'] = module.params['caas_credentials']['datacenter']
     module.params.pop('caas_credentials', None)
 
-    result = _getOrgId(caas_credentials)
-    if not result['status']:
-        module.fail_json(msg=result['msg'])
-    orgId = result['orgId']
+    orgId = _getOrgId(module, caas_credentials)
 
     # resolve imageId, networkId, vlanId
     if module.params['imageId']== None:
         if module.params['imageName']!=None:
             f = { 'datacenterId' : module.params['datacenterId'], 'name' : module.params['imageName'] }
             uri = '/caas/2.1/'+orgId+'/image/osImage?'+urllib.urlencode(f)
-            result = caasAPI(caas_credentials, uri, '')
-            if result['status']:
-                if result['msg']['totalCount']==1:
-                    module.params['imageId'] = result['msg']['osImage'][0]['id']
+            result = caasAPI(module,caas_credentials, uri, '')
+            if result['totalCount']==1:
+                module.params['imageId'] = result['osImage'][0]['id']
     if not 'networkDomainId' in module.params['networkInfo']:
         if 'networkDomainName' in module.params['networkInfo']:
             f = { 'name' : module.params['networkInfo']['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
             uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
-            result = caasAPI(caas_credentials, uri, '')
-            if result['status']:
-                if result['msg']['totalCount']==1:
-                    module.params['networkInfo']['networkDomainId'] = result['msg']['networkDomain'][0]['id']
+            result = caasAPI(module,caas_credentials, uri, '')
+            if result['totalCount']==1:
+                module.params['networkInfo']['networkDomainId'] = result['networkDomain'][0]['id']
     if 'primaryNic' in module.params['networkInfo']:
         if not 'vlanId' in module.params['networkInfo']['primaryNic']:
             if 'vlanName' in module.params['networkInfo']['primaryNic']:
                 f = { 'name' : module.params['networkInfo']['primaryNic']['vlanName'], 'datacenterId' : module.params['datacenterId']}
                 uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
-                result = caasAPI(caas_credentials, uri, '')
-                if result['status']:
-                    if result['msg']['totalCount']==1:
-                        module.params['networkInfo']['primaryNic']['vlanId'] = result['msg']['vlan'][0]['id']
+                result = caasAPI(module, caas_credentials, uri, '')
+                if result['totalCount']==1:
+                    module.params['networkInfo']['primaryNic']['vlanId'] = result['vlan'][0]['id']
     
     serverList = _listServer(module,caas_credentials,orgId,True)
     
@@ -471,9 +450,8 @@ def main():
         while i < module.params['count']:
             if module.check_mode: has_changed=True
             else: 
-                result = caasAPI(caas_credentials, uri, data)
-                if not result['status']: module.fail_json(msg=result['msg'])
-                else: has_changed = True
+                result = caasAPI(module,caas_credentials, uri, data)
+                has_changed = True
             i += 1            
 
         # Execute Action on Servers
@@ -482,6 +460,8 @@ def main():
         
     module.exit_json(changed=has_changed, servers=_listServer(module,caas_credentials,orgId,module.params['wait']))
 
+# import module snippets
 from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 if __name__ == '__main__':
     main()
