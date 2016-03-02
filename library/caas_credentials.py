@@ -135,8 +135,7 @@ def _getOrgId(module, caas_credentials):
         root = ET.fromstring(response.read())
         ns = {'directory': 'http://oec.api.opsource.net/schemas/directory'}
         return root.find('directory:orgId',ns).text
-    else:
-	    module.fail_json(msg=info['msg'])
+    else: module.fail_json(msg=info['msg'])
 
 def main():
     module = AnsibleModule(
