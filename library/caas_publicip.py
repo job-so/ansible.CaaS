@@ -144,20 +144,14 @@ def caasAPI(module, caas_credentials, apiuri, data):
     url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     headers = { "Authorization": "Basic %s" % (base64string), "Content-Type": "application/json"}
-    result = {}
-    result['status'] = False
     retryCount = 0
-    while (result['status'] == False) and (retryCount < 5*6):
-        if data == '':
-            response, info = fetch_url(module, url, headers=headers) 
-        else:
-            response, info = fetch_url(module, url, headers=headers, data=data) 
-        msg = json.loads(response.read())
-        status = True
-        if info['status'] == 200:
-            return msg
+    while retryCount < 5*6:
+        if data == '': response, info = fetch_url(module, url, headers=headers) 
+        else: response, info = fetch_url(module, url, headers=headers, data=data) 
+        if info['status'] == 200: return json.loads(response.read())
         else:
             if info['status'] == 400:
+                msg = json.loads(response.read())
                 if msg['responseCode'] == "RESOURCE_BUSY":
                     logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
                     time.sleep(10)
@@ -183,10 +177,10 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec = dict(
-            caas_credentials = dict(required=True,no_log=True),
+            caas_credentials = dict(type='dict',required=True,no_log=True),
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
-            minFreePublicIpv4Address = dict(required=False,default=1),
+            minFreePublicIpv4Address = dict(type='int',required=False,default=1),
         )
     )
     if not IMPORT_STATUS:

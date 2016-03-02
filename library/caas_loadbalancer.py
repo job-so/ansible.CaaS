@@ -171,20 +171,14 @@ def caasAPI(module, caas_credentials, apiuri, data):
     url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     headers = { "Authorization": "Basic %s" % (base64string), "Content-Type": "application/json"}
-    result = {}
-    result['status'] = False
     retryCount = 0
-    while (result['status'] == False) and (retryCount < 5*6):
-        if data == '':
-            response, info = fetch_url(module, url, headers=headers) 
-        else:
-            response, info = fetch_url(module, url, headers=headers, data=data) 
-        msg = json.loads(response.read())
-        status = True
-        if info['status'] == 200:
-            return msg
+    while retryCount < 5*6:
+        if data == '': response, info = fetch_url(module, url, headers=headers) 
+        else: response, info = fetch_url(module, url, headers=headers, data=data) 
+        if info['status'] == 200: return json.loads(response.read())
         else:
             if info['status'] == 400:
+                msg = json.loads(response.read())
                 if msg['responseCode'] == "RESOURCE_BUSY":
                     logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
                     time.sleep(10)
@@ -213,7 +207,7 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec = dict(
-            caas_credentials = dict(required=True,no_log=True),
+            caas_credentials = dict(type='dict',required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
             wait = dict(default=True),
             id = dict(default=None),
@@ -225,7 +219,7 @@ def main():
             protocol=dict(default='TCP', choices = ['ANY','TCP','UDP','HTTP']),
             listenerIpAddress = dict(default=None),
             port = dict(default=None),
-            enabled = dict(default=True, choices = [True,False]),
+            enabled = dict(type='bool',default=True, choices = [True,False]),
             connectionLimit = dict(type='int',default=25000),
             connectionRateLimit= dict(type='int',default=2000),
             sourcePortPreservation=dict(default='PRESERVE', choices = ['PRESERVE','PRESERVE_STRICT','CHANGE']),
@@ -234,7 +228,7 @@ def main():
 #fallbackPersistenceProfileId": "6f2f5d7b-cdd9-4d84-8ad7-999b64a87978",
 #iruleId": ["2b20abd9-ffdc-11e4-b010-005056806999"],
             optimizationProfile=dict(type='list',default='TCP'), #choices = ['TCP', 'LAN_OPT', 'WAN_OPT', 'MOBILE_OPT', 'TCP_LEGACY', 'SMTP', 'SIP']),
-            pool=dict(),
+            pool=dict(type='dict',required=False),
         )
     )
     if not IMPORT_STATUS:

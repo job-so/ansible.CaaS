@@ -309,20 +309,14 @@ def caasAPI(module, caas_credentials, apiuri, data):
     url = caas_credentials['apiurl'] + apiuri
     base64string = base64.encodestring('%s:%s' % (caas_credentials['username'], caas_credentials['password'])).replace('\n', '')
     headers = { "Authorization": "Basic %s" % (base64string), "Content-Type": "application/json"}
-    result = {}
-    result['status'] = False
     retryCount = 0
-    while (result['status'] == False) and (retryCount < 5*6):
-        if data == '':
-            response, info = fetch_url(module, url, headers=headers) 
-        else:
-            response, info = fetch_url(module, url, headers=headers, data=data) 
-        msg = json.loads(response.read())
-        status = True
-        if info['status'] == 200:
-            return msg
+    while retryCount < 5*6:
+        if data == '': response, info = fetch_url(module, url, headers=headers) 
+        else: response, info = fetch_url(module, url, headers=headers, data=data) 
+        if info['status'] == 200: return json.loads(response.read())
         else:
             if info['status'] == 400:
+                msg = json.loads(response.read())
                 if msg['responseCode'] == "RESOURCE_BUSY":
                     logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
                     time.sleep(10)
@@ -380,21 +374,21 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec = dict(
-            caas_credentials = dict(required=True,no_log=True),
+            caas_credentials = dict(type='dict',required=True,no_log=True),
             name = dict(required=True),
             count = dict(type='int', default='1'),
             state = dict(default='present', choices=['present', 'absent']),
-            start = dict(default=True, choices=[True,False]),
+            start = dict(type='bool',default=True, choices=[True,False]),
             action = dict(default=None, choices=['startServer', 'shutdownServer', 'rebootServer', 'resetServer', 'powerOffServer', 'updateVmwareTools', 'upgradeVirtualHardware']),
             wait = dict(default=True),
             description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
             imageId = dict(default=None),
             imageName = dict(default=None),
             administratorPassword = dict(default='',no_log=True),
-            networkInfo = dict(),
-            cpu = dict(),
+            networkInfo = dict(type='dict'),
+            cpu = dict(type='dict'),
             memoryGb = dict(default=None),
-            disk = dict(),
+            disk = dict(type='dict'),
             microsoftTimeZone = dict(default=None),
         )
     )
