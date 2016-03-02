@@ -12,7 +12,7 @@
           password: "{{caas_credentials.password}}"
           apiurl: "{{caas_credentials.apiurl}}"
           datacenter: "{{caas_credentials.datacenter}}" 
-        register: caas_credentials
+#        register: caas_credentials
 #      - name: print debug
 #        debug: var=caas_credentials
       - name: Deploy my Nework Domain
