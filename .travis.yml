@@ -38,6 +38,7 @@ script:
   #- python3.5 -m compileall -fq library
   - ansible-playbook --version
   - ansible-playbook -i ./hosts test/01-setup.yml
+  - ansible-playbook -i ./hosts test/99-teardown.yml
   
 # From ansible/modules-extras
   - if test x"$test" == x'True' ; then ansible-validate-modules library ; fi

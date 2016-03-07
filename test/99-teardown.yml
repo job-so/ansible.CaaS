@@ -1,0 +1,69 @@
+---
+  - name: Clean Dimension Data infrastructure  
+    hosts: localhost
+    vars:
+        networkDomainName: "{{ lookup ('env','caas_networkdomain') }}"
+    vars_files:
+      - caas_credentials.yml
+    tasks:
+      - name: TearDown LoadBalancer
+        caas_loadbalancer:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "WebServers.Load.Balancer"
+          state: absent
+      - name: Release PublicIP
+        caas_publicip:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          minFreePublicIpv4Address: 0
+      - name: TearDown WebServers
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          networkInfo:
+              networkDomainName: "{{ networkDomainName }}"
+              primaryNic: 
+                  vlanName: "{{ networkDomainName }}_vlan_webservers"
+          name: "WebServer"
+          state: absent
+      - name: TearDown AppServers
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          networkInfo:
+              networkDomainName: "{{ networkDomainName }}"
+              primaryNic: 
+                  vlanName: "{{ networkDomainName }}_vlan_appservers"
+          name: "AppServer"
+          state: absent
+      - name: TearDown DBServers
+        caas_server:
+          caas_credentials: "{{ caas_credentials }}"
+          networkInfo:
+              networkDomainName: "{{ networkDomainName }}"
+              primaryNic: 
+                  vlanName: "{{ networkDomainName }}_vlan_dbservers"
+          name: "DBServer"
+          state: absent
+      - name: TearDown  DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "{{ networkDomainName }}_vlan_webservers"
+          state: absent
+      - name: TearDown  DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "{{ networkDomainName }}_vlan_appservers"
+          state: absent
+      - name: TearDown  DMZ
+        caas_vlan:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          name: "{{ networkDomainName }}_vlan_dbservers"
+          state: absent
+      - name: TearDown my Nework Domain
+        caas_networkdomain:
+          caas_credentials: "{{ caas_credentials }}"
+          name: "{{ networkDomainName }}"
+          state: absent
