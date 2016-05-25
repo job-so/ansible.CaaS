@@ -21,7 +21,8 @@ env:
   matrix:
     - ansible_branche=stable-1.9 test=False caas_networkdomain=ansible1.9.CaaS_travis-ci
     - ansible_branche=stable-2.0 test=False caas_networkdomain=ansible2.0.CaaS_travis-ci
-    - ansible_branche=devel      test=True caas_networkdomain=ansibledevel.CaaS_travis-ci
+    - ansible_branche=stable-2.1 test=True caas_networkdomain=ansible2.1.CaaS_travis-ci
+#    - ansible_branche=devel      test=True caas_networkdomain=ansibledevel.CaaS_travis-ci
 before_install:
  - pip install tox paramiko PyYAML jinja2 httplib2 passlib nose mock
 install:

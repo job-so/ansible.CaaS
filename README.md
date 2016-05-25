@@ -1,5 +1,5 @@
 [![Build status](https://travis-ci.org/job-so/ansible.CaaS.svg)](https://travis-ci.org/job-so/ansible.CaaS)  ![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)  ![Python 2.6](https://img.shields.io/badge/python-2.6-blue.svg)  ![Python 2.4](https://img.shields.io/badge/python-2.4-blue.svg)
-# ansible.CaaS ![Ansible 1.9](https://img.shields.io/badge/ansible-1.9-green.svg) ![Ansible 2.0](https://img.shields.io/badge/ansible-2.0-green.svg)
+# ansible.CaaS ![Ansible 1.9](https://img.shields.io/badge/ansible-1.9-green.svg) ![Ansible 2.0](https://img.shields.io/badge/ansible-2.0-green.svg) ![Ansible 2.1](https://img.shields.io/badge/ansible-2.1-green.svg)
 Ansible modules for managing Dimension Data Cloud
 
  A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)
