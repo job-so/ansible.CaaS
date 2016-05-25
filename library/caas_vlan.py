@@ -162,13 +162,18 @@ def caasAPI(module, caas_credentials, apiuri, data):
         if info['status'] == 200: return json.loads(response.read())
         else:
             if info['status'] == 400:
-                msg = json.loads(info['body'])
-                if msg['responseCode'] == "RESOURCE_BUSY":
-                    logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
-                    time.sleep(10)
-                    retryCount += 1
+                if 'body' in info: # ansible version >= 2.1
+                    msg = json.loads(info['body'])
+                    if msg['responseCode'] == "RESOURCE_BUSY":
+                        logging.debug("RESOURCE_BUSY "+str(retryCount)+"/30")
+                        time.sleep(10)
+                        retryCount += 1
+                    else:
+                        module.fail_json(msg=msg)
                 else:
-                    module.fail_json(msg=msg)
+                    logging.debug("RESOURCE_BUSY ?"+str(retryCount)+"/30")
+                    time.sleep(10)
+                retryCount += 1
             else:
                 module.fail_json(msg=info['msg'])
 
