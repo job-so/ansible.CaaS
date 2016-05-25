@@ -2,7 +2,7 @@
 # ansible.CaaS ![Ansible 1.9](https://img.shields.io/badge/ansible-1.9-green.svg) ![Ansible 2.0](https://img.shields.io/badge/ansible-2.0-green.svg)
 Ansible modules for managing Dimension Data Cloud
 
-A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)
+ A simple/trivial wrappper of CaaS API v2.1 documented [here](https://community.opsourcecloud.net/View.jsp?procId=10011686f65f51b7f474acb2013072d2)
 
 RFTM :-) : For each module, you should find a clear documentation. click on documentation links below.
 
