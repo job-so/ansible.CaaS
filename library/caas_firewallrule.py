@@ -350,7 +350,7 @@ def main():
         if firewallList['totalCount'] == 1:
             uri = '/caas/2.1/'+orgId+'/network/deleteFirewallRule'
             _data = {}
-            _data['id'] = networkDomainList['networkDomain'][0]['id']
+            _data['id'] = firewallList['firewallRule'][0]['id']
             data = json.dumps(_data)
             if module.check_mode: has_changed=True
             else: 
