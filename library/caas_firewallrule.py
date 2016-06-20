@@ -289,7 +289,7 @@ def caasAPI(module, caas_credentials, apiuri, data):
 
 def _listFirewallRule(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/firewallRule?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/network/firewallRule?'+urllib.urlencode(f)
     b = True;
     while b:
         result = caasAPI(module,caas_credentials, uri, '')
@@ -338,7 +338,7 @@ def main():
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
-            uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
             result = caasAPI(module,caas_credentials, uri, '')
             if result['totalCount']==1:
                 module.params['networkDomainId'] = result['networkDomain'][0]['id']
@@ -348,7 +348,7 @@ def main():
 #ABSENT
     if state == 'absent':
         if firewallList['totalCount'] == 1:
-            uri = '/caas/2.1/'+orgId+'/network/deleteFirewallRule'
+            uri = '/caas/2.3/'+orgId+'/network/deleteFirewallRule'
             _data = {}
             _data['id'] = firewallList['firewallRule'][0]['id']
             data = json.dumps(_data)
@@ -360,7 +360,7 @@ def main():
 #PRESENT
     if state == "present":
         if firewallList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/network/createFirewallRule'
+            uri = '/caas/2.3/'+orgId+'/network/createFirewallRule'
             _data = {}
             _data['name'] = module.params['name']
             _data['action'] = module.params['action']
@@ -378,7 +378,7 @@ def main():
                 has_changed = True
         if firewallList['totalCount'] == 1:
             if firewallList['firewallRule'][0]['enabled'] != module.params['enabled']: 
-                uri = '/caas/2.1/'+orgId+'/network/editFirewallRule'
+                uri = '/caas/2.3/'+orgId+'/network/editFirewallRule'
                 _data = {}
                 _data['id'] = firewallList['firewallRule'][0]['id']
                 _data['enabled'] = module.params['enabled']

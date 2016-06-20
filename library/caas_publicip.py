@@ -167,7 +167,7 @@ def caasAPI(module, caas_credentials, apiuri, data):
 
 def _listPublicIpBlock(module,caas_credentials,orgId):
     f = { 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/publicIpBlock?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/network/publicIpBlock?'+urllib.urlencode(f)
     publicIpList = caasAPI(module,caas_credentials, uri, '')
     i = 0
     totalPublicIp = 0
@@ -201,7 +201,7 @@ def main():
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
-            uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
             result = caasAPI(module,caas_credentials, uri, '')
             if result['totalCount']==1:
                 module.params['networkDomainId'] = result['networkDomain'][0]['id']
@@ -209,7 +209,7 @@ def main():
     publicIpList = _listPublicIpBlock(module,caas_credentials,orgId)
 
     f = { 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/reservedPublicIpv4Address?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/network/reservedPublicIpv4Address?'+urllib.urlencode(f)
     reservedPublicIpv4Address = caasAPI(module,caas_credentials, uri, '')
     logging.debug("   reservedPublicIpv4Address:"+str(reservedPublicIpv4Address['totalCount']))
     
@@ -223,7 +223,7 @@ def main():
                 if reservedPublicIpv4Address['ip'][j]['ipBlockId']==publicIpList['publicIpBlock'][i]['id']: b = False
                 j += 1
             if b and (module.params['minFreePublicIpv4Address'] <= (publicIpList['totalPublicIp'] - publicIpList['publicIpBlock'][i]['size'] - reservedPublicIpv4Address['totalCount'])):
-                uri = '/caas/2.1/'+orgId+'/network/removePublicIpBlock'
+                uri = '/caas/2.3/'+orgId+'/network/removePublicIpBlock'
                 _data = {}
                 _data['id'] = publicIpList['publicIpBlock'][i]['id']
                 data = json.dumps(_data)
@@ -238,7 +238,7 @@ def main():
 #GET
     logging.debug("   minFreePublicIpv4Address/totalPublicIp/reservedPublicIpv4Address:"+str(module.params['minFreePublicIpv4Address'])+"/"+str(publicIpList['totalPublicIp'])+"/"+str(reservedPublicIpv4Address['totalCount']))
     while module.params['minFreePublicIpv4Address'] > (publicIpList['totalPublicIp'] - reservedPublicIpv4Address['totalCount']):
-        uri = '/caas/2.1/'+orgId+'/network/addPublicIpBlock'
+        uri = '/caas/2.3/'+orgId+'/network/addPublicIpBlock'
         _data = {}
         _data['networkDomainId'] = module.params['networkDomainId']
         data = json.dumps(_data)

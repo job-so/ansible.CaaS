@@ -194,7 +194,7 @@ def caasAPI(module, caas_credentials, apiuri, data):
 
 def _listVirtualListenerRule(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     b = True;
     while b:
         virtualListenerList = caasAPI(module,caas_credentials, uri, '')
@@ -251,20 +251,20 @@ def main():
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
-            uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
             result = caasAPI(module,caas_credentials, uri, '')
             if result['totalCount']==1:
                 module.params['networkDomainId'] = result['networkDomain'][0]['id']
 
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     virtualListenerList = caasAPI(module,caas_credentials, uri, '')
  
 #ABSENT
     if state == "absent":
         if virtualListenerList['totalCount'] == 1:
             #Delete Virtual Listener
-            uri = '/caas/2.1/'+orgId+'/networkDomainVip/deleteVirtualListener'
+            uri = '/caas/2.3/'+orgId+'/networkDomainVip/deleteVirtualListener'
             _data = {}
             _data['id'] = virtualListenerList['virtualListener'][0]['id']
             data = json.dumps(_data)
@@ -275,10 +275,10 @@ def main():
             if virtualListenerList['virtualListener'][0]['pool']['id']!='':
                 #List associated Nodes
                 f = { 'poolId' : virtualListenerList['virtualListener'][0]['pool']['id'] }
-                uri = '/caas/2.1/'+orgId+'/networkDomainVip/poolMember?'+urllib.urlencode(f)
+                uri = '/caas/2.3/'+orgId+'/networkDomainVip/poolMember?'+urllib.urlencode(f)
                 poolMembers = caasAPI(module,caas_credentials, uri, '')
                 #Delete associated Pool
-                uri = '/caas/2.1/'+orgId+'/networkDomainVip/deletePool'
+                uri = '/caas/2.3/'+orgId+'/networkDomainVip/deletePool'
                 _data = {}
                 _data['id'] = virtualListenerList['virtualListener'][0]['pool']['id']
                 data = json.dumps(_data)
@@ -288,7 +288,7 @@ def main():
                     has_changed = True
                 #Delete associated Nodes
                 i = 0
-                uri = '/caas/2.1/'+orgId+'/networkDomainVip/deleteNode'
+                uri = '/caas/2.3/'+orgId+'/networkDomainVip/deleteNode'
                 while i < poolMembers['totalCount']:
                     if module.check_mode: has_changed=True
                     else: 
@@ -302,7 +302,7 @@ def main():
     if state == "present":
         if virtualListenerList['totalCount'] == 1: module.params['id'] = virtualListenerList['virtualListener'][0]['id']
         if virtualListenerList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/networkDomainVip/createVirtualListener'
+            uri = '/caas/2.3/'+orgId+'/networkDomainVip/createVirtualListener'
             _data = {}
             _data['name'] = module.params['name']
             _data['description'] = module.params['description']
@@ -327,11 +327,11 @@ def main():
 #TODO chack if poolid in vip
             if not 'name' in module.params['pool']: module.params['pool']['name']= module.params['name']+'.pool'
             f = { 'name' : module.params['pool']['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
-            uri = '/caas/2.1/'+orgId+'/networkDomainVip/pool?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/networkDomainVip/pool?'+urllib.urlencode(f)
             poolList = caasAPI(module,caas_credentials, uri, '')
             if poolList['totalCount'] == 1: module.params['pool']['id'] = poolList['pool'][0]['id']
             if poolList['totalCount'] < 1:
-                uri = '/caas/2.1/'+orgId+'/networkDomainVip/createPool'
+                uri = '/caas/2.3/'+orgId+'/networkDomainVip/createPool'
                 _data = {}
                 _data['networkDomainId'] = module.params['networkDomainId']
                 _data['name'] = module.params['pool']['name']
@@ -351,7 +351,7 @@ def main():
                     has_changed = True
                     for info in result['info']:
                         if info['name'] == 'poolId': module.params['pool']['id'] = info['value']
-                uri = '/caas/2.1/'+orgId+'/networkDomainVip/editVirtualListener'
+                uri = '/caas/2.3/'+orgId+'/networkDomainVip/editVirtualListener'
                 _data = {}
                 _data['id'] = module.params['id']
                 _data['poolId'] = module.params['pool']['id']
@@ -363,10 +363,10 @@ def main():
             for node in module.params['pool']['node']:
                 logging.debug("--Node"+str(node))
                 f = { 'name' : node['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
-                uri = '/caas/2.1/'+orgId+'/networkDomainVip/node?'+urllib.urlencode(f)
+                uri = '/caas/2.3/'+orgId+'/networkDomainVip/node?'+urllib.urlencode(f)
                 nodeList = caasAPI(module,caas_credentials, uri, '')
                 if nodeList['totalCount'] < 1:
-                    uri = '/caas/2.1/'+orgId+'/networkDomainVip/createNode'
+                    uri = '/caas/2.3/'+orgId+'/networkDomainVip/createNode'
                     _data = {}
                     _data['networkDomainId'] = module.params['networkDomainId']
                     _data['name'] = node['name']
@@ -384,7 +384,7 @@ def main():
                         has_changed = True
                         for info in result['info']:
                             if info['name'] == 'nodeId': node['id'] = info['value']
-                    uri = '/caas/2.1/'+orgId+'/networkDomainVip/addPoolMember'
+                    uri = '/caas/2.3/'+orgId+'/networkDomainVip/addPoolMember'
                     _data = {}
                     _data['poolId'] = module.params['pool']['id']
                     _data['nodeId'] = node['id']
@@ -397,7 +397,7 @@ def main():
                         has_changed = True
 
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/networkDomainVip/virtualListener?'+urllib.urlencode(f)
     virtualListenerList = caasAPI(module,caas_credentials, uri, '')
 
     module.exit_json(changed=has_changed, loadBalancers=virtualListenerList)

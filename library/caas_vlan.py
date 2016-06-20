@@ -179,7 +179,7 @@ def caasAPI(module, caas_credentials, apiuri, data):
 
 def _listVlan(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
-    uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/network/vlan?'+urllib.urlencode(f)
     b = True;
     while b:
         vlanList = caasAPI(module,caas_credentials, uri, '')
@@ -223,7 +223,7 @@ def main():
     if module.params['networkDomainId']==None:
         if module.params['networkDomainName']!=None:
             f = { 'name' : module.params['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
-            uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
             result = caasAPI(module,caas_credentials, uri, '')
             if result['totalCount']==1:
                 module.params['networkDomainId'] = result['networkDomain'][0]['id']
@@ -232,7 +232,7 @@ def main():
 #ABSENT
     if state == 'absent':
         if vlanList['totalCount'] == 1:
-            uri = '/caas/2.1/'+orgId+'/network/deleteVlan'
+            uri = '/caas/2.3/'+orgId+'/network/deleteVlan'
             _data = {}
             _data['id'] = vlanList['vlan'][0]['id']
             data = json.dumps(_data)
@@ -244,7 +244,7 @@ def main():
 #PRESENT
     if state == "present":
         if vlanList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/network/deployVlan'
+            uri = '/caas/2.3/'+orgId+'/network/deployVlan'
             _data = {}
             _data['name'] = module.params['name']
             _data['description'] = module.params['description']

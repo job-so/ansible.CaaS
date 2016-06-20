@@ -339,7 +339,7 @@ def _listServer(module,caas_credentials,orgId,wait):
            f = { 'networkDomainId' : module.params['networkInfo']['networkDomainId'], 'privateIpv4' : module.params['networkInfo']['primaryNic']['privateIpv4'], 'name' : module.params['name']}
         else:
             return None;
-    uri = '/caas/2.1/'+orgId+'/server/server?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/server/server?'+urllib.urlencode(f)
     b = True;
     while b:
         result = caasAPI(module,caas_credentials, uri, '')
@@ -357,7 +357,7 @@ def _executeAction(module,caas_credentials,orgId,serverList,action):
     logging.debug("---_executeAction "+action)
     has_changed = False
     _data = {}
-    uri = '/caas/2.1/'+orgId+'/server/'+action
+    uri = '/caas/2.3/'+orgId+'/server/'+action
     for (server) in serverList['server']:
         logging.debug(server['id'])
         _data['id'] = server['id']
@@ -411,14 +411,14 @@ def main():
     if module.params['imageId']== None:
         if module.params['imageName']!=None:
             f = { 'datacenterId' : module.params['datacenterId'], 'name' : module.params['imageName'] }
-            uri = '/caas/2.1/'+orgId+'/image/osImage?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/image/osImage?'+urllib.urlencode(f)
             result = caasAPI(module,caas_credentials, uri, '')
             if result['totalCount']==1:
                 module.params['imageId'] = result['osImage'][0]['id']
     if not 'networkDomainId' in module.params['networkInfo']:
         if 'networkDomainName' in module.params['networkInfo']:
             f = { 'name' : module.params['networkInfo']['networkDomainName'], 'datacenterId' : module.params['datacenterId']}
-            uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+            uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
             result = caasAPI(module,caas_credentials, uri, '')
             if result['totalCount']==1:
                 module.params['networkInfo']['networkDomainId'] = result['networkDomain'][0]['id']
@@ -426,7 +426,7 @@ def main():
         if not 'vlanId' in module.params['networkInfo']['primaryNic']:
             if 'vlanName' in module.params['networkInfo']['primaryNic']:
                 f = { 'name' : module.params['networkInfo']['primaryNic']['vlanName'], 'datacenterId' : module.params['datacenterId']}
-                uri = '/caas/2.1/'+orgId+'/network/vlan?'+urllib.urlencode(f)
+                uri = '/caas/2.3/'+orgId+'/network/vlan?'+urllib.urlencode(f)
                 result = caasAPI(module, caas_credentials, uri, '')
                 if result['totalCount']==1:
                     module.params['networkInfo']['primaryNic']['vlanId'] = result['vlan'][0]['id']
@@ -443,7 +443,7 @@ def main():
 #PRESENT
     if module.params['state'] == "present":
         i = serverList['totalCount']
-        uri = '/caas/2.1/'+orgId+'/server/deployServer'
+        uri = '/caas/2.3/'+orgId+'/server/deployServer'
         data = json.dumps(module.params)
         while i < module.params['count']:
             if module.check_mode: has_changed=True

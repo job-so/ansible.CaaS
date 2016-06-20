@@ -161,13 +161,13 @@ def main():
     orgId = _getOrgId(module, caas_credentials)
 
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
-    uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
     networkDomainList = caasAPI(module,caas_credentials, uri, '')
      
 #ABSENT
     if state == 'absent':
         if networkDomainList['totalCount'] == 1:
-            uri = '/caas/2.1/'+orgId+'/network/deleteNetworkDomain'
+            uri = '/caas/2.3/'+orgId+'/network/deleteNetworkDomain'
             _data = {}
             _data['id'] = networkDomainList['networkDomain'][0]['id']
             data = json.dumps(_data)
@@ -178,7 +178,7 @@ def main():
 #PRESENT
     if state == "present":
         if networkDomainList['totalCount'] < 1:
-            uri = '/caas/2.1/'+orgId+'/network/deployNetworkDomain'
+            uri = '/caas/2.3/'+orgId+'/network/deployNetworkDomain'
             _data = {}
             _data['datacenterId'] = module.params['caas_credentials']['datacenter']
             _data['name'] = module.params['name']
@@ -191,7 +191,7 @@ def main():
                 has_changed = True
     
     f = { 'name' : module.params['name'], 'datacenterId' : module.params['datacenterId']}
-    uri = '/caas/2.1/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
+    uri = '/caas/2.3/'+orgId+'/network/networkDomain?'+urllib.urlencode(f)
     networkDomainList = caasAPI(module,caas_credentials, uri, '')
     module.exit_json(changed=has_changed, networkdomains=networkDomainList)
 

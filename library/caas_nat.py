@@ -27,14 +27,14 @@ except ImportError:
 
 DOCUMENTATION = '''
 --- 
-module: caas_vlan
-short_description: "Create, Configure, Remove VLANs on Dimension Data Managed Cloud Platform"
+module: caas_nat
+short_description: "Create, Configure, Remove Network Address Translation on Dimension Data Managed Cloud Platform"
 version_added: "1.9"
 author: "Olivier GROSJEANNE, @job-so"
 description: 
-  - "Create, Configure, Remove Network Network VLANs on Dimension Data Managed Cloud Platform"
+  - "Create, Configure, Remove Network Network Network Address Translation on Dimension Data Managed Cloud Platform"
 notes:
-  - "This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5)"
+  - "This is a wrappper of Dimension Data CaaS API v2.3. Please refer to this documentation for more details and examples : U(https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5)"
 requirements:
     - a caas_credentials variable, see caas_credentials module.  
     - a network domain already deployed, see caas_networkdomain module.
@@ -54,16 +54,11 @@ options:
     default: present
     description: 
       - "Should the resource be present or absent."
-      - "Take care : Absent will delete the Vlan."
   wait:
     description:
       - "Does the task must wait for the vlan creation ? or deploy it asynchronously ?"
     choices: [true,false]
     default: true
-  description:
-    description:
-      - "Maximum length: 255 characters."
-    default: "Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS"
   networkDomainId:
     description:
       - "The id of a Network Domain belonging within the same MCP 2.0 data center."
@@ -74,34 +69,36 @@ options:
       - "The name of a Network Domain belonging within the same MCP 2.0 data center."
       - "You can use either networkDomainId or networkDomainName, however one of them must be specified"
     default: null
-  privateIpv4BaseAddress:
+  internalIp:
     description:
-      - "RFC1918 Dot-decimal representation of an IPv4 address."
-      - "For example: “10.0.4.0”. Must be unique within the Network Domain."
+      - "Dot-decimal IPv4 address. For example: "10.11.12.13".
     default: null
-  privateIpv4BaseAddress:
+    required: true
+  externalIp:
     description:
-      - "An Integer between 16 and 24, which represents the size of the VLAN to be deployed and must be consistent with the privateIpv4BaseAddress provided."
-    default: "24"
+      - "Dot-decimal IPv4 address. For example: "165.180.12.12". Maybe private or public.
+      - "If not provided on the request, an unreserved Public IPv4 address from the Public IPv4 Address Blocks belonging Network Domain will be automatically assigned. You can use either networkDomainId or networkDomainName, however one of them must be specified"
+    default: null
 '''
 
 EXAMPLES = '''
-# Create a new vlan named "vlan_webservers" in network domain "ansible.Caas_SandBox", 
-      - name: Deploy WebServers DMZ
-        caas_vlan:
+# Create a new private Network Address Translation Rule in network domain "ansible.Caas_SandBox", 
+      - name: Deploy a private NAT
+        caas_nat:
+          #state: absent
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "ansible.Caas_SandBox"
-          name: "vlan_webservers"
-          privateIpv4BaseAddress: "192.168.30.0"
-        register: caas_vlan_webservers
-# Create a new vlan named {{networkDomainName}}_vlan_webserver in a network domain referenced from a previous task.
-      - name: Deploy WebServers DMZ
-        caas_vlan:
+          internalIp: 172.18.1.20
+          externalIp: 192.168.110.1
+          register: caas_nat
+
+# Delete a Network Address Translation Rule
+      - name: Deploy a private NAT
+        caas_nat:
+          state: absent
           caas_credentials: "{{ caas_credentials }}"
-          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
-          name: "{{caas_networkdomain.networkdomains.networkDomain[0].name}}_vlan_webservers"
-          privateIpv4BaseAddress: "192.168.30.0"
-        register: caas_vlan_webservers
+          networkDomainName: "ansible.Caas_SandBox"
+          internalIp: 172.18.1.20
 '''
 
 RETURN = '''
@@ -190,10 +187,9 @@ def main():
             caas_credentials = dict(type='dict',required=True,no_log=True),
             state = dict(default='present', choices=['present', 'absent']),
             wait = dict(default=True),
-            description = dict(default='Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS'),
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
-            internalIp = dict(default=None),
+            internalIp = dict(default=None,required=True),
             externalIp = dict(default=None),
         )
     )
