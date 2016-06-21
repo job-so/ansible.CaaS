@@ -226,6 +226,14 @@
         #when: item.started
         register: caas_loadbalancer
         with_items: "{{caas_webservers.servers.server}}"
+      - name: Deploy a public NAT
+        caas_nat:
+          #state: absent
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          internalIp: "{{caas_appservers.servers.server[0].networkInfo.primaryNic.privateIpv4}}"
+          #externalIp: 192.168.110.1
+        register: caas_nat
       - name: Add new instances to group WebServers
         add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
         #when: item.started
