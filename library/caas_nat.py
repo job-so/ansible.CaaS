@@ -71,12 +71,12 @@ options:
     default: null
   internalIp:
     description:
-      - "Dot-decimal IPv4 address. For example: "10.11.12.13".
+      - "Dot-decimal IPv4 address. For example: 10.11.12.13"
     default: null
     required: true
   externalIp:
     description:
-      - "Dot-decimal IPv4 address. For example: "165.180.12.12". Maybe private or public.
+      - "Dot-decimal IPv4 address. For example: 165.180.12.12. Maybe private or public."
       - "If not provided on the request, an unreserved Public IPv4 address from the Public IPv4 Address Blocks belonging Network Domain will be automatically assigned. You can use either networkDomainId or networkDomainName, however one of them must be specified"
     default: null
 '''
@@ -236,7 +236,6 @@ def main():
             _data['internalIp'] = module.params['internalIp']
             _data['externalIp'] = module.params['externalIp']
             data = json.dumps(_data)
-            print (data)
             if module.check_mode: has_changed=True
             else: 
                 result = caasAPI(module,caas_credentials, uri, data)
