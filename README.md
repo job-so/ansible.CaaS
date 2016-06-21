@@ -14,6 +14,7 @@ RFTM :-) : For each module, you should find a clear documentation. click on docu
   * [caas_firewallrule.py](/library/caas_firewallrule.py) : Create/Delete FireWall rules on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_firewallrule_module.html)
   * [caas_loadbalancer.py](/library/caas_loadbalancer.py) : Create/Delete Load Balancing config on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_loadbalancer_module.html)
   * [caas_publicip.py](/library/caas_publicip.py) : Create/Delete Public IP blocks on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_publicip_module.html)
+  * [caas_nat.py](/library/caas_nat.py) : Create/Delete Network Address Translation rules on MCP [(documentation)](https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_nat.html)
 
 ## example
   * [demo.yml](/demo.yml) : Sample Demo Ansible playbook file
