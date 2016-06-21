@@ -15,7 +15,7 @@
   <!-- End Google Tag Manager Data Layer -->
 
   
-  <title>caas_server - Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform &mdash; Ansible Documentation</title>
+  <title>caas_nat - Create, Configure, Remove Network Address Translation on Dimension Data Managed Cloud Platform &mdash; Ansible Documentation</title>
   
 
   
@@ -54,8 +54,8 @@
   
     <link rel="top" title="Ansible Documentation" href="index.html"/>
         <link rel="up" title="Cloud Modules" href="list_of_cloud_modules.html"/>
-        <link rel="next" title="caas_vlan - Create, Configure, Remove VLANs on Dimension Data Managed Cloud Platform" href="caas_vlan_module.html"/>
-        <link rel="prev" title="caas_publicip - Get or Release Public IP addresses on Dimension Data Managed Cloud Platform" href="caas_publicip_module.html"/> 
+        <link rel="next" title="caas_networkdomain - Create, Configure, Remove Network Domains on Dimension Data Managed Cloud Platform" href="caas_networkdomain_module.html"/>
+        <link rel="prev" title="caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform" href="caas_loadbalancer_module.html"/> 
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 
@@ -386,15 +386,15 @@
 
           <ul class="wy-breadcrumbs">
   <li><a href="index.html">Docs</a> &raquo;</li>
-  <li><a href="">caas_server - Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform</a></li>
+  <li><a href="">caas_nat - Create, Configure, Remove Network Address Translation on Dimension Data Managed Cloud Platform</a></li>
   
 </ul>
 <hr/>
 
           <div id="page-content">
           
-  <div class="section" id="caas-server-create-configure-remove-servers-on-dimension-data-managed-cloud-platform">
-<span id="caas-server"></span><h1>caas_server - Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform<a class="headerlink" href="#caas-server-create-configure-remove-servers-on-dimension-data-managed-cloud-platform" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="caas-nat-create-configure-remove-network-address-translation-on-dimension-data-managed-cloud-platform">
+<span id="caas-nat"></span><h1>caas_nat - Create, Configure, Remove Network Address Translation on Dimension Data Managed Cloud Platform<a class="headerlink" href="#caas-nat-create-configure-remove-network-address-translation-on-dimension-data-managed-cloud-platform" title="Permalink to this headline">¶</a></h1>
 <p class="versionadded">
 <span class="versionmodified">New in version 1.9.</span></p>
 <div class="contents local topic" id="contents">
@@ -410,7 +410,7 @@
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Create, Configure, Remove Servers on Dimension Data Managed Cloud Platform</p>
+<p>Create, Configure, Remove Network Network Network Address Translation on Dimension Data Managed Cloud Platform</p>
 </div>
 <div class="section" id="requirements-on-host-that-executes-module">
 <h2><a class="toc-backref" href="#id2">Requirements (on host that executes module)</a><a class="headerlink" href="#requirements-on-host-that-executes-module" title="Permalink to this headline">¶</a></h2>
@@ -418,7 +418,6 @@
 <div><ul class="simple">
 <li>a caas_credentials variable, see caas_credentials module.</li>
 <li>a network domain already deployed, see caas_networkdomain module.</li>
-<li>a vlan already deployed, see caas_vlan module.</li>
 </ul>
 </div></blockquote>
 </div>
@@ -433,217 +432,75 @@
 <th class="head">comments</th>
 </tr>
         <tr>
-<td>action<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul><li>startServer</li><li>shutdownServer</li><li>rebootServer</li><li>resetServer</li><li>powerOffServer</li><li>updateVmwareTools</li><li>upgradeVirtualHardware</li></ul></td>
-    <td><div>Action to perform against all servers.</div><div>** startServer : starts non-running Servers</div><div>** shutdownServer : performs guest OS initiated shutdown of running Servers (preferable to powerOffServer)</div><div>** rebootServer : performs guest OS initiated restart of running Servers (preferable to resetServer)</div><div>** resetServer : performs hard reset of running Servers</div><div>** powerOffServer : performs hard power off of running Servers</div><div>** updateVmwareTools : triggers an update of the VMware Tools software running on the guest OS of the Servers</div><div>** upgradeVirtualHardware : triggers an update of the VMware Virtual Hardware. VMware recommend cloning the Server prior to performing the upgrade in case something goes wrong during the upgrade process</div></td></tr>
-        <tr>
-<td>administratorPassword<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The administrator password for Windows Servers,</div><div>The root password for Linux Servers.</div></td></tr>
-        <tr>
 <td>caas_credentials<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
     <td><div>Complexe variable containing credentials. From an external file or from module caas_credentials (See related documentation)</div></td></tr>
         <tr>
-<td>count<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td>1</td>
-    <td><ul></ul></td>
-    <td><div>Number of instances to deploy. This parameter is mutable, however decreasing as no effect.</div></td></tr>
-        <tr>
-<td>cpu<br/><div style="font-size: small;"></div></td>
+<td>externalIp<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Can be used to override CPU values inherited from the source Server Image (imageName or imageId)</div></td></tr>
+    <td><div>Dot-decimal IPv4 address. For example: 165.180.12.12. Maybe private or public.</div><div>If not provided on the request, an unreserved Public IPv4 address from the Public IPv4 Address Blocks belonging Network Domain will be automatically assigned. You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
         <tr>
-<td>cpu.coresPerSocket<br/><div style="font-size: small;"></div></td>
-<td>no</td>
+<td>internalIp<br/><div style="font-size: small;"></div></td>
+<td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Must must be an integer factor of CPU count.</div><div>The default and recommended value for cores per socket is 1.</div></td></tr>
-        <tr>
-<td>cpu.count<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>Overrides the number of CPUs specified on the source Server Image.</div><div>Note the relationship between this value and the coresPerSocket value.</div></td></tr>
-        <tr>
-<td>cpu.speed<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>Determines the CPU Speed to be used across all of the CPUs on the Server</div></td></tr>
-        <tr>
-<td>description<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td>Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS</td>
-    <td><ul></ul></td>
-    <td><div>Maximum length: 255 characters.</div></td></tr>
-        <tr>
-<td>disk<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>Optional disk elements can be used to define the disk speed that each disk on the Server – inherited from the source Server Image - will be deployed to</div><div>disk.scsiId and disk.speed</div></td></tr>
-        <tr>
-<td>imageId<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The id of the Server Image being used as the target for the new Server deployment</div><div>You can use either imageId or imageName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>imageName<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The name of the Server Image being used as the target for the new Server deployment</div><div>You can use either imageId or imageName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>memoryGb<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>Can be used to override the memory value inherited from the source Server Image (imageName or imageId)</div></td></tr>
-        <tr>
-<td>microsoftTimeZone<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>For use with Microsoft Windows source Server Images (imageId) only.</div><div>For the exact value to use please refer to the table of time zone indexes in Microsoft Technet</div></td></tr>
+    <td><div>Dot-decimal IPv4 address. For example: 10.11.12.13</div></td></tr>
         <tr>
 <td>name<br/><div style="font-size: small;"></div></td>
 <td>yes</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>Name that has to be given to the instance Minimum length 1 character Maximum length 75 characters.</div></td></tr>
+    <td><div>Name that has to be given to the instance</div><div>The name must be unique inside the DataCenter</div><div>Minimum length 1 character Maximum length 75 characters.</div></td></tr>
         <tr>
-<td>networkInfo<br/><div style="font-size: small;"></div></td>
+<td>networkDomainId<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>For an MCP 2.0 request, a networkInfo element is required. networkInfo identifies the Network Domain to which the Server will be deployed.</div><div>It contains a primaryNic element defining the required NIC for the Server and optional additionalNic elements defining any additional VLAN connections for the Server.</div><div>Each NIC must contain either a VLAN ID (vlanId) OR a Private IPv4 address (privateIpv4) from the target VLAN which the NIC will associate the Server with.</div></td></tr>
+    <td><div>The id of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
         <tr>
-<td>networkInfo.networkDomainId<br/><div style="font-size: small;"></div></td>
+<td>networkDomainName<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td></td>
     <td><ul></ul></td>
-    <td><div>The id of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkInfo.networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>networkInfo.networkDomainName<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The name of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkInfo.networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>networkInfo.primaryNic.privateIpv4<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>RFC1918 Dot-decimal representation of an IPv4 address.</div><div>For example: “192.168.30.42”. Must be unique within the Network Domain.</div><div>You can use either networkInfo.primaryNic.privateIpv4 or networkInfo.primaryNic.vlanId or networkInfo.primaryNic.vlanName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>networkInfo.primaryNic.vlanId<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The id of a Vlan belonging within the same Network Domain.</div><div>You can use either networkInfo.primaryNic.privateIpv4 or networkInfo.primaryNic.vlanId or networkInfo.primaryNic.vlanName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>networkInfo.primaryNic.vlanName<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td></td>
-    <td><ul></ul></td>
-    <td><div>The name of a Vlan belonging within the same Network Domain.</div><div>You can use either networkInfo.primaryNic.privateIpv4 or networkInfo.primaryNic.vlanId or networkInfo.primaryNic.vlanName, however one of them must be specified</div></td></tr>
-        <tr>
-<td>start<br/><div style="font-size: small;"></div></td>
-<td>no</td>
-<td>True</td>
-    <td><ul><li>True</li><li>False</li></ul></td>
-    <td><div>True indicates that the Server will be started following deployment.</div></td></tr>
+    <td><div>The name of a Network Domain belonging within the same MCP 2.0 data center.</div><div>You can use either networkDomainId or networkDomainName, however one of them must be specified</div></td></tr>
         <tr>
 <td>state<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>present</td>
     <td><ul><li>present</li><li>absent</li></ul></td>
-    <td><div>Should the resource be present or absent.</div><div>Take care : Absent will powerOff and delete all servers.</div></td></tr>
+    <td><div>Should the resource be present or absent.</div></td></tr>
         <tr>
 <td>wait<br/><div style="font-size: small;"></div></td>
 <td>no</td>
 <td>True</td>
     <td><ul><li>True</li><li>False</li></ul></td>
-    <td><div>Does the task must wait for the server(s) creation ? or deploy it asynchronously ?</div></td></tr>
+    <td><div>Does the task must wait for the vlan creation ? or deploy it asynchronously ?</div></td></tr>
     </table>
 </br></div>
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><div class="highlight-YAML"><pre># Create a new server named "MyWebServer" of CentOS 7 with default CPU/RAM/HD,
-#   with a specific IP (vlan is determined based on this IPv4), in Network Domain : "ansible.Caas_SandBox"
-      - name: Deploy WebServers DMZ
-        caas_server:
+<div><div class="highlight-YAML"><pre># Create a new private Network Address Translation Rule in network domain "ansible.Caas_SandBox",
+      - name: Deploy a private NAT
+        caas_nat:
+          #state: absent
           caas_credentials: "{{ caas_credentials }}"
-          name: "MyWebServer"
-          imageName: CentOS 7 64-bit 2 CPU
-          administratorPassword: "{{ root_password }}"
-          networkInfo:
-              networkDomainName: ansible.Caas_SandBox
-              primaryNic:
-                  privateIpv4: 192.168.30.42
-        register: caas_mywebserver
+          networkDomainName: "ansible.Caas_SandBox"
+          internalIp: 172.18.1.20
+          externalIp: 192.168.110.1
+          register: caas_nat
 
-# shutdown this server
-      - name: Deploy WebServers DMZ
-        caas_server:
-          caas_credentials: "{{ caas_credentials }}"
-          name: "MyWebServer"
-          action: shutdownServer
-          networkInfo:
-              networkDomainName: ansible.Caas_SandBox
-              primaryNic:
-                  privateIpv4: 192.168.30.42
-
-# teardown this server (no need to ShutDown/PowerOff)
-      - name: Deploy WebServers DMZ
-        caas_server:
-          caas_credentials: "{{ caas_credentials }}"
-          name: "MyWebServer"
+# Delete a Network Address Translation Rule
+      - name: Deploy a private NAT
+        caas_nat:
           state: absent
-          networkInfo:
-              networkDomainName: ansible.Caas_SandBox
-              primaryNic:
-                  privateIpv4: 192.168.30.42
-
-# Create 2 servers named "WebServer" of CentOS 7 with default CPU/RAM/HD,
-#   automatic IPv4 assignement, in a vlan and a Network Domain referenced from a previous task.
-      - name: Deploy WebServers
-        caas_server:
           caas_credentials: "{{ caas_credentials }}"
-          name: "WebServer"
-          count: 2
-          imageName: CentOS 7 64-bit 2 CPU
-          administratorPassword: "{{ root_password }}"
-          networkInfo:
-              networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
-              primaryNic:
-                  vlanName: "{{caas_vlan_webservers.vlans.vlan[0].name}}"
-        register: caas_webservers
-# and add this 2 new servers to Ansible dynamic inventoy (Group : WebServers)
-      - name: Add new instances to group WebServers
-        add_host: name="{{ item.id }}" ansible_ssh_host="{{ item.networkInfo.primaryNic.ipv6 }}" ansible_ssh_pass="{{ root_password }}" groupname=WebServers
-        when: item.started
-        with_items: "{{caas_webservers.servers.server}}"
-#you can now apply roles ands tasks, as usual
-  - name: Configure Web Servers
-    hosts: WebServers
-    vars_files:
-      - /root/main.yml
-    roles:
-      - { role: my.apache }
-      - { role: my.php }</pre>
+          networkDomainName: "ansible.Caas_SandBox"
+          internalIp: 172.18.1.20</pre>
 </div>
 </div></blockquote>
 </div>
@@ -660,11 +517,11 @@
 </tr>
 
     <tr>
-    <td> servers </td>
-    <td> A list of Servers (one, or more) matching the task parameters. </td>
+    <td> vlans </td>
+    <td> A list of VLANs (should be one) matching the task parameters. </td>
     <td align=center> success </td>
     <td align=center> Dictionary </td>
-    <td align=center> {'totalCount': 1, 'pageCount': 1, 'pageNumber': 1, 'pageSize': 250, 'server': [{'softwareLabel': [], 'description': 'Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS', 'started': True, 'networkInfo': {'networkDomainId': '94e50925-2d2f-4727-b137-6d70ce416829', 'primaryNic': {'state': 'NORMAL', 'privateIpv4': '192.168.30.42', 'ipv6': '2a00:47c0:111:1168:82b:fb61:c846:7758', 'vlanName': 'ansible.CaaS_Sandbox_vlan_webservers', 'vlanId': '3a454c87-c8f6-4517-8531-b55f9440449c', 'id': '1ab80e75-ca8b-490f-8105-f17a0e3c78af'}, 'additionalNic': []}, 'sourceImageId': 'd265499b-842d-46b1-a5aa-719971510e06', 'memoryGb': 4, 'vmwareTools': {'apiVersion': 9354, 'runningStatus': 'RUNNING', 'versionStatus': 'CURRENT'}, 'disk': [{'state': 'NORMAL', 'scsiId': 0, 'speed': 'STANDARD', 'id': '3ef2ac30-0b64-4dd1-bd24-a01780ea6b7e', 'sizeGb': 10}], 'createTime': '2016-01-28T15:47:34.000Z', 'deployed': True, 'name': 'MyWebServer', 'cpu': {'coresPerSocket': 1, 'count': 2, 'speed': 'STANDARD'}, 'id': '029383e1-6912-45fb-a604-5c7d2e9e0998', 'datacenterId': 'EU6', 'state': 'NORMAL', 'operatingSystem': {'displayName': 'CENTOS7/64', 'id': 'CENTOS764', 'family': 'UNIX'}, 'virtualHardware': {'upToDate': False, 'version': 'vmx-08'}}]} </td>
+    <td align=center> {'totalCount': 1, 'vlan': [{'ipv6GatewayAddress': '2a00:47c0:111:1168:0:0:0:1', 'description': 'Created and managed by ansible.CaaS - https://github.com/job-so/ansible.CaaS', 'name': 'ansible.CaaS_Sandbox_vlan_webservers', 'ipv6Range': {'prefixSize': 64, 'address': '2a00:47c0:111:1168:0:0:0:0'}, 'id': '3a454c87-c8f6-4517-8531-b55f9440449c', 'datacenterId': 'EU6', 'state': 'NORMAL', 'networkDomain': {'id': '94e50925-2d2f-4727-b137-6d70ce416829', 'name': 'ansible.CaaS_Sandbox'}, 'ipv4GatewayAddress': '192.168.30.1', 'createTime': '2016-01-28T08:49:04.000Z', 'privateIpv4Range': {'prefixSize': 24, 'address': '192.168.30.0'}}], 'pageNumber': 1, 'pageSize': 250, 'pageCount': 1} </td>
 </tr>
 
 </table>
@@ -673,7 +530,7 @@
 <h2><a class="toc-backref" href="#id6">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is a wrappper of Dimension Data CaaS API v2.1. Please refer to this documentation for more details and examples : <a class="reference external" href="https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5">https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5</a></p>
+<p class="last">This is a wrappper of Dimension Data CaaS API v2.3. Please refer to this documentation for more details and examples : <a class="reference external" href="https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5">https://community.opsourcecloud.net/DocumentRevision.jsp?docId=7897c5018f9bca01cf2f4724de2bcfc5</a></p>
 </div>
 </div>
 <div class="section" id="this-is-an-extras-module">
@@ -690,10 +547,10 @@
   
     <div class="rst-footer-buttons">
       
-        <a href="caas_vlan_module.html" class="btn btn-neutral float-right" title="caas_vlan - Create, Configure, Remove VLANs on Dimension Data Managed Cloud Platform"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="caas_networkdomain_module.html" class="btn btn-neutral float-right" title="caas_networkdomain - Create, Configure, Remove Network Domains on Dimension Data Managed Cloud Platform"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="caas_publicip_module.html" class="btn btn-neutral" title="caas_publicip - Get or Release Public IP addresses on Dimension Data Managed Cloud Platform"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="caas_loadbalancer_module.html" class="btn btn-neutral" title="caas_loadbalancer - Create, Configure, Remove Load Balancer instances on Dimension Data Managed Cloud Platform"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
