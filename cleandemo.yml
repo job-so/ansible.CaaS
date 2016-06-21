@@ -6,6 +6,12 @@
     vars_files:
       - /root/caas_credentials.yml
     tasks:
+      - name: TearDown Public NAT
+        caas_naat:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          internalIp: "192.168.40.4"
+          state: absent
       - name: TearDown LoadBalancer
         caas_loadbalancer:
           caas_credentials: "{{ caas_credentials }}"
