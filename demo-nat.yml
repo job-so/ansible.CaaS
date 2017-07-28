@@ -1,0 +1,32 @@
+---
+  - name: Deploy Dimension Data infrastructure  
+    hosts: localhost
+    vars:
+      root_password: P$$ssWwrrdGoDd!
+    vars_files:
+      - /root/caas_credentials.yml
+    tasks:
+      - name: Check credentials (optionnal Step)
+        caas_credentials:
+          username: "{{caas_credentials.username}}"
+          password: "{{caas_credentials.password}}"
+          apiurl: "{{caas_credentials.apiurl}}"
+          datacenter: "{{caas_credentials.datacenter}}" 
+      - name: Deploy my Nework Domain
+        caas_networkdomain:
+          caas_credentials: "{{ caas_credentials }}"
+          name: PoC
+#          type: ADVANCED
+        register: caas_networkdomain
+#      - name: print debug
+#        debug: var=caas_networkdomain
+      - name: Deploy a private NAT
+        caas_nat:
+          #state: absent
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
+          internalIp: 172.18.1.4
+          externalIp: 192.168.110.30
+        register: caas_nat
+      - name: print debug
+        debug: var=caas_nat
