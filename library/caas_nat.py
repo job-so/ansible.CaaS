@@ -73,7 +73,6 @@ options:
     description:
       - "Dot-decimal IPv4 address. For example: 10.11.12.13"
     default: null
-    required: true
   externalIp:
     description:
       - "Dot-decimal IPv4 address. For example: 165.180.12.12. Maybe private or public."
@@ -175,7 +174,8 @@ def caasAPI(module, caas_credentials, apiuri, data):
                 module.fail_json(msg=info['msg'])
 
 def _listNatRule(module,caas_credentials,orgId,wait):
-    f = { 'internalIp' : module.params['internalIp'], 'networkDomainId' : module.params['networkDomainId']}
+    f = { 'networkDomainId' : module.params['networkDomainId'] }
+    if module.params['internalIp']: f['internalIp'] = module.params['internalIp']
     uri = '/caas/2.3/'+orgId+'/network/natRule?'+urllib.urlencode(f)
     result = caasAPI(module,caas_credentials, uri, '')
     return result
@@ -189,7 +189,7 @@ def main():
             wait = dict(default=True),
             networkDomainId = dict(default=None),
             networkDomainName = dict(default=None),
-            internalIp = dict(default=None,required=True),
+            internalIp = dict(default=None),
             externalIp = dict(default=None),
         )
     )

@@ -6,12 +6,20 @@
     vars_files:
       - /root/caas_credentials.yml
     tasks:
-      - name: TearDown Public NAT
+      - name: List current NAT
         caas_nat:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ networkDomainName }}"
-          internalIp: "192.168.40.4"
+        register: caas_nat
+      - name: Delete NAT rules
+        caas_nat:
+          caas_credentials: "{{ caas_credentials }}"
+          networkDomainName: "{{ networkDomainName }}"
+          internalIp: "{{item.internalIp}}"          
           state: absent
+        with_items: "{{caas_nat.natRules.natRule}}"
+      - name: print debug
+        debug: var=caas_nat
       - name: TearDown LoadBalancer
         caas_loadbalancer:
           caas_credentials: "{{ caas_credentials }}"
