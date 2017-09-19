@@ -347,7 +347,7 @@ def _listServer(module,caas_credentials,orgId,wait):
         b = False
         for (server) in serverList['server']:
             logging.debug(server['id']+' '+server['name']+' '+server['state'])
-            if (server['state'] != "NORMAL") and wait:
+            if (server['state'] != "NORMAL") and wait == True:
                 b = True
         if b:
             time.sleep(5)
@@ -455,7 +455,7 @@ def main():
         # Execute Action on Servers
         if module.params['action']!=None:
             has_changed = _executeAction(module, caas_credentials,orgId,serverList,module.params['action']) or has_changed
-        
+
     module.exit_json(changed=has_changed, servers=_listServer(module,caas_credentials,orgId,module.params['wait']))
 
 # import module snippets
