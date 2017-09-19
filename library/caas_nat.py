@@ -216,7 +216,7 @@ def main():
     
     natRuleList = _listNatRule(module,caas_credentials,orgId,True)
 #ABSENT
-    if state == 'absent':
+    if state == 'absent' and module.params['internalIp']:
         if natRuleList['totalCount'] == 1:
             uri = '/caas/2.3/'+orgId+'/network/deleteNatRule'
             _data = {}
@@ -228,7 +228,7 @@ def main():
                 has_changed = True
 
 #PRESENT
-    if state == "present":
+    if state == "present" and module.params['internalIp']:
         if natRuleList['totalCount'] < 1:
             uri = '/caas/2.3/'+orgId+'/network/createNatRule'
             _data = {}
