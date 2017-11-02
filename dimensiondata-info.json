@@ -1,0 +1,25 @@
+{
+  "source_code": {
+    "documentation": "https://rawgit.com/job-so/ansible.CaaS/master/docs/caas_server_module.html",
+    "url": "https://github.com/job-so/ansible.CaaS",
+    "scm": "https://scm.dimensiondata.com/olivier.grosjeanne/ansible.CaaS/",
+    "demo": "https://github.com/job-so/ansible.CaaS/blob/master/demo.yml",
+    "testSystem": "https://travis-ci.org/job-so/ansible.CaaS"
+  },
+  "organization": {
+    "company": "Dimension Data",
+    "business_unit": "DC",
+    "service_unit": "ITaaS"
+  },
+  "project_name": "ansible.CaaS",
+  "description": "Ansible modules for managing Dimension Data Cloud\n\nA simple/trivial wrappper of CaaS API v2\n\nRFTM :-) : For each module, you should find a clear documentation. ",
+  "development_status": "release",
+  "version": "2017.09.19",
+  "license": "Internal Only",
+  "primary_contact": "olivier.grosjeanne@dimensiondata.com",
+  "lead_developer": "olivier.grosjeanne@dimensiondata.com",
+  "open_to_contribution": "yes",
+  "access": "Public (open source)",
+  "confidentiality": "Unrestricted",
+  "type": "Automation"
+}
