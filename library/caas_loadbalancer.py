@@ -199,10 +199,11 @@ def _listVirtualListenerRule(module,caas_credentials,orgId,wait):
     while b:
         virtualListenerList = caasAPI(module,caas_credentials, uri, '')
         b = False
-        for (virtualListener) in virtualListenerList['virtualListener']:
-            logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
-            if (firewallRule['state'] != "NORMAL") and wait:
-                b = True
+        if 'virtualListener' in virtualListenerList:
+            for (virtualListener) in virtualListenerList['virtualListener']:
+                logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
+                if (firewallRule['state'] != "NORMAL") and wait:
+                    b = True
         if b:
             time.sleep(5)
     return firewallRuleList

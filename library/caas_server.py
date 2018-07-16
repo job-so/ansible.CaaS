@@ -358,20 +358,21 @@ def _executeAction(module,caas_credentials,orgId,serverList,action):
     has_changed = False
     _data = {}
     uri = '/caas/2.3/'+orgId+'/server/'+action
-    for (server) in serverList['server']:
-        logging.debug(server['id'])
-        _data['id'] = server['id']
-        data = json.dumps(_data)
-        if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
-            if module.check_mode: has_changed=True
-            else: 
-                result = caasAPI(module,caas_credentials, uri, data)
-                has_changed = True
-        if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
-            if module.check_mode: has_changed=True
-            else: 
-                result = caasAPI(module,caas_credentials, uri, data)
-                has_changed = True
+    if 'server' in serverList:
+      for (server) in serverList['server']:
+          logging.debug(server['id'])
+          _data['id'] = server['id']
+          data = json.dumps(_data)
+          if not server['started'] and (action == "startServer" or action == "updateVmwareTools" or action == "deleteServer"):
+              if module.check_mode: has_changed=True
+              else: 
+                  result = caasAPI(module,caas_credentials, uri, data)
+                  has_changed = True
+          if server['started'] and (action == "shutdownServer" or action == "powerOffServer" or action == "resetServer" or action == "rebootServer" or action == "upgradeVirtualHardware"):
+              if module.check_mode: has_changed=True
+              else: 
+                  result = caasAPI(module,caas_credentials, uri, data)
+                  has_changed = True
     return has_changed
     
 def main():

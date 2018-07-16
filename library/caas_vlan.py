@@ -180,14 +180,15 @@ def caasAPI(module, caas_credentials, apiuri, data):
 def _listVlan(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.3/'+orgId+'/network/vlan?'+urllib.urlencode(f)
-    b = True;
+    b = True
     while b:
         vlanList = caasAPI(module,caas_credentials, uri, '')
         b = False
-        for (vlan) in vlanList['vlan']:
-            logging.debug(vlan['id']+' '+vlan['name']+' '+vlan['state'])
-            if (vlan['state'] != "NORMAL") and wait:
-                b = True
+        if 'vlan' in vlanList:
+            for (vlan) in vlanList['vlan']:
+                logging.debug(vlan['id']+' '+vlan['name']+' '+vlan['state'])
+                if (vlan['state'] != "NORMAL") and wait:
+                    b = True
         if b:
             time.sleep(5)
     return vlanList

@@ -295,10 +295,11 @@ def _listFirewallRule(module,caas_credentials,orgId,wait):
         result = caasAPI(module,caas_credentials, uri, '')
         firewallRuleList = result
         b = False
-        for (firewallRule) in firewallRuleList['firewallRule']:
-            logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
-            if (firewallRule['state'] != "NORMAL") and wait:
-                b = True
+        if 'firewallRule' in firewallRuleList:
+          for (firewallRule) in firewallRuleList['firewallRule']:
+              logging.debug(firewallRule['id']+' '+firewallRule['name']+' '+firewallRule['state'])
+              if (firewallRule['state'] != "NORMAL") and wait:
+                  b = True
         if b:
             time.sleep(5)
     return firewallRuleList
