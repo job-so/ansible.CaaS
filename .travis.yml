@@ -36,8 +36,6 @@ install:
 script:
   - sed -e "s/firstname.lastname/$caas_username/g" -e "s/MySecret_KeepItSecret/$caas_password/g" caas_credentials.yml > test/caas_credentials.yml
   - touch hosts
-  #- python2.4 -m compileall -fq library
-  #- python2.6 -m compileall -fq library
   - python2.7 -m compileall -fq library
   #- python3.5 -m compileall -fq library
   - ansible-playbook --version
