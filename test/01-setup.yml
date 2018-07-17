@@ -104,6 +104,8 @@
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "CCDEFAULT.DenyExternalInboundIPv6"
           enabled: False
+      - name: print ansible_all_ipv6_addresses
+          debug: var=ansible_all_ipv6_addresses
       - name: Add FireWall Rule to allow IPv6 SSH (if any) for Ansible to webservers
         caas_firewallrule:
           when: ansible_all_ipv6_addresses[0] != ""
