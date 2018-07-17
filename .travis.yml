@@ -2,26 +2,28 @@ sudo: false
 language: python
 python:
   - "2.7"
-  #- "3.5"
+  - "3.6"
 addons:
   apt:
     sources:
       - deadsnakes
     packages:
-      - python2.4
-      - python2.6
+#      - python2.4
+#      - python2.6
       - python2.7
-      - python3.5
+#      - python3.5
+      - python3.6
 env:
   global: 
   #caas_username
-    - secure: "a2CDr9D5rm0nPv63uDB4yxwwHciACJ0Sb59FF9/rzHO82wmCmGuc5dmDkhJ/Enzct4eI1/6Z6Kni43R/CkzQVGC1HVefKXWA6YOOhUfYOn1WWRCpvurwvtlTyPGDzIFF537bwBXGzNA/YdbDyKk15rWnyt0oprVIqYiSrddXNU8X+osOG91QpRA+c4peOF5jv/OeLccP206D5YvwjyjM05Ins5qPHFKwJZGoJAPdO+xAEthFXqkbqoPKgMRGRQ5lAVjMdLmae5SsMm9HpoeeZ0YZ1YXsuSB9Yrx1UL7wbfohcwEo84yr1Kxlgm99iFr575Rx27Ij7QhghphrdA6J4nUkms0j7CAltaq4iNouHE+oHdTU6kNT4ST6BQGhNYYP4miz7PYlFjG2LO0FxKF9XCzJNBYMLnhM3asMhThM6AGHHvHCh0beCNFZWBW5q9PY4AI96eIbWgdUuVEdOVNLbeKnCz0Sk4nGTFLGygeaZoVZcbh1l206YD8amy/mksWWx57pk5grnofszeBxM1mH07wxtGfKRZIA14rbLOSW18djnsx2+4leUSTzZESrxQ7QPH68Y4BQJpYFC7KF92DvnGOxOC63fXlnbzHwCZB+sqTF+tNTC6zsZSwCR0aPumK/F3dO6IgNE0oc67EVAVr0iwfRDJByiI4F5eAXnZ67XAY="
+    - secure: "g6sEOPBA5LTTDnIgdv1SPAw3KlJzYCt8HPIrnnEwlPvThDuNBx1F4PFY88CeOBIoV0Vo8Kn0gR93CP5WN1RGDgsPSSG2bOjE18PusYt3eRYGyLulHC44ghWdkgfHBPe5GcctK8uuO3/i+5xWGQ1+HDca+uX+Us725uyTcT/cLs1KnlTnG/gQqJ0uoccFE0VgOGQLd4XLPhRNIsom2hgX8iaO6XceHufCRc6ea76hlpKIkxrQ3aHbj0kHXSboxTAepon2vgAOOoHnGcC6x8ATbmoj8N0prkiAwXEa+SkW1jDoWHpHw45guzcsf95EGMmiyB/O+TVNeDdAsnSzfnVXX1Sxv6Xkgx5hMaGVUUtrTPszNI87DbzU0Se/+kVvIfV2ReQ1YJDKT5LH+SIcR2f/O80J6+mpHx0nSYg2a1c7IQr1Nyn0hLE+56lRP/3UVDE63xaz/xmoQlAGfxJYRAPHfiqBpQPlscGauaUAh0Nt1EZabsQx3+B7HlI/W+fmP2E/j6h/DkHU6dz6uU+6I/+rrk03Nueo97oUVb1mrN01FVO0zeQkzErvzJbE2f0WMV1SWBci8+9bZX9ZzIEAH0iApNnJ/nVb6pOKSDRj7EizhGmxDS0Ae/RGTmdcdPXCOK8IwxCexJCu5YWbiDFtT1GZ7dlm0hFpYaI9cAHPFJbHHAQ="
   #caas_password
-    - secure: "QC52ccqrkvkKcXpDq7WjYoMPkUQZdNFBz4gBmpm8N13H9esemL+oMTGIms+5tn3LFrOODnwc4V5lPT9+U1bs6INu2ORJs/G3fNsOuM07QLR+47xKKRBN8KdMPRY09ael46RAP1obxwXmghKa/LlRBfzSIcGiA0P0rtFd6CLqSuk41T0TNGbLFJlibP/VBSIN+GF9PU2mj/LRqAaZ3XaAyV9vKrfbqF3hIOBun8cYg9/8p1Fq7PCaB5MzmNCd9oIt2FL3EArm6ovitFoAaknFbWWp36FiTiez1tPmq2YPtGbE3Jz8yljlYA11bVR04UOvqTdhv63m1Yj+hm1C4OVvYEaUN/S6IXelYOkaZClGJFXwCi5Uz/pY0a6uLIo3ZXCRtUKg+cEr1oiVhlcn29fwJMl/c1NFKmk5ewN3640nzsa/TpaGKvWb9bMUvk4eda8GF5CZqDIRZ07iJXvFzxj+MYbNxkcKEhShHqJma8GD6u38yrTZf/gA6FomEuP5N4BTE1dMB0zhSD1lwzi7WW/4QkvunChpRv5oinEt3CbJnfKJojsd61OM+pq72YosA0W1bDPagg6thIXkNuTR9Gx1ofCSJMeWgMqZq+D+iUSsn0ln+5v8dukqzLeay4FhmfzQKiB3f29Wv+AD1EWnpKKEyLh+mAggtI3s6nQN3VvJObQ="
+    - secure: "l05r1FmdG8S7/KfDIFM/MfKzeu+9w39y94v6UzJ/49apNJKDSUvp0QLB08u34pyE1Jc/klCUsuBTFH0iQJQSYlkXPxro3PgmEsKBLtklIuvt/1hju7lLrixl/8C6L+X4Y722Fs7YAzpWRJtDgA2XN3b68tCXQpnoIA9Lih1ARQXG0Nojs24+cOWy+q+z5Uoc0UteGH507LjpNG5Fm7I1g9xUp+ZcgMJqxYndVnKiZmTWMeKS3cVa4lE8m77YulKVrDt+WfPc8BcNb+ggZaRleZZfbxynHjNtvEumVR+fbFTsGYcDfslILJhPT7JEXiTWdI6uuCzwlsJbxG/nbEtuXs7wN1qRVsVIHCeTx5QCfX+nATu5rqBrN5vo3eoi5JVL24Ezh73Hqy0ZTs9TxIU2hr6poquyhmzMCchmtEbtrH4LWQzqMmgDSF44Mclmdu8chpytrEJUxcQx2IziiadM4XWMnkq0Zggfx+fTQKTpJSkTOBn1vgWZ96mY1s00tQoOauZALP+p14rK9DOs+/Q82zwZ8wFjkXPDlszU9PpJbkqrqn0UEqG1yfEDMcjVcx8+vW2iMRNjfRm4QzOSHRccd06NmwCKgrjlwEX3vxRD2dXsRyz6JmhPkE0tfxyAY4ZjTCTeONgXXYTLDUQYc8QK8qzSGRXhJeWOFzxcDG3hNYU="
   matrix:
-    - ansible_branche=stable-1.9 test=False caas_networkdomain=ansible1.9.CaaS_travis-ci
-    - ansible_branche=stable-2.0 test=False caas_networkdomain=ansible2.0.CaaS_travis-ci
-    - ansible_branche=stable-2.1 test=True caas_networkdomain=ansible2.1.CaaS_travis-ci
+#    - ansible_branche=stable-1.9 test=False caas_networkdomain=ansible1.9.CaaS_travis-ci
+#    - ansible_branche=stable-2.0 test=False caas_networkdomain=ansible2.0.CaaS_travis-ci
+#    - ansible_branche=stable-2.1 test=True caas_networkdomain=ansible2.1.CaaS_travis-ci
+    - ansible_branche=stable-2.6 test=True caas_networkdomain=ansible2.6.CaaS_travis-ci
 #    - ansible_branche=devel      test=True caas_networkdomain=ansibledevel.CaaS_travis-ci
 before_install:
  - pip install tox paramiko PyYAML jinja2 httplib2 passlib nose mock
@@ -33,8 +35,8 @@ install:
 script:
   - sed -e "s/firstname.lastname/$caas_username/g" -e "s/MySecret_KeepItSecret/$caas_password/g" caas_credentials.yml > test/caas_credentials.yml
   - touch hosts
-  - python2.4 -m compileall -fq library
-  - python2.6 -m compileall -fq library
+  #- python2.4 -m compileall -fq library
+  #- python2.6 -m compileall -fq library
   - python2.7 -m compileall -fq library
   #- python3.5 -m compileall -fq library
   - ansible-playbook --version
