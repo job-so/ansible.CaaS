@@ -79,14 +79,14 @@
               primaryNic: 
                   vlanName: "{{caas_vlan_appservers.vlans.vlan[0].name}}"
         register: caas_appservers
-#      - name: Deploy DBServers DMZ
+#      - name: Deploy DBServer DMZ
 #        caas_vlan:
 #          caas_credentials: "{{ caas_credentials }}"
 #          networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
 #          name: "{{caas_networkdomain.networkdomains.networkDomain[0].name}}_vlan_dbservers"
 #          privateIpv4BaseAddress: "192.168.50.0"
 #        register: caas_vlan_dbservers
-#      - name: Deploy DBServers
+#      - name: Deploy DBServer
 #        caas_server:
 #          caas_credentials: "{{ caas_credentials }}"
 #          name: "DBServer"
