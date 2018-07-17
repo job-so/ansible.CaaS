@@ -319,7 +319,7 @@ def main():
             networkDomainName = dict(default=None),
             source = dict(type='dict'),
             destination = dict(type='dict'),
-            enabled = dict(type='bool',default=True, choices=[True, False, 0, 1]),
+            enabled = dict(type='bool',default=True, choices=[True, False]),
             placement = dict(type='dict'),
         )
     )

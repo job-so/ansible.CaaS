@@ -224,7 +224,7 @@ def main():
             protocol=dict(default='TCP', choices = ['ANY','TCP','UDP','HTTP']),
             listenerIpAddress = dict(default=None),
             port = dict(default=None),
-            enabled = dict(type='bool',default=True, choices = [True,False,0,1]),
+            enabled = dict(type='bool',default=True, choices = [True,False]),
             connectionLimit = dict(type='int',default=25000),
             connectionRateLimit= dict(type='int',default=2000),
             sourcePortPreservation=dict(default='PRESERVE', choices = ['PRESERVE','PRESERVE_STRICT','CHANGE']),
