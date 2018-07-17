@@ -100,11 +100,11 @@
 #        register: caas_dbserver
       - name: Disable Default Rule that Drop Any external IPv6 connection
         caas_firewallrule:
-          enabled: False
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "CCDEFAULT.DenyExternalInboundIPv6"
-      - name: Add FireWall Rule to allow IPv6 SSH for Ansible
+          enabled: False
+      - name: Add FireWall Rule to allow IPv6 SSH for Ansible to webservers
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
@@ -123,7 +123,7 @@
               begin: 22
           placement:
             position: "LAST"
-      - name: Add FireWall Rule to allow IPv6 SSH for Ansible
+      - name: Add FireWall Rule to allow IPv6 SSH for Ansible to appservers
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
