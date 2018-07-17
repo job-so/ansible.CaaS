@@ -106,7 +106,7 @@
           enabled: False
       - name: Add FireWall Rule to allow IPv6 SSH (if any) for Ansible to webservers
         caas_firewallrule:
-          when: ansible_all_ipv6_addresses != []
+          when: ansible_all_ipv6_addresses[0] is defined
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "ssh_for_ansible_to_vlan_webservers"
@@ -126,7 +126,7 @@
             position: "LAST"
       - name: Add FireWall Rule to allow IPv6 SSH (if any) for Ansible to appservers
         caas_firewallrule:
-          when: ansible_all_ipv6_addresses != []
+          when: ansible_all_ipv6_addresses[0] is defined
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "ssh_for_ansible_to_vlan_appservers"
