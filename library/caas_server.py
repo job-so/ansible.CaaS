@@ -340,7 +340,7 @@ def _listServer(module,caas_credentials,orgId,wait):
         else:
             return None;
     uri = '/caas/2.3/'+orgId+'/server/server?'+urllib.urlencode(f)
-    b = True;
+    b = True
     while b:
         result = caasAPI(module,caas_credentials, uri, '')
         serverList = result
