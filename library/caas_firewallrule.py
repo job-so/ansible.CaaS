@@ -290,7 +290,7 @@ def caasAPI(module, caas_credentials, apiuri, data):
 def _listFirewallRule(module,caas_credentials,orgId,wait):
     f = { 'name' : module.params['name'], 'networkDomainId' : module.params['networkDomainId']}
     uri = '/caas/2.3/'+orgId+'/network/firewallRule?'+urllib.urlencode(f)
-    b = True;
+    b = True
     while b:
         result = caasAPI(module,caas_credentials, uri, '')
         firewallRuleList = result
@@ -319,7 +319,7 @@ def main():
             networkDomainName = dict(default=None),
             source = dict(type='dict'),
             destination = dict(type='dict'),
-            enabled = dict(type='bool',default=True, choices=[True, False]),
+            enabled = dict(type='bool',default=True, choices=[True, False, 0, 1]),
             placement = dict(type='dict'),
         )
     )
