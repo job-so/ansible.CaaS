@@ -103,7 +103,7 @@
           caas_credentials: "{{ caas_credentials }}"
           networkDomainName: "{{ caas_networkdomain.networkdomains.networkDomain[0].name }}"
           name: "CCDEFAULT.DenyExternalInboundIPv6"
-          enabled: False
+#          enabled: False
       - name: Add FireWall Rule to allow IPv6 SSH for Ansible to webservers
         caas_firewallrule:
           caas_credentials: "{{ caas_credentials }}"
